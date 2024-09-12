@@ -14,11 +14,24 @@ import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  app.useStaticAssets(join(__dirname, '..', 'public')); //js, css, images
-  app.setBaseViewsDir(join(__dirname, '..', 'views')); //view 
-  // config port
+
+  // get port from .env
   const configService = app.get(ConfigService);
   const port = configService.get<string>('PORT');
+
+  // config middleware: use metedata
+  const reflector = app.get(Reflector);
+  app.useGlobalGuards(new JwtAuthGuard(reflector)); // enable jwt-guard globally
+  app.useGlobalInterceptors(new TransformInterceptor(reflector)); // transform-interceptor
+
+  //config view engine
+  app.useStaticAssets(join(__dirname, '..', 'public')); // js, css, image
+  app.setBaseViewsDir(join(__dirname, '..', 'views')); // view html
+  app.setViewEngine('ejs');
+
+  console.log('>> check path public: ', join(__dirname, '..', 'public'));
+  console.log('>> check path views: ', join(__dirname, '..', 'views'));
+  // config port
 
   // config security
   app.use(helmet());
@@ -32,10 +45,6 @@ async function bootstrap() {
     preflightContinue: true,
   });
 
-  const reflector = app.get(Reflector);
-  // public decorator
-  app.useGlobalGuards(new JwtAuthGuard(reflector));
-  app.useGlobalInterceptors(new TransformInterceptor(reflector));
 
   // config tools
   // app.use(compression())

@@ -9,6 +9,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/passport/jwt-auth.guard';
 import { softDeletePlugin } from 'soft-delete-plugin-mongoose';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { softDeletePlugin } from 'soft-delete-plugin-mongoose';
     ThrottlerModule.forRoot({ ttl: 60, limit: 60 }),
     UsersModule,
     AuthModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [
