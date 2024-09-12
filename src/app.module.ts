@@ -6,6 +6,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
+import { JwtAuthGuard } from './auth/passport/jwt-auth.guard';
+import { softDeletePlugin } from 'soft-delete-plugin-mongoose';
 
 @Module({
   imports: [
@@ -22,24 +25,16 @@ import { UsersModule } from './users/users.module';
         {
           uri: configService.get<string>('MONGODB_URI'),
           connectionFactory: (connection) => {
-            //connection.plugin(softDeletePlugin);
+            connection.plugin(softDeletePlugin);
             return connection;
           },
         }
       ),
     }),
     // Throttler Module
-    ThrottlerModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => [
-        {
-          ttl: configService.get('THROTTLE_TTL'),
-          limit: configService.get('THROTTLE_LIMIT'),
-        }
-      ],
-    }),
+    ThrottlerModule.forRoot({ ttl: 60, limit: 60 }),
     UsersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [
@@ -47,9 +42,15 @@ import { UsersModule } from './users/users.module';
     // bind to ThrottlerGuard globally
     {
       provide: APP_GUARD,
-      useClass: ThrottlerGuard
-    }
+      useClass: ThrottlerGuard,
+    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: JwtAuthGuard,
+    // }
   ],
 
+
+
 })
-export class AppModule {}
+export class AppModule { }
