@@ -19,7 +19,11 @@ export class MailController {
       to: "uyenbao4a5@gmail.com",
       from: '"Support Team" <support@example.com>', // override default from
       subject: 'Welcome to Nice App! Confirm your Email',
-      template: "new-job"
+      template: "register",
+      context: {
+        name: "nnb",
+        activationCode: "123456"
+      }
 
     });
   }

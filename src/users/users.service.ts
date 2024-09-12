@@ -9,13 +9,17 @@ import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from './users.interface';
 import { User } from 'src/decorator/customize';
 import aqp from 'api-query-params';
-
+import { MailerService } from '@nestjs-modules/mailer';
+import { v4 as uuidv4 } from 'uuid';
+import dayjs from 'dayjs';
+import { ChangePasswordAuthDto, CodeAuthDto } from 'src/auth/dto/create-auth.dto';
 @Injectable()
 export class UsersService {
 
   constructor(
     @InjectModel(UserM.name)
-    private userModel: SoftDeleteModel<UserDocument>
+    private userModel: SoftDeleteModel<UserDocument>,
+    private readonly mailerService: MailerService
   ) { }
 
 
@@ -28,7 +32,7 @@ export class UsersService {
   async create(createUserDto: CreateUserDto, @User() user: IUser) {
     const {
       name, email, password, age,
-      gender, address, role
+      gender, address
     }
       = createUserDto;
 
@@ -44,7 +48,7 @@ export class UsersService {
       name, email,
       password: hashPassword,
       age,
-      gender, address, role,
+      gender, address,
       createdBy: {
         _id: user._id,
         email: user.email
@@ -61,13 +65,27 @@ export class UsersService {
       throw new BadRequestException(`Email: ${email} đã tồn tại trên hệ thống. Vui lòng sử dụng email khác.`)
     }
     const hashPassword = this.getHashPassword(password);
+    const codeId = uuidv4();
     let newRegister = await this.userModel.create({
       name, email,
       password: hashPassword,
       age,
       gender,
       address,
-      role: "USER"
+      role: "USER",
+      isActive: false,
+      codeId: codeId,
+      codeExpired: dayjs().add(5, 'minutes')
+    })
+    //send email
+    this.mailerService.sendMail({
+      to: user.email, // list of receivers
+      subject: 'Activate your account at @hoidanit', // Subject line
+      template: "register",
+      context: {
+        name: user?.name ?? user.email,
+        activationCode: codeId
+      }
     })
     return newRegister;
   }
@@ -166,6 +184,117 @@ export class UsersService {
 
   findUserByToken = async (refreshToken: string) => {
     return await this.userModel.findOne({ refreshToken })
+  }
+  async handleActive(data: CodeAuthDto) {
+    const user = await this.userModel.findOne({
+      _id: data._id,
+      codeId: data.code
+    })
+    if (!user) {
+      throw new BadRequestException("Mã code không hợp lệ hoặc đã hết hạn")
+    }
+
+    //check expire code
+    const isBeforeCheck = dayjs().isBefore(user.codeExpired);
+
+    if (isBeforeCheck) {
+      //valid => update user
+      await this.userModel.updateOne({ _id: data._id }, {
+        isActive: true
+      })
+      return { isBeforeCheck };
+    } else {
+      throw new BadRequestException("Mã code không hợp lệ hoặc đã hết hạn")
+    }
+
+
+  }
+  async retryActive(email: string) {
+    //check email
+    const user = await this.userModel.findOne({ email });
+
+    if (!user) {
+      throw new BadRequestException("Tài khoản không tồn tại")
+    }
+    if (user.isActive) {
+      throw new BadRequestException("Tài khoản đã được kích hoạt")
+    }
+
+    //send Email
+    const codeId = uuidv4();
+
+    //update user
+    await user.updateOne({
+      codeId: codeId,
+      codeExpired: dayjs().add(5, 'minutes')
+    })
+
+    //send email
+    this.mailerService.sendMail({
+      to: user.email, // list of receivers
+      subject: 'Activate your account at @hoidanit', // Subject line
+      template: "register",
+      context: {
+        name: user?.name ?? user.email,
+        activationCode: codeId
+      }
+    })
+    return { _id: user._id }
+  }
+  async retryPassword(email: string) {
+    //check email
+    const user = await this.userModel.findOne({ email });
+
+    if (!user) {
+      throw new BadRequestException("Tài khoản không tồn tại")
+    }
+
+
+    //send Email
+    const codeId = uuidv4();
+
+    //update user
+    await user.updateOne({
+      codeId: codeId,
+      codeExpired: dayjs().add(5, 'minutes')
+    })
+
+    //send email
+    this.mailerService.sendMail({
+      to: user.email, // list of receivers
+      subject: 'Change your password account at @hoidanit', // Subject line
+      template: "register",
+      context: {
+        name: user?.name ?? user.email,
+        activationCode: codeId
+      }
+    })
+    return { _id: user._id, email: user.email }
+  }
+  async changePassword(data: ChangePasswordAuthDto) {
+    if (data.confirmPassword !== data.password) {
+      throw new BadRequestException("Mật khẩu/xác nhận mật khẩu không chính xác.")
+    }
+
+    //check email
+    const user = await this.userModel.findOne({ email: data.email });
+
+    if (!user) {
+      throw new BadRequestException("Tài khoản không tồn tại")
+    }
+
+    //check expire code
+    const isBeforeCheck = dayjs().isBefore(user.codeExpired);
+
+    if (isBeforeCheck) {
+      //valid => update password
+      const newPassword = this.getHashPassword(data.password);
+      await user.updateOne({ password: newPassword })
+      return { isBeforeCheck };
+    } else {
+      throw new BadRequestException("Mã code không hợp lệ hoặc đã hết hạn")
+    }
+
   }
 
 }

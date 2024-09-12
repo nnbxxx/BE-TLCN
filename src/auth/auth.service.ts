@@ -6,6 +6,7 @@ import { RegisterUserDto } from 'src/users/dto/create-user.dto';
 import { ConfigService } from '@nestjs/config';
 import ms from 'ms';
 import { Response } from 'express';
+import { ChangePasswordAuthDto, CodeAuthDto } from './dto/create-auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -70,7 +71,18 @@ export class AuthService {
             createdAt: newUser?.createdAt
         };
     }
-
+    checkCode = async (data: CodeAuthDto) => {
+        return await this.usersService.handleActive(data);
+    }
+    retryActive = async (data: string) => {
+        return await this.usersService.retryActive(data);
+    }
+    retryPassword = async (data: string) => {
+        return await this.usersService.retryPassword(data);
+    }
+    changePassword = async (data: ChangePasswordAuthDto) => {
+        return await this.usersService.changePassword(data);
+    }
     createRefreshToken = (payload: any) => {
         const refresh_token = this.jwtService.sign(payload, {
             secret: this.configService.get<string>("JWT_REFRESH_TOKEN_SECRET"),
@@ -130,5 +142,6 @@ export class AuthService {
         response.clearCookie("refresh_token");
         return "ok";
     }
+
 
 }

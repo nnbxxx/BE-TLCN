@@ -33,8 +33,6 @@ export class User {
     // @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Role.name })
     // role: mongoose.Schema.Types.ObjectId;
     @Prop()
-    role: string;
-    @Prop()
     refreshToken: string;
 
     @Prop({ type: Object })
@@ -42,6 +40,23 @@ export class User {
         _id: mongoose.Schema.Types.ObjectId;
         email: string;
     };
+    @Prop()
+    image: string;
+
+    @Prop({ default: "USERS" })
+    role: string;
+
+    @Prop({ default: "LOCAL" })
+    accountType: string;
+
+    @Prop({ default: false })
+    isActive: boolean;
+
+    @Prop()
+    codeId: string;
+
+    @Prop()
+    codeExpired: Date;
 
     @Prop({ type: Object })
     updatedBy: {
