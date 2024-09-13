@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
     IsEmail,
@@ -58,4 +59,19 @@ export class RegisterUserDto {
 
     @IsNotEmpty({ message: 'Address không được để trống', })
     address: string;
+}
+export class UserLoginDto {
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty({ example: 'uyenbao4a5@gmail.com', description: 'username' })
+    readonly username: string;
+
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty({
+        example: '123456',
+        description: 'password',
+    })
+    readonly password: string;
+
 }
