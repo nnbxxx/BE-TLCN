@@ -2,7 +2,7 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import helmet from 'helmet';
-import * as compression from 'compression';
+import compression from 'compression';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { JwtAuthGuard } from './auth/passport/jwt-auth.guard';
 import { join } from 'path';
@@ -48,7 +48,7 @@ async function bootstrap() {
 
 
   // config tools
-  // app.use(compression())
+  app.use(compression())
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
   //config versioning

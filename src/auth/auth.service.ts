@@ -73,7 +73,7 @@ export class AuthService {
             createdAt: newUser?.createdAt
         };
     }
-    checkCode = async (data: CodeAuthDto) => {
+    handleActive = async (data: CodeAuthDto) => {
         return await this.usersService.handleActive(data);
     }
     retryActive = async (data: string) => {
@@ -92,7 +92,7 @@ export class AuthService {
         });
         return refresh_token;
     }
-
+    // get new refresh_token
     processNewToken = async (refreshToken: string, response: Response) => {
         try {
             this.jwtService.verify(refreshToken, {
