@@ -33,6 +33,7 @@ export class AuthService {
 
     async login(user: IUser, response: Response) {
         const { _id, name, email, role } = user;
+
         const payload = {
             sub: "token login",
             iss: "from server",
@@ -76,11 +77,15 @@ export class AuthService {
     handleActive = async (data: CodeAuthDto) => {
         return await this.usersService.handleActive(data);
     }
+
+    checkCode = async (data: CodeAuthDto) => {
+        return await this.usersService.handleActive(data);
+    }
     retryActive = async (data: string) => {
         return await this.usersService.retryActive(data);
     }
-    retryPassword = async (data: string) => {
-        return await this.usersService.retryPassword(data);
+    retryPassword = async (email: string) => {
+        return await this.usersService.retryPassword(email);
     }
     changePassword = async (data: ChangePasswordAuthDto) => {
         return await this.usersService.changePassword(data);

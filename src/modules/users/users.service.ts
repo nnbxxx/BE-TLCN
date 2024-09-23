@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateUserDto, RegisterUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { ProfileUserDto, UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User as UserM, UserDocument } from './schemas/user.schema';
 import mongoose, { Model } from 'mongoose';
@@ -296,5 +296,20 @@ export class UsersService {
     }
 
   }
+  async updateProfile(userDto: ProfileUserDto, user: IUser) {
+    let updateUser = await this.userModel.updateOne(
+      { _id: user._id },
+      {
+        ...userDto,
+        updatedBy: {
+          _id: user._id,
+          email: user.email,
+        },
+      },
+    );
+
+    return updateUser;
+  }
+
 
 }

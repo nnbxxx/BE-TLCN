@@ -10,18 +10,19 @@ import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { RegisterUserDto, UserLoginDto } from 'src/modules/users/dto/create-user.dto';
 import { IUser } from 'src/modules/users/users.interface';
 
-import { ChangePasswordAuthDto } from './dto/create-auth.dto';
+import { ChangePasswordAuthDto, CodeAuthDto } from './dto/create-auth.dto';
 import { UsersService } from '../modules/users/users.service';
 import { ForgotPassUserDto } from './dto/update-auth.dto';
+import { ProfileUserDto, ProfileUserDtoSw } from 'src/modules/users/dto/update-user.dto';
 
 @ApiTags('auth')
 @Controller("auth")
 export class AuthController {
     constructor(
-        private authService: AuthService
+        private authService: AuthService,
+        private userService: UsersService
 
     ) { }
-
     @Public()
     @ApiBody({ type: UserLoginDto, })
     @UseGuards(LocalAuthGuard)
@@ -62,20 +63,19 @@ export class AuthController {
     @ResponseMessage('Change Password User')
     async handleChangePassword(
         @Body() userDto: ChangePasswordAuthDto,
-        @User() user: IUser,
     ) {
         const changePassUser = await this.authService.changePassword(userDto)
         return changePassUser;
 
     }
     @Patch('/update-profile') // ""
+    @ApiBody({ type: ProfileUserDtoSw })
     @ResponseMessage('Update profile User')
     async handleUpdateProfile(
-        // @Body() userDto: ProfileUserDto,
-        // @User() user: IUser,
+        @Body() userDto: ProfileUserDto,
+        @User() user: IUser,
     ) {
-        //return this.usersService.updateProfile(userDto, user);
-        //return { x: "Chưa làm" };
+        return this.userService.updateProfile(userDto, user);
     }
     @Public()
     @Post('/forgot-password')
@@ -85,17 +85,23 @@ export class AuthController {
     ) {
         const forgotPassUser = await this.authService.retryPassword(userDto.email);
         return forgotPassUser;
-
     }
+    @Post('check-code')
     @Public()
-    @Post('/active-account')
-    @ResponseMessage('Forgot password of user')
-    async handleActiveAccount(
-        // @Body() userDto: ForgotPassUserDto
-    ) {
-        //   const forgotPassUser = await this.authService.forgotPassword(userDto);
-        //   return forgotPassUser;
-        return { x: "Chưa làm" };
+    checkCode(@Body() registerDto: CodeAuthDto) {
+        return this.authService.checkCode(registerDto);
+    }
+
+    @Post('retry-active')
+    @Public()
+    retryActive(@Body("email") email: string) {
+        return this.authService.retryActive(email);
+    }
+
+    @Post('retry-password')
+    @Public()
+    retryPassword(@Body("email") email: string) {
+        return this.authService.retryPassword(email);
     }
 
 }

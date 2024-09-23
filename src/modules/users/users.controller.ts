@@ -1,10 +1,10 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { ProfileUserDtoSw, UpdateUserDto } from './dto/update-user.dto';
 import { Public, ResponseMessage, User } from 'src/decorator/customize';
 import { IUser } from './users.interface';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('users')
 @Controller('users')
