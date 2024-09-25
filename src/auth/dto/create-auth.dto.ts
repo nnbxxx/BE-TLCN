@@ -14,8 +14,8 @@ export class CreateAuthDto {
 
 export class CodeAuthDto {
 
-    @IsNotEmpty({ message: "_id không được để trống" })
-    _id: string;
+    @IsNotEmpty({ message: "email không được để trống" })
+    email: string;
 
     @IsNotEmpty({ message: "code không được để trống" })
     code: string;

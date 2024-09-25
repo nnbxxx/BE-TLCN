@@ -18,10 +18,10 @@ export class ProductsController {
 
   @Get()
   @ResponseMessage("Fetch Product with paginate")
-  findAll(@Query("current") currentPage: string,
-    @Query("pageSize") limit: string,
+  findAll(@Query("current") currentPage: number,
+    @Query("pageSize") limit: number,
     @Query() qs: string,) {
-    return this.productsService.findAll();
+    return this.productsService.findAll(currentPage, limit, qs);
   }
 
   @Public()

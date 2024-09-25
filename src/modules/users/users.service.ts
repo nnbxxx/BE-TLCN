@@ -10,9 +10,10 @@ import { IUser } from './users.interface';
 import { User } from 'src/decorator/customize';
 import aqp from 'api-query-params';
 import { MailerService } from '@nestjs-modules/mailer';
-import { v4 as uuidv4 } from 'uuid';
+
 import dayjs from 'dayjs';
 import { ChangePasswordAuthDto, CodeAuthDto } from 'src/auth/dto/create-auth.dto';
+import * as crypto from 'crypto';
 @Injectable()
 export class UsersService {
 
@@ -65,7 +66,7 @@ export class UsersService {
       throw new BadRequestException(`Email: ${email} đã tồn tại trên hệ thống. Vui lòng sử dụng email khác.`)
     }
     const hashPassword = this.getHashPassword(password);
-    const codeId = uuidv4();
+    const codeId = crypto.randomInt(100000, 999999);
     let newRegister = await this.userModel.create({
       name, email,
       password: hashPassword,
@@ -139,7 +140,6 @@ export class UsersService {
     })
   }
 
-
   isValidPassword(password: string, hash: string) {
     return compareSync(password, hash);
   }
@@ -186,8 +186,9 @@ export class UsersService {
     return await this.userModel.findOne({ refreshToken })
   }
   async handleActive(data: CodeAuthDto) {
+
     const user = await this.userModel.findOne({
-      _id: data._id,
+      email: data.email,
       codeId: data.code
     })
     if (!user) {
@@ -199,7 +200,10 @@ export class UsersService {
 
     if (isBeforeCheck) {
       //valid => update user
-      await this.userModel.updateOne({ _id: data._id }, {
+      await this.userModel.updateOne({
+        email: data.email,
+        codeId: data.code
+      }, {
         isActive: true
       })
       return { isBeforeCheck };
@@ -221,7 +225,7 @@ export class UsersService {
     }
 
     //send Email
-    const codeId = uuidv4();
+    const codeId = crypto.randomInt(100000, 999999);
 
     //update user
     await user.updateOne({
@@ -251,7 +255,7 @@ export class UsersService {
 
 
     //send Email
-    const codeId = uuidv4();
+    const codeId = crypto.randomInt(100000, 999999);
 
     //update user
     await user.updateOne({
@@ -275,17 +279,13 @@ export class UsersService {
     if (data.confirmPassword !== data.password) {
       throw new BadRequestException("Mật khẩu/xác nhận mật khẩu không chính xác.")
     }
-
     //check email
     const user = await this.userModel.findOne({ email: data.email });
-
     if (!user) {
       throw new BadRequestException("Tài khoản không tồn tại")
     }
-
     //check expire code
     const isBeforeCheck = dayjs().isBefore(user.codeExpired);
-
     if (isBeforeCheck) {
       //valid => update password
       const newPassword = this.getHashPassword(data.password);
@@ -294,7 +294,6 @@ export class UsersService {
     } else {
       throw new BadRequestException("Mã code không hợp lệ hoặc đã hết hạn")
     }
-
   }
   async updateProfile(userDto: ProfileUserDto, user: IUser) {
     let updateUser = await this.userModel.updateOne(

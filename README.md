@@ -56,6 +56,15 @@ $ npm run test:e2e
 
 # test coverage
 $ npm run test:cov
+
+```
+
+## Deployserver
+
+```bash
+$ ngrok config add-authtoken 2mVXsVpgPvfWizhRnbHAxiF2OSg_2jyJoj2UusFSGrG3MAdsf
+
+$ ngrok http http://localhost:8800
 ```
 
 ## Resources
@@ -83,3 +92,7 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+```
+
+```

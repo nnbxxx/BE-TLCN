@@ -9,10 +9,33 @@ export class Product {
     name: string;
 
     @Prop({ required: true })
-    type: string;
+    category: string;
+
+    @Prop({ required: true })
+    brand: string;
+
+    @Prop({ required: true })
+    price: number;
+
+    // Số sản phẩm trong kho
+    @Prop({ default: 0 })
+    stock: string;
 
     @Prop({ required: true })
     description: string;
+
+    @Prop({ required: true })
+    shopName: string;
+
+    @Prop({ required: true })
+    image: string;
+
+    @Prop({ default: 0 })
+    rating: string;
+
+    // Số sản phẩm bán được
+    @Prop({ default: 0 })
+    quantitySold: number;
 
     @Prop({ type: Object })
     createdBy: {

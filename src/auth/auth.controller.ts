@@ -13,7 +13,7 @@ import { IUser } from 'src/modules/users/users.interface';
 import { ChangePasswordAuthDto, CodeAuthDto } from './dto/create-auth.dto';
 import { UsersService } from '../modules/users/users.service';
 import { ForgotPassUserDto } from './dto/update-auth.dto';
-import { ProfileUserDto, ProfileUserDtoSw } from 'src/modules/users/dto/update-user.dto';
+import { EmailSW, ProfileUserDto, ProfileUserDtoSw } from 'src/modules/users/dto/update-user.dto';
 
 @ApiTags('auth')
 @Controller("auth")
@@ -59,14 +59,14 @@ export class AuthController {
     ) {
         return this.authService.logout(response, user);
     }
+    @Public()
     @Patch('/change-password') // ""
     @ResponseMessage('Change Password User')
     async handleChangePassword(
         @Body() userDto: ChangePasswordAuthDto,
     ) {
-        const changePassUser = await this.authService.changePassword(userDto)
-        return changePassUser;
-
+        console.log("🚀 ~ AuthController ~ userDto:", userDto)
+        return this.authService.changePassword(userDto);
     }
     @Patch('/update-profile') // ""
     @ApiBody({ type: ProfileUserDtoSw })
@@ -77,15 +77,7 @@ export class AuthController {
     ) {
         return this.userService.updateProfile(userDto, user);
     }
-    @Public()
-    @Post('/forgot-password')
-    @ResponseMessage('Forgot password of user')
-    async handleForgotPassword(
-        @Body() userDto: ForgotPassUserDto
-    ) {
-        const forgotPassUser = await this.authService.retryPassword(userDto.email);
-        return forgotPassUser;
-    }
+
     @Post('check-code')
     @Public()
     checkCode(@Body() registerDto: CodeAuthDto) {
@@ -94,11 +86,13 @@ export class AuthController {
 
     @Post('retry-active')
     @Public()
+    @ApiBody({ type: EmailSW })
     retryActive(@Body("email") email: string) {
         return this.authService.retryActive(email);
     }
 
     @Post('retry-password')
+    @ApiBody({ type: EmailSW })
     @Public()
     retryPassword(@Body("email") email: string) {
         return this.authService.retryPassword(email);

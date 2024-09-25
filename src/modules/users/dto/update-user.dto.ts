@@ -29,3 +29,9 @@ export class ProfileUserDtoSw {
     address: string;
 
 }
+
+export class EmailSW {
+    @ApiProperty({ example: 'uyenbao4a5@gmail.com', description: 'Email' })
+    @IsNotEmpty({ message: 'Email không được để trống' })
+    email: string;
+}
