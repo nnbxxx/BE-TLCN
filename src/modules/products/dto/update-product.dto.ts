@@ -1,7 +1,8 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateProductDto } from './create-product.dto';
-import { IsNotEmpty } from 'class-validator';
+import { IsMongoId, IsNotEmpty } from 'class-validator';
 import { ApiProperty, OmitType } from '@nestjs/swagger';
+import mongoose from 'mongoose';
 
 export class UpdateProductDto extends OmitType(CreateProductDto, [
 ] as const) {
@@ -14,9 +15,9 @@ export class ProductUpdateDtoSw {
     name: string;
 
     @ApiProperty({ example: `WONMAN'S FASHION`, description: 'Tên loại sp' })
-    @IsNotEmpty({ message: 'Category không được để trống' })
-    category: string;
-
+    @IsMongoId({ message: "Category phải là mongo id" })
+    @IsNotEmpty({ message: 'Category sản phẩm không được để trống', })
+    category: mongoose.Schema.Types.ObjectId;
     @ApiProperty({ example: `Dior`, description: 'Tên loại sản phẩm' })
     @IsNotEmpty({ message: 'Category không được để trống' })
     brand: string;

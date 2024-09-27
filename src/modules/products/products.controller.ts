@@ -16,6 +16,7 @@ export class ProductsController {
     return this.productsService.create(createProductDto, user);
   }
 
+  @Public()
   @Get()
   @ResponseMessage("Fetch Product with paginate")
   findAll(@Query("current") currentPage: number,

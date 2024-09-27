@@ -1,11 +1,13 @@
-import { IsNotEmpty } from "class-validator";
+import { IsMongoId, IsNotEmpty } from "class-validator";
+import mongoose from "mongoose";
 
 export class CreateProductDto {
     @IsNotEmpty({ message: 'Tên sản phẩm không được để trống', })
     name: string;
 
+    @IsMongoId({ message: "Category phải là mongo id" })
     @IsNotEmpty({ message: 'Category sản phẩm không được để trống', })
-    category: string;
+    category: mongoose.Schema.Types.ObjectId;
 
     @IsNotEmpty({ message: 'Brand không được để trống', })
     brand: string;

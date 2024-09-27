@@ -43,7 +43,7 @@ export class ProductsService {
       .skip(offset)
       .limit(defaultLimit)
       .sort(sort as any)
-      .select('-password')
+      .select(['-stock'])
       .populate(population)
       .exec();
 

@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { HydratedDocument } from "mongoose";
+import { Category } from "src/modules/categories/schemas/category.Schemas";
 
 export type ProductDocument = HydratedDocument<Product>;
 
@@ -8,7 +9,7 @@ export class Product {
     @Prop({ required: true })
     name: string;
 
-    @Prop({ required: true })
+    @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: Category.name })
     category: string;
 
     @Prop({ required: true })
@@ -67,6 +68,5 @@ export class Product {
 
     @Prop()
     deletedAt: Date;
-
 }
 export const ProductSchema = SchemaFactory.createForClass(Product);
