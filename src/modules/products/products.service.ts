@@ -5,7 +5,7 @@ import { Product, ProductDocument } from './schemas/product.schemas';
 import { InjectModel } from '@nestjs/mongoose';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from '../users/users.interface';
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import aqp from 'api-query-params';
 
 @Injectable()
@@ -61,9 +61,9 @@ export class ProductsService {
   }
 
 
-  async findOne(id: string) {
+  async findOne(id: Types.ObjectId) {
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new BadRequestException(`not found product with id=${id}`); // status: 200 => 400
+      throw new BadRequestException(`not found product with id=${id}`);
     }
     return await this.productModel.findById(id);
   }

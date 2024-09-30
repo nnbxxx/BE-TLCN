@@ -65,7 +65,6 @@ export class AuthController {
     async handleChangePassword(
         @Body() userDto: ChangePasswordAuthDto,
     ) {
-        console.log("🚀 ~ AuthController ~ userDto:", userDto)
         return this.authService.changePassword(userDto);
     }
     @Patch('/update-profile') // ""

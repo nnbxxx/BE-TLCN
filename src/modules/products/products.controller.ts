@@ -29,7 +29,7 @@ export class ProductsController {
   @Get(':id')
   @ResponseMessage("Fetch Product by id")
   findOne(@Param('id') id: string) {
-    return this.productsService.findOne(id);
+    return this.productsService.findOne(id as any);
   }
 
   @ResponseMessage("Update a Product")

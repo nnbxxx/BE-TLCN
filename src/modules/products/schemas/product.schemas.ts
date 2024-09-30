@@ -10,7 +10,7 @@ export class Product {
     name: string;
 
     @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: Category.name })
-    category: string;
+    category: mongoose.Schema.Types.ObjectId;
 
     @Prop({ required: true })
     brand: string;
@@ -20,7 +20,7 @@ export class Product {
 
     // Số sản phẩm trong kho
     @Prop({ default: 0 })
-    stock: string;
+    stock: number;
 
     @Prop({ required: true })
     description: string;

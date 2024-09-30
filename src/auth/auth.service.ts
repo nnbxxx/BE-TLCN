@@ -9,6 +9,7 @@ import { ChangePasswordAuthDto, CodeAuthDto } from './dto/create-auth.dto';
 import { UsersService } from 'src/modules/users/users.service';
 import { IUser } from 'src/modules/users/users.interface';
 import { RegisterUserDto } from 'src/modules/users/dto/create-user.dto';
+import { CartsService } from 'src/modules/carts/carts.service';
 
 @Injectable()
 export class AuthService {
@@ -16,6 +17,7 @@ export class AuthService {
         private usersService: UsersService,
         private jwtService: JwtService,
         private configService: ConfigService,
+        private cartService: CartsService,
     ) { }
 
     //ussername/ pass là 2 tham số thư viện passport nó ném về
@@ -69,7 +71,7 @@ export class AuthService {
 
     async register(user: RegisterUserDto) {
         let newUser = await this.usersService.register(user);
-
+        await this.cartService.create(newUser as any)
         return {
             _id: newUser?._id,
             createdAt: newUser?.createdAt

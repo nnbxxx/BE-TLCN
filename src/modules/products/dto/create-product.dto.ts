@@ -1,4 +1,4 @@
-import { IsMongoId, IsNotEmpty } from "class-validator";
+import { IsMongoId, IsNotEmpty, IsNumber, Min } from "class-validator";
 import mongoose from "mongoose";
 
 export class CreateProductDto {
@@ -12,6 +12,8 @@ export class CreateProductDto {
     @IsNotEmpty({ message: 'Brand không được để trống', })
     brand: string;
 
+    @Min(1, { message: 'Price phải là số dương' })
+    @IsNumber({}, { message: 'Price phải là số nguyên', })
     @IsNotEmpty({ message: 'Giá không được để trống', })
     price: number;
 
@@ -24,5 +26,8 @@ export class CreateProductDto {
     @IsNotEmpty({ message: 'Image không được để trống', })
     image: string;
 
-
+    @Min(1, { message: 'Stock phải là số dương' })
+    @IsNumber({}, { message: 'Stock phải là số nguyên', })
+    @IsNotEmpty({ message: 'Image không được để trống', })
+    stock: number;
 }
