@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
-import { AddressService } from './address.service';
+import { AddressService } from './addresses.service';
 import { CreateAddressDto, CreateAddressMultipleDto } from './dto/create-address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
 import { ApiTags } from '@nestjs/swagger';

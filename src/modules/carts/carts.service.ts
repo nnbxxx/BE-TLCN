@@ -31,7 +31,6 @@ export class CartsService {
       .select("-__v -updatedAt -createdAt");
   }
   async removeProductToCart(idProduct: string, user: IUser) {
-
     if (!mongoose.Types.ObjectId.isValid(idProduct)) {
       throw new BadRequestException(`not found product with id=${idProduct}`);
     }
@@ -47,6 +46,19 @@ export class CartsService {
 
     );
     return await this.calcTotal(foundCart?._id as any);
+  }
+  async removeAllCartItem(user: IUser) {
+    const foundCart = await this.cartModel.findOneAndUpdate(
+      {
+        user: user._id,
+      },
+      {
+        $set: { items: [], total: 0 }
+      },
+      { new: true },
+    )
+
+    return foundCart;
   }
   async addProductToCart(cartItem: CartItem, user: IUser) {
     if (!mongoose.Types.ObjectId.isValid(cartItem.product._id)) {

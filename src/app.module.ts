@@ -14,10 +14,13 @@ import { UsersModule } from './modules/users/users.module';
 import { ProductsModule } from './modules/products/products.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { CartsModule } from './modules/carts/carts.module';
-import { AddressModule } from './modules/address/address.module';
+import { AddressModule } from './modules/address/addresses.module';
+import { ReceiptsModule } from './modules/receipts/receipts.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     // Config Module
     ConfigModule.forRoot({
       isGlobal: true,
@@ -45,7 +48,8 @@ import { AddressModule } from './modules/address/address.module';
     ProductsModule,
     CategoriesModule,
     CartsModule,
-    AddressModule
+    AddressModule,
+    ReceiptsModule
   ],
   controllers: [AppController],
   providers: [

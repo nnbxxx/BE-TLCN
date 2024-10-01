@@ -37,7 +37,12 @@ export class CartsController {
 
   @ResponseMessage("Delete product to Cart User")
   @Delete(':id')
-  remove(@Param('id') id: string, @User() user: IUser) {
+  removeCartItem(@Param('id') id: string, @User() user: IUser) {
     return this.cartsService.removeProductToCart(id, user);
+  }
+  @ResponseMessage("Remove All Cart User")
+  @Post('/remove')
+  removeCart(@User() user: IUser) {
+    return this.cartsService.removeAllCartItem(user);
   }
 }

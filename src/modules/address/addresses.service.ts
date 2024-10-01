@@ -2,7 +2,7 @@ import { BadGatewayException, Injectable, NotFoundException } from '@nestjs/comm
 import { CreateAddressDto, CreateAddressMultipleDto } from './dto/create-address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Address, AddressDocument, Districts } from './schemas/address.schemas';
+import { Address, AddressDocument, Districts } from './schemas/addresses.schemas';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { Model } from 'mongoose';
 import aqp from 'api-query-params';
