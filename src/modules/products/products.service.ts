@@ -31,7 +31,6 @@ export class ProductsService {
     delete filter.current;
     delete filter.pageSize;
 
-
     let offset = (+currentPage - 1) * (+limit);
     let defaultLimit = +limit ? +limit : 10;
 

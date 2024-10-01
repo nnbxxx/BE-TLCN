@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCartDto } from './dto/create-cart.dto';
-import { AddToCartDto, UpdateToCartDto } from './dto/update-cart.dto';
+import { CartItem, UpdateToCartDto } from './dto/update-cart.dto';
 import { IUser } from '../users/users.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { Cart, CartDocument } from './schemas/cart.schemas';
@@ -48,7 +48,7 @@ export class CartsService {
     );
     return await this.calcTotal(foundCart?._id as any);
   }
-  async addProductToCart(cartItem: AddToCartDto, user: IUser) {
+  async addProductToCart(cartItem: CartItem, user: IUser) {
     if (!mongoose.Types.ObjectId.isValid(cartItem.product._id)) {
       throw new BadRequestException(`not found product with id=${cartItem.product._id}`);
     }
@@ -103,7 +103,7 @@ export class CartsService {
 
 
   //                                          ==================Utils=================
-  async checkIsProductStock(productId: Types.ObjectId, cartItem: AddToCartDto | UpdateToCartDto) {
+  async checkIsProductStock(productId: Types.ObjectId, cartItem: CartItem | UpdateToCartDto) {
     const productStock = (await this.productService.findOne(productId)).stock;
     return productStock >= cartItem.product.quantity
   }

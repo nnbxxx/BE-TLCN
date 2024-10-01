@@ -22,7 +22,7 @@ class ProductAdd {
     @IsNotEmpty({ message: 'Quantity không được để trống', })
     quantity: number;
 }
-export class AddToCartDto {
+export class CartItem {
     @ValidateNested()
     @Type(() => ProductAdd)
     @IsNotEmpty()
@@ -33,7 +33,7 @@ export class AddToCartDto {
         quantity: number
     }
 }
-export class UpdateToCartDto extends PartialType(AddToCartDto) {
+export class UpdateToCartDto extends PartialType(CartItem) {
 
 }
 
