@@ -3,6 +3,7 @@ import { CreateReceiptDto, ReceiptDetailDTo } from './create-receipt.dto';
 import { IsEnum, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, Min, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 import { RECEIPT_STATUS } from 'src/constants/schema.enum';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateReceiptDto {
     @IsMongoId({ message: '_id phải là mongo id' })
@@ -88,4 +89,9 @@ export class AddressReceipt {
     @IsString({ message: "detail phải là string" }) // To make a field optional you can add @IsOptional
     detail: string;
 
+}
+export class IdSW {
+    @ApiProperty({ example: '66fc6cc09bc7b3960846313f', description: 'Id ' })
+    @IsNotEmpty({ message: 'Id không được để trống' })
+    id: string;
 }

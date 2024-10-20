@@ -309,6 +309,25 @@ export class UsersService {
 
     return updateUser;
   }
+  async updatePurchasedProducts(user: IUser, productIds: string[], point: number) {
+    await this.userModel.findByIdAndUpdate(user._id, {
+      $addToSet: { purchasedProducts: { $each: productIds } },
+      $inc: { point: point }
+    }, {
+      new: true,
+    });
+  }
+  async updateRecentViewProduct(user: IUser, productId: string) {
+    await this.userModel.findByIdAndUpdate(user._id, {
+      $addToSet: { recentViewProducts: productId },
+    }, {
+      new: true,
+    });
+  }
 
+  async checkPurchasedProduct(userId: string, productId: string) {
+    const re = await this.userModel.findById(userId);
+    return re.purchasedProducts.includes(productId as any);
+  }
 
 }

@@ -17,6 +17,10 @@ import { CartsModule } from './modules/carts/carts.module';
 import { AddressModule } from './modules/address/addresses.module';
 import { ReceiptsModule } from './modules/receipts/receipts.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ReviewsModule } from './modules/reviews/reviews.module';
+import { LikeProductsModule } from './modules/like-products/like-products.module';
+import { CouponsModule } from './modules/coupons/coupons.module';
+
 
 @Module({
   imports: [
@@ -49,7 +53,12 @@ import { ScheduleModule } from '@nestjs/schedule';
     CategoriesModule,
     CartsModule,
     AddressModule,
-    ReceiptsModule
+    ReceiptsModule,
+    ReviewsModule,
+    LikeProductsModule,
+    CouponsModule
+
+
   ],
   controllers: [AppController],
   providers: [

@@ -40,23 +40,28 @@ export class CreateUserDto {
     // company: Company;
 }
 export class RegisterUserDto {
-
+    @ApiProperty({ example: 'ngô nguyên bảo', description: 'name' })
     @IsNotEmpty({ message: 'Name không được để trống', })
     name: string;
 
+    @ApiProperty({ example: 'uyenbao4a5@gmail.com', description: 'email' })
     @IsEmail({}, { message: 'Email không đúng định dạng', })
     @IsNotEmpty({ message: 'Email không được để trống', })
     email: string;
 
+    @ApiProperty({ example: '123456', description: 'password' })
     @IsNotEmpty({ message: 'Password không được để trống', })
     password: string;
 
+    @ApiProperty({ example: 21, description: 'age' })
     @IsNotEmpty({ message: 'Age không được để trống', })
     age: number;
 
+    @ApiProperty({ example: 'female', description: 'gender' })
     @IsNotEmpty({ message: 'Gender không được để trống', })
     gender: string;
 
+    @ApiProperty({ example: '1 vvn hcm tp', description: 'address' })
     @IsNotEmpty({ message: 'Address không được để trống', })
     address: string;
 }

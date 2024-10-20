@@ -1,11 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { ReceiptsService } from './receipts.service';
 import { CreateReceiptDto } from './dto/create-receipt.dto';
-import { UpdateReceiptDto } from './dto/update-receipt.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { IdSW, UpdateReceiptDto } from './dto/update-receipt.dto';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { Public, ResponseMessage, User } from 'src/decorator/customize';
 import { IUser } from '../users/users.interface';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { EmailSW } from '../users/dto/update-user.dto';
 
 @ApiTags('receipts')
 @Controller('receipts')
@@ -45,8 +46,16 @@ export class ReceiptsController {
   @Public()
   @Cron(CronExpression.EVERY_MINUTE)
   autoUpdateConfirm() {
-    console.log("🚀 ~ ReceiptsController ~ autoUpdateConfirm ~ autoUpdateConfirm")
+    // console.log("🚀 ~ ReceiptsController ~ autoUpdateConfirm ~ autoUpdateConfirm")
     return this.receiptsService.autoconfirm();
+  }
+
+  @ResponseMessage("confirmPayment receipts")
+  @Post('/confirmPayment')
+  @ApiBody({ type: IdSW })
+  confirmPayment(@Body("id") id: string, @User() user: IUser) {
+    // console.log("🚀 ~ ReceiptsController ~ autoUpdateConfirm ~ autoUpdateConfirm")
+    return this.receiptsService.confirmPayment(id, user);
   }
 
 

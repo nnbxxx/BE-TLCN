@@ -7,12 +7,14 @@ import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from '../users/users.interface';
 import mongoose, { Types } from 'mongoose';
 import aqp from 'api-query-params';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectModel(Product.name)
-    private productModel: SoftDeleteModel<ProductDocument>
+    private productModel: SoftDeleteModel<ProductDocument>,
+    private userService: UsersService
   ) { }
 
   create(createProductDto: CreateProductDto, user: IUser) {
@@ -64,6 +66,13 @@ export class ProductsService {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new BadRequestException(`not found product with id=${id}`);
     }
+    return await this.productModel.findById(id);
+  }
+  async findOneForUser(id: Types.ObjectId, user: IUser) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new BadRequestException(`not found product with id=${id}`);
+    }
+    this.userService.updateRecentViewProduct(user, id as any);
     return await this.productModel.findById(id);
   }
 

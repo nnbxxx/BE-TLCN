@@ -18,10 +18,6 @@ export class Product {
     @Prop({ required: true })
     price: number;
 
-    // Số sản phẩm trong kho
-    @Prop({ default: 0 })
-    stock: number;
-
     @Prop({ required: true })
     description: string;
 
@@ -34,9 +30,14 @@ export class Product {
     @Prop({ default: 0 })
     rating: string;
 
+    // chuyển đổi thành kho
+
     // Số sản phẩm bán được
     @Prop({ default: 0 })
     quantitySold: number;
+    // Số sản phẩm trong kho
+    @Prop({ default: 0 })
+    stock: number;
 
     @Prop({ type: Object })
     createdBy: {

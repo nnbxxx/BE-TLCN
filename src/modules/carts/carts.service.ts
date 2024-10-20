@@ -108,13 +108,12 @@ export class CartsService {
       )
     }
     return await this.calcTotal(foundCart?._id as any);
-
   }
 
 
 
 
-  //                                          ==================Utils=================
+  //                        ==================Utils=================
   async checkIsProductStock(productId: Types.ObjectId, cartItem: CartItem | UpdateToCartDto) {
     const productStock = (await this.productService.findOne(productId)).stock;
     return productStock >= cartItem.product.quantity

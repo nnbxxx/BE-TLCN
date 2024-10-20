@@ -59,14 +59,6 @@ $ npm run test:cov
 
 ```
 
-## Deployserver
-
-```bash
-$ ngrok config add-authtoken 2mVXsVpgPvfWizhRnbHAxiF2OSg_2jyJoj2UusFSGrG3MAdsf
-
-$ ngrok http http://localhost:8800
-```
-
 ## Resources
 
 Check out a few resources that may come in handy when working with NestJS:

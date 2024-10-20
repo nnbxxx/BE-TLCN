@@ -27,9 +27,14 @@ export class ProductsController {
 
   @Public()
   @Get(':id')
-  @ResponseMessage("Fetch Product by id")
+  @ResponseMessage("Fetch Product by id for non-members")
   findOne(@Param('id') id: string) {
     return this.productsService.findOne(id as any);
+  }
+  @Get('/user/:id')
+  @ResponseMessage("Fetch Product by id for non-members")
+  findOneForUser(@Param('id') id: string, @User() user: IUser) {
+    return this.productsService.findOneForUser(id as any, user);
   }
 
   @ResponseMessage("Update a Product")

@@ -6,7 +6,6 @@ import { Address, AddressDocument, Districts } from './schemas/addresses.schemas
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { Model } from 'mongoose';
 import aqp from 'api-query-params';
-import { NotFoundError } from 'rxjs';
 
 @Injectable()
 export class AddressService {

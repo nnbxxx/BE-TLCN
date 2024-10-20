@@ -24,7 +24,6 @@ export class CartsController {
 
   @ResponseMessage("Add product to Cart User")
   @Post('/add')
-
   addItem(@User() user: IUser, @Body() CartItem: CartItem) {
     return this.cartsService.addProductToCart(CartItem, user);
   }

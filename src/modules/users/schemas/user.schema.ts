@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
+import { Product } from 'src/modules/products/schemas/product.schemas';
 // import { Role } from 'src/roles/schemas/role.schemas';
 
 export type UserDocument = HydratedDocument<User>;
@@ -32,6 +33,11 @@ export class User {
 
     // @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Role.name })
     // role: mongoose.Schema.Types.ObjectId;
+
+    @Prop({ required: true, type: [mongoose.Schema.Types.ObjectId], ref: Product.name })
+    purchasedProducts: [mongoose.Schema.Types.ObjectId];
+    @Prop({ required: true, type: [mongoose.Schema.Types.ObjectId], ref: Product.name })
+    recentViewProducts: [mongoose.Schema.Types.ObjectId];
     @Prop()
     refreshToken: string;
 
@@ -45,6 +51,8 @@ export class User {
 
     @Prop({ default: "USERS" })
     role: string;
+    @Prop({ default: 0 })
+    point: number;
 
     @Prop({ default: "LOCAL" })
     accountType: string;

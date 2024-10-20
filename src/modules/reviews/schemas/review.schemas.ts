@@ -1,31 +1,22 @@
-
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import mongoose, { HydratedDocument, Types } from "mongoose";
-
+import mongoose, { HydratedDocument } from "mongoose";
 import { Product } from "src/modules/products/schemas/product.schemas";
-import { CartItem } from "../dto/update-cart.dto";
 import { User } from "src/modules/users/schemas/user.schema";
 
-export type CartDocument = HydratedDocument<Cart>;
+export type ReviewDocument = HydratedDocument<Review>;
+
 @Schema({ timestamps: true })
-export class Cart {
+export class Review {
     @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: User.name })
-    user: mongoose.Schema.Types.ObjectId;
+    userId: mongoose.Schema.Types.ObjectId;
+    @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: Product.name })
+    productId: mongoose.Schema.Types.ObjectId;
 
-    @Prop({
-        require: true,
-        type: [{
-            product: { type: mongoose.Schema.Types.ObjectId, ref: Product.name, require: true, },
-            name: { type: String, require: true, },
-            quantity: { type: Number, require: true, },
-            price: { type: Number, require: true, },
-        }]
-    })
-    items: CartItem[];
+    @Prop({ required: true, default: [] })
+    fileUrl?: [string];
 
-    // giá tiền
-    @Prop({ type: Number, default: 0 })
-    total: number;
+    @Prop({ default: 0 })
+    rating: string;
 
     @Prop({ type: Object })
     createdBy: {
@@ -46,7 +37,7 @@ export class Cart {
         email: string;
     };
 
-    @Prop()
+    @Prop({ default: Date.now })
     createdAt: Date;
 
     @Prop()
@@ -58,4 +49,6 @@ export class Cart {
     @Prop()
     deletedAt: Date;
 }
-export const CartSchema = SchemaFactory.createForClass(Cart);
+
+
+export const ReviewSchema = SchemaFactory.createForClass(Review);

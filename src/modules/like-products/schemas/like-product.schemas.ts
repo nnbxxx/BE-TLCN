@@ -1,14 +1,13 @@
-
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import mongoose, { HydratedDocument, Types } from "mongoose";
-
+import mongoose, { HydratedDocument } from "mongoose";
 import { Product } from "src/modules/products/schemas/product.schemas";
-import { CartItem } from "../dto/update-cart.dto";
 import { User } from "src/modules/users/schemas/user.schema";
+import { ProductLikeItem } from "../dto/update-like-product.dto";
 
-export type CartDocument = HydratedDocument<Cart>;
+export type LikeProductDocument = HydratedDocument<LikeProduct>;
+
 @Schema({ timestamps: true })
-export class Cart {
+export class LikeProduct {
     @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: User.name })
     user: mongoose.Schema.Types.ObjectId;
 
@@ -17,15 +16,9 @@ export class Cart {
         type: [{
             product: { type: mongoose.Schema.Types.ObjectId, ref: Product.name, require: true, },
             name: { type: String, require: true, },
-            quantity: { type: Number, require: true, },
-            price: { type: Number, require: true, },
         }]
     })
-    items: CartItem[];
-
-    // giá tiền
-    @Prop({ type: Number, default: 0 })
-    total: number;
+    items: ProductLikeItem[];
 
     @Prop({ type: Object })
     createdBy: {
@@ -58,4 +51,6 @@ export class Cart {
     @Prop()
     deletedAt: Date;
 }
-export const CartSchema = SchemaFactory.createForClass(Cart);
+
+
+export const LikeProductSchema = SchemaFactory.createForClass(LikeProduct);

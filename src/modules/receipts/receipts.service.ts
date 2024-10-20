@@ -11,6 +11,8 @@ import mongoose from 'mongoose';
 import { RECEIPT_STATUS } from 'src/constants/schema.enum';
 import aqp from 'api-query-params';
 import { AddressService } from '../address/addresses.service';
+import { CartsService } from '../carts/carts.service';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class ReceiptsService {
@@ -18,6 +20,8 @@ export class ReceiptsService {
     @InjectModel(Receipt.name)
     private receiptModel: SoftDeleteModel<ReceiptDocument>,
     private productService: ProductsService,
+    private cartService: CartsService,
+    private userService: UsersService,
 
   ) { }
   async create(createReceiptDto: CreateReceiptDto, user: IUser) {
@@ -31,6 +35,7 @@ export class ReceiptsService {
       },
       confirmationDate: dayjs().add(30, 'minutes')
     });
+    this.cartService.removeAllCartItem(user);
     return await this.calcTotal(receipt._id as any);
   }
   async validate(createReceiptDto: CreateReceiptDto) {
@@ -165,4 +170,24 @@ export class ReceiptsService {
     })
 
   }
+
+  // thanh toán thành công 
+  async confirmPayment(receiptId: string, user: IUser) {
+
+    const receipt = await this.findOne(receiptId);
+    const productIds = receipt.items.map(item => item.product._id.toString());
+    if (receipt.statusUser !== RECEIPT_STATUS.CONFIRMED && receipt.statusUser !== RECEIPT_STATUS.DELIVERED) {
+      this.userService.updatePurchasedProducts(user, productIds, receipt.total / 10)
+      return await this.receiptModel.findOneAndUpdate(
+        { _id: receiptId },
+        { $set: { statusUser: RECEIPT_STATUS.CONFIRMED, statusSupplier: RECEIPT_STATUS.DELIVERED } },
+        { new: true }
+      );
+    }
+    return await this.receiptModel.findOneAndUpdate(
+      { _id: receiptId },
+    );
+
+  }
+
 }

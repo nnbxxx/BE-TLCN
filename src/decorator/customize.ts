@@ -22,21 +22,6 @@ export const User = createParamDecorator(
     // import {Request} from Express;
     // @Req req: Request;
     // coust user = req.user; ==> cách cũ này không tường minh và mất 2 lần code
-    // ví dụ
-    //service
-    // create(createCompanyDto: CreateCompanyDto, user: IUser) {
-    //   return this.companyModel.create({
-    //     ...createCompanyDto,
-    //     createdBy: {
-    //       _id: user._id,
-    //       email: user.email
-    //     }
-    //   })
-    // }
-    // controller
-    // create(@Body() createCompanyDto: CreateCompanyDto, @User() user: IUser) {
-    //   return this.companiesService.create(createCompanyDto, user);
-    // }
 
   },
 );

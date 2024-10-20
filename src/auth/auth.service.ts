@@ -10,6 +10,7 @@ import { UsersService } from 'src/modules/users/users.service';
 import { IUser } from 'src/modules/users/users.interface';
 import { RegisterUserDto } from 'src/modules/users/dto/create-user.dto';
 import { CartsService } from 'src/modules/carts/carts.service';
+import { LikeProductsService } from 'src/modules/like-products/like-products.service';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +19,7 @@ export class AuthService {
         private jwtService: JwtService,
         private configService: ConfigService,
         private cartService: CartsService,
+        private likeProductService: LikeProductsService
     ) { }
 
     //ussername/ pass là 2 tham số thư viện passport nó ném về
@@ -72,6 +74,7 @@ export class AuthService {
     async register(user: RegisterUserDto) {
         let newUser = await this.usersService.register(user);
         await this.cartService.create(newUser as any)
+        await this.likeProductService.create(newUser as any)
         return {
             _id: newUser?._id,
             createdAt: newUser?.createdAt
