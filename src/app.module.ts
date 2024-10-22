@@ -20,6 +20,8 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { LikeProductsModule } from './modules/like-products/like-products.module';
 import { CouponsModule } from './modules/coupons/coupons.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { NotificationsGateway } from './notifications/notifications.gateway';
 
 
 @Module({
@@ -45,7 +47,7 @@ import { CouponsModule } from './modules/coupons/coupons.module';
       ),
     }),
     // Throttler Module
-    ThrottlerModule.forRoot({ ttl: 60, limit: 60 }),
+    ThrottlerModule.forRoot(),
     UsersModule,
     AuthModule,
     MailModule,
@@ -56,13 +58,14 @@ import { CouponsModule } from './modules/coupons/coupons.module';
     ReceiptsModule,
     ReviewsModule,
     LikeProductsModule,
-    CouponsModule
+    CouponsModule,
+    NotificationsModule
 
 
   ],
   controllers: [AppController],
   providers: [
-    AppService,
+    AppService, NotificationsGateway,
     // bind to ThrottlerGuard globally
     {
       provide: APP_GUARD,

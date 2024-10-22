@@ -329,5 +329,14 @@ export class UsersService {
     const re = await this.userModel.findById(userId);
     return re.purchasedProducts.includes(productId as any);
   }
+  async updateSocketId(userId: string, socketId: string = null) {
+    return await this.userModel.findByIdAndUpdate(
+      { _id: userId },
+      {
+        $set: { socketId: socketId }
+      },
+    );
+  }
+  
 
 }

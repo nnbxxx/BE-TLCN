@@ -6,3 +6,7 @@ export enum RECEIPT_STATUS {
     DELIVERED = 'DELIVERED',// ĐÃ GIAO HÀNG THÀNH CÔNG
     CANCEL = 'CANCEL'// HỦY ĐƠN HÀNG
 }
+export enum TYPE_COUPONS {
+    PRICE = 'PRICE',
+    PERCENT = 'PERCENT'
+}

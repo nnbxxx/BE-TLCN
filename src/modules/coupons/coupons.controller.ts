@@ -1,34 +1,44 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { CouponsService } from './coupons.service';
 import { CreateCouponDto } from './dto/create-coupon.dto';
 import { UpdateCouponDto } from './dto/update-coupon.dto';
+import { ApiTags } from '@nestjs/swagger';
+import { ResponseMessage, User } from 'src/decorator/customize';
+import { IUser } from '../users/users.interface';
 
+@ApiTags('coupons')
 @Controller('coupons')
 export class CouponsController {
-  constructor(private readonly couponsService: CouponsService) {}
-
+  constructor(private readonly couponsService: CouponsService) { }
+  @ResponseMessage("Create a new coupon")
   @Post()
-  create(@Body() createCouponDto: CreateCouponDto) {
-    return this.couponsService.create(createCouponDto);
+  create(@Body() createCouponDto: CreateCouponDto, @User() user: IUser) {
+    return this.couponsService.create(createCouponDto, user);
   }
 
   @Get()
-  findAll() {
-    return this.couponsService.findAll();
+  @ResponseMessage("Fetch Coupons with paginate")
+  findAll(@Query("current") currentPage: number,
+    @Query("pageSize") limit: number,
+    @Query() qs: string,) {
+    return this.couponsService.findAll(currentPage, limit, qs);
   }
 
   @Get(':id')
+  @ResponseMessage("Fetch Coupons by id ")
   findOne(@Param('id') id: string) {
-    return this.couponsService.findOne(+id);
+    return this.couponsService.findOne(id as any);
   }
-
+  @ResponseMessage("Update a Coupons")
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCouponDto: UpdateCouponDto) {
-    return this.couponsService.update(+id, updateCouponDto);
+  update(@Body() updateCouponDto: UpdateCouponDto, @User() user: IUser) {
+    return this.couponsService.update(updateCouponDto, user);
+  }
+  @ResponseMessage("Delete a Coupons")
+  @Delete(':id')
+  remove(@Param('id') id: string, @User() user: IUser) {
+    return this.couponsService.remove(id, user);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.couponsService.remove(+id);
-  }
+
 }

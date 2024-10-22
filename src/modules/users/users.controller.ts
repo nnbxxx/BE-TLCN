@@ -5,6 +5,7 @@ import { ProfileUserDtoSw, UpdateUserDto } from './dto/update-user.dto';
 import { Public, ResponseMessage, User } from 'src/decorator/customize';
 import { IUser } from './users.interface';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @ApiTags('users')
 @Controller('users')
@@ -51,5 +52,14 @@ export class UsersController {
     return this.usersService.remove(id, user);
   }
 
+  //auto send notification to user
+  @ResponseMessage("auto send notification accept coupons to user")
+  @Get('/auto_notification_coupons')
+  @Public()
+  // @Cron(CronExpression.EVERY_MINUTE)
+  autoSendNotificationCouponsToUser() {
+    // console.log("🚀 ~ ReceiptsController ~ autoUpdateConfirm ~ autoUpdateConfirm")
+    //return this.receiptsService.autoconfirm();
+  }
 
 }

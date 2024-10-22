@@ -66,6 +66,8 @@ export class User {
     @Prop()
     codeExpired: Date;
 
+    @Prop({ default: null })
+    socketId: string;
     @Prop({ type: Object })
     updatedBy: {
         _id: mongoose.Schema.Types.ObjectId;

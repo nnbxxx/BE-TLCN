@@ -11,8 +11,6 @@ import { TransformInterceptor } from './core/transform.interceptor';
 import cookieParser from 'cookie-parser';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-
-
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
@@ -80,7 +78,6 @@ async function bootstrap() {
     }
   }
   );
-
 
   await app.listen(port);
 
