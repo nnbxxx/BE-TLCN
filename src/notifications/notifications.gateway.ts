@@ -14,6 +14,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
   constructor(private readonly notificationsService: NotificationsService,
     private usersService: UsersService,
 
+
   ) { }
   async handleDisconnect(client: Socket) {
     // console.log("🚀 ~ NotificationsGateway ~ handleDisconnect ~ client:", client.id)
@@ -29,9 +30,11 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
     this.usersService.updateSocketId(_id as any, client.id)
 
   }
-
-  sendNotification(message: any) {
-    this.server.emit('new-notification', message); // Gửi thông báo tới tất cả các client
+  // send all user or room
+  sendNotification(message: any, room: string = null) {
+    if (room != null)
+      this.server.to(room).emit('new-notification', message); // Gửi thông báo tới tất cả các client
+    else this.server.emit('new-notification', message); // Gửi thông báo tới tất cả các client
   }
 
   // cho admin

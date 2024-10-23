@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
+import { Coupon } from 'src/modules/coupons/schemas/coupon.schemas';
 import { Product } from 'src/modules/products/schemas/product.schemas';
 // import { Role } from 'src/roles/schemas/role.schemas';
 
@@ -38,6 +39,25 @@ export class User {
     purchasedProducts: [mongoose.Schema.Types.ObjectId];
     @Prop({ required: true, type: [mongoose.Schema.Types.ObjectId], ref: Product.name })
     recentViewProducts: [mongoose.Schema.Types.ObjectId];
+
+    @Prop({
+        type: [{
+            _id: { type: mongoose.Schema.Types.ObjectId, ref: Coupon.name },
+            isActive: { type: Boolean, required: true, default: false },
+            name: { type: String, required: true },
+            code: { type: String, required: true },
+        }],
+        required: true, default: []
+    })
+    couponsUser: [
+        {
+            _id: mongoose.Schema.Types.ObjectId,
+            isActive: boolean,
+            name: string,
+            code: string
+        }
+    ];
+
     @Prop()
     refreshToken: string;
 

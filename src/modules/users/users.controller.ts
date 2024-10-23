@@ -52,14 +52,6 @@ export class UsersController {
     return this.usersService.remove(id, user);
   }
 
-  //auto send notification to user
-  @ResponseMessage("auto send notification accept coupons to user")
-  @Get('/auto_notification_coupons')
-  @Public()
-  // @Cron(CronExpression.EVERY_MINUTE)
-  autoSendNotificationCouponsToUser() {
-    // console.log("🚀 ~ ReceiptsController ~ autoUpdateConfirm ~ autoUpdateConfirm")
-    //return this.receiptsService.autoconfirm();
-  }
+
 
 }

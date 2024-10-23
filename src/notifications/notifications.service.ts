@@ -77,4 +77,10 @@ export class NotificationsService {
   remove(id: number) {
     return `This action removes a #${id} notification`;
   }
+
+  async sendNotificationCouponToUsers(listUser: [{ point: number, _id: any, couponsUser: [{}] }], coupon: {
+    _id: any, code: string, description: {}
+  }) {
+    
+  }
 }

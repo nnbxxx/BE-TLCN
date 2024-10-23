@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto, RegisterUserDto } from './dto/create-user.dto';
 import { ProfileUserDto, UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -336,7 +336,41 @@ export class UsersService {
         $set: { socketId: socketId }
       },
     );
-  }
-  
 
+
+  }
+  async getAllUserAcceptPoint(point: number = 0, couponId: string) {
+    if (!mongoose.Types.ObjectId.isValid(couponId))
+      throw new NotFoundException(`Not found coupon`);
+
+    return await this.userModel.find({
+      isActive: true,
+      point: { $gte: point },  // Điều kiện user.point >=point
+      'couponsUser._id': { $nin: [couponId] }  // couponsUser không chứa coupon có _id là code
+    })
+      .select({ point: 1, _id: 1, couponsUser: 1 })
+      .exec();
+  }
+  async updateUserNewCoupons(userId: string, coupon: {
+    _id: string, name: string, code: string
+  }) {
+    if (!mongoose.Types.ObjectId.isValid(userId))
+      throw new NotFoundException(`Not found coupon`);
+    const { _id, name, code } = coupon
+    await this.userModel.findByIdAndUpdate(userId, {
+      $addToSet: {
+        couponsUser: {
+          _id, name, code,
+          isActive: false,
+        }
+      },
+    }, {
+      new: true,
+    });
+  }
+
+  async checkConnectSocketIo(userId: string) {
+    const user = await this.findOne(userId) as any;
+    return user.socketId;
+  }
 }

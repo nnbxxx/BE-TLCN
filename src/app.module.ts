@@ -60,8 +60,6 @@ import { NotificationsGateway } from './notifications/notifications.gateway';
     LikeProductsModule,
     CouponsModule,
     NotificationsModule
-
-
   ],
   controllers: [AppController],
   providers: [
