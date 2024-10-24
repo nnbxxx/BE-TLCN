@@ -22,6 +22,8 @@ import { LikeProductsModule } from './modules/like-products/like-products.module
 import { CouponsModule } from './modules/coupons/coupons.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { NotificationsGateway } from './notifications/notifications.gateway';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { FilesModule } from './modules/files/files.module';
 
 
 @Module({
@@ -59,7 +61,10 @@ import { NotificationsGateway } from './notifications/notifications.gateway';
     ReviewsModule,
     LikeProductsModule,
     CouponsModule,
-    NotificationsModule
+    NotificationsModule,
+    CloudinaryModule,
+    FilesModule
+
   ],
   controllers: [AppController],
   providers: [
