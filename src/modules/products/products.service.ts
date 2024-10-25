@@ -8,23 +8,36 @@ import { IUser } from '../users/users.interface';
 import mongoose, { Types } from 'mongoose';
 import aqp from 'api-query-params';
 import { UsersService } from '../users/users.service';
+import { InventoryProductService } from '../inventory-product/inventory-product.service';
+import { CreateInventoryProductDto } from '../inventory-product/dto/create-inventory-product.dto';
+import { ReviewsService } from '../reviews/reviews.service';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectModel(Product.name)
     private productModel: SoftDeleteModel<ProductDocument>,
-    private userService: UsersService
+    private userService: UsersService,
+    private inventoryProductService: InventoryProductService,
+    private reviewService: ReviewsService
   ) { }
 
-  create(createProductDto: CreateProductDto, user: IUser) {
-    return this.productModel.create({
-      ...createProductDto,
+  async create(createProductDto: CreateProductDto, user: IUser) {
+    const { brand, category, description, image, name, price, shopName, quantity } = createProductDto
+    const product = await this.productModel.create({
+      brand, category, description, image, name, price, shopName,
       createdBy: {
         _id: user._id,
         email: user.email
       }
     })
+    const inventoryProductDto: CreateInventoryProductDto = {
+      productId: product._id as any,
+      quantity: quantity,
+      reservations: []
+    }
+    await this.inventoryProductService.create(inventoryProductDto, user)
+    return product;
 
   }
 
@@ -44,7 +57,7 @@ export class ProductsService {
       .skip(offset)
       .limit(defaultLimit)
       .sort(sort as any)
-      .select(['-stock'])
+      .select([''])
       .populate(population)
       .exec();
 
@@ -66,7 +79,11 @@ export class ProductsService {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new BadRequestException(`not found product with id=${id}`);
     }
-    return await this.productModel.findById(id);
+    const data = await this.productModel.findById(id);
+    const quantityComments = await this.reviewService.getQuantityComment(id as any)
+    const quantityProductPurchased = await this.inventoryProductService.getProductPurchased(id as any)
+    const newData = { ...data.toObject(), quantityComments: +quantityComments, quantityProductPurchased: +quantityProductPurchased }
+    return newData;
   }
   async findOneForUser(id: Types.ObjectId, user: IUser) {
     if (!mongoose.Types.ObjectId.isValid(id)) {

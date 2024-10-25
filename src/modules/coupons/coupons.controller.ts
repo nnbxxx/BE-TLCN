@@ -45,7 +45,7 @@ export class CouponsController {
   @ResponseMessage("auto send notification accept coupons to user")
   @Get('/user/auto_notification_coupons')
   @Public()
-  @Cron(CronExpression.EVERY_5_MINUTES)
+  @Cron(CronExpression.EVERY_MINUTE)
   autoSendNotificationCouponsToUser() {
     return this.couponsService.autoNotificationCoupons();
   }

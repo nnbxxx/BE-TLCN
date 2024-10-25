@@ -30,15 +30,6 @@ export class Product {
     @Prop({ default: 0 })
     rating: string;
 
-    // chuyển đổi thành kho
-
-    // Số sản phẩm bán được
-    @Prop({ default: 0 })
-    quantitySold: number;
-    // Số sản phẩm trong kho
-    @Prop({ default: 0 })
-    stock: number;
-
     @Prop({ type: Object })
     createdBy: {
         _id: mongoose.Schema.Types.ObjectId;

@@ -46,6 +46,7 @@ export class CloudinaryService {
         return result;
     }
 
+
     destroy(publicId: string): Promise<CloudinaryResponse> {
         return new Promise<CloudinaryResponse>((resolve, reject) => {
             cloudinary.uploader.destroy(

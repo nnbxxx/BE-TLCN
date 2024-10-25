@@ -6,7 +6,7 @@ import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
 class ProductAdd {
-    @IsNotEmpty({ message: 'product không được để trống' })
+    @IsNotEmpty({ message: 'product_id không được để trống' })
     _id: string;
 
     @IsNotEmpty({ message: 'name không được để trống' })

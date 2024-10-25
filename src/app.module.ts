@@ -24,6 +24,8 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { NotificationsGateway } from './notifications/notifications.gateway';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { FilesModule } from './modules/files/files.module';
+import { InventoryProduct } from './modules/inventory-product/schemas/inventory-product.schemas';
+import { InventoryProductModule } from './modules/inventory-product/inventory-product.module';
 
 
 @Module({
@@ -63,7 +65,8 @@ import { FilesModule } from './modules/files/files.module';
     CouponsModule,
     NotificationsModule,
     CloudinaryModule,
-    FilesModule
+    FilesModule,
+    InventoryProductModule
 
   ],
   controllers: [AppController],

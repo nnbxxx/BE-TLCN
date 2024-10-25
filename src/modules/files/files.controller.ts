@@ -34,14 +34,15 @@ export class FilesController {
         fileType: /^(jpg|jpeg|png|image\/png|gif|txt|pdf|application\/pdf|doc|docx|text\/plain)$/i,
       })
       .addMaxSizeValidator({
-        maxSize: 1024 * 1024 //kb = 1 MB
+        maxSize: 100 * 1024 * 1024 //kb = 1 MB
       })
       .build({
         errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY
       }),
   ) file: Express.Multer.File) {
-    const imgUrl = (await this.cloudinaryService.uploadFile(file, 'new-img'))
-    console.log("🚀 ~ FilesController ~ imgUrl:", imgUrl)
+    const imgUrl = (await this.cloudinaryService.uploadFile(file, 'new-img')).url
+    //console.log("🚀 ~ FilesController ~ imgUrl:", imgUrl)
+    return imgUrl;
   }
   @ResponseMessage("Upload multiple new file")
   @Public()
@@ -65,11 +66,21 @@ export class FilesController {
     }
   })
   async uploadFiles(
-    @UploadedFiles() files: Express.Multer.File[],
+    @UploadedFiles(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType: /^(jpg|jpeg|png|image\/png|gif|txt|pdf|application\/pdf|doc|docx|text\/plain)$/i,
+        })
+        .addMaxSizeValidator({
+          maxSize: 100 * 1024 * 1024 //kb = 1 MB
+        })
+        .build({
+          errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY
+        }),) files: Express.Multer.File[],
   ) {
     if (files) {
       const resultUpload = await this.cloudinaryService.uploadMultipleFile(files, 'new-img-files');
-
+      return resultUpload
     }
 
   }

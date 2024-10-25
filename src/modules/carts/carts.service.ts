@@ -8,13 +8,15 @@ import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 
 import { ProductsService } from '../products/products.service';
 import mongoose, { Types } from 'mongoose';
+import { InventoryProductService } from '../inventory-product/inventory-product.service';
 
 @Injectable()
 export class CartsService {
   constructor(
     @InjectModel(Cart.name)
     private cartModel: SoftDeleteModel<CartDocument>,
-    private productService: ProductsService
+    private productService: ProductsService,
+    private inventoryProductService: InventoryProductService
   ) { }
   create(user: IUser) {
     return this.cartModel.create({
@@ -67,9 +69,9 @@ export class CartsService {
 
     const isStock = await this.checkIsProductStock(cartItem.product._id as any, cartItem)
     const foundCart = await this.findByUser(user)
-    if (!isStock) {
-      throw new BadRequestException(`Sản phẩm ${cartItem.product.name} không đủ số lượng`)
-    }
+    // if (!isStock) {
+    //   throw new BadRequestException(`Sản phẩm ${cartItem.product.name} không đủ số lượng`)
+    // }
     //true -> empty
     const isItemExist = await this.checkIsItemExit(cartItem.product._id as any, foundCart.items)
     if (!isItemExist) {
@@ -115,7 +117,7 @@ export class CartsService {
 
   //                        ==================Utils=================
   async checkIsProductStock(productId: Types.ObjectId, cartItem: CartItem | UpdateToCartDto) {
-    const productStock = (await this.productService.findOne(productId)).stock;
+    const productStock = (await this.inventoryProductService.findByProductId(productId as any)).quantity;
     return productStock >= cartItem.product.quantity
   }
   async checkIsItemExit(productId: mongoose.Types.ObjectId, userProductCart: any) {

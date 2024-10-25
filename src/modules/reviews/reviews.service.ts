@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -7,6 +7,7 @@ import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { UserDocument } from '../users/schemas/user.schema';
 import { UsersService } from '../users/users.service';
 import { IUser } from '../users/users.interface';
+import mongoose from 'mongoose';
 
 @Injectable()
 export class ReviewsService {
@@ -31,6 +32,12 @@ export class ReviewsService {
     return newReview;
   }
 
+  async getQuantityComment(productId: string) {
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      throw new NotFoundException(`not found product with id=${productId}`);
+    }
+    return this.reviewModel.countDocuments({ productId }).exec();
+  }
   findAll() {
     return `This action returns all reviews`;
   }

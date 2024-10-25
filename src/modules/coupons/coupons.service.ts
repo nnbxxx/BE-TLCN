@@ -56,7 +56,7 @@ export class CouponsService {
       .skip(offset)
       .limit(defaultLimit)
       .sort(sort as any)
-      .select(['-stock'])
+      .select([''])
       .populate(population)
       .exec();
 

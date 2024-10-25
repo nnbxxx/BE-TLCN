@@ -13,6 +13,7 @@ import aqp from 'api-query-params';
 import { AddressService } from '../address/addresses.service';
 import { CartsService } from '../carts/carts.service';
 import { UsersService } from '../users/users.service';
+import { InventoryProductService } from '../inventory-product/inventory-product.service';
 
 @Injectable()
 export class ReceiptsService {
@@ -22,6 +23,7 @@ export class ReceiptsService {
     private productService: ProductsService,
     private cartService: CartsService,
     private userService: UsersService,
+    private inventoryProductService: InventoryProductService
 
   ) { }
   async create(createReceiptDto: CreateReceiptDto, user: IUser) {
@@ -171,18 +173,23 @@ export class ReceiptsService {
 
   }
 
-  // thanh toán thành công 
+  // thanh toán thành công for user
   async confirmPayment(receiptId: string, user: IUser) {
-
     const receipt = await this.findOne(receiptId);
     const productIds = receipt.items.map(item => item.product._id.toString());
-    if (receipt.statusUser !== RECEIPT_STATUS.CONFIRMED && receipt.statusUser !== RECEIPT_STATUS.DELIVERED) {
-      this.userService.updatePurchasedProducts(user, productIds, receipt.total / 10)
+
+    if (receipt.statusUser !== RECEIPT_STATUS.DELIVERED) {
+      // update sản phẩm đã mua của user
+      await this.userService.updatePurchasedProducts(user, productIds, receipt.total / 10)
+      // update vào kho lịch sử mua hàng
+      await this.inventoryProductService.updateReceiptUser(receipt.items, user)
+
       return await this.receiptModel.findOneAndUpdate(
         { _id: receiptId },
         { $set: { statusUser: RECEIPT_STATUS.CONFIRMED, statusSupplier: RECEIPT_STATUS.DELIVERED } },
         { new: true }
       );
+
     }
     return await this.receiptModel.findOneAndUpdate(
       { _id: receiptId },

@@ -1,22 +1,27 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { HydratedDocument } from "mongoose";
 import { Product } from "src/modules/products/schemas/product.schemas";
+import { ReservationProduct } from "../dto/create-inventory-product.dto";
 import { User } from "src/modules/users/schemas/user.schema";
 
-export type ReviewDocument = HydratedDocument<Review>;
+export type InventoryProductDocument = HydratedDocument<InventoryProduct>;
 
 @Schema({ timestamps: true })
-export class Review {
-    @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: User.name })
-    userId: mongoose.Schema.Types.ObjectId;
+export class InventoryProduct {
     @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: Product.name })
     productId: mongoose.Schema.Types.ObjectId;
+    @Prop({ type: Number, default: 0 })
+    quantity: number;
 
-    @Prop({ required: true, default: [] })
-    fileUrl?: [string];
-
-    @Prop({ default: '0' })
-    rating: string;
+    // chi tiết các sản phẩm user mua
+    @Prop({
+        type: [{
+            userId: { type: mongoose.Schema.Types.ObjectId, ref: User.name, require: true, },
+            quantity: { type: Number, require: true, },
+            price: { type: Number, require: true, },
+        }], default: []
+    })
+    reservations: [ReservationProduct]
 
     @Prop({ type: Object })
     createdBy: {
@@ -51,4 +56,4 @@ export class Review {
 }
 
 
-export const ReviewSchema = SchemaFactory.createForClass(Review);
+export const InventoryProductSchema = SchemaFactory.createForClass(InventoryProduct);

@@ -49,7 +49,7 @@ export class NotificationsService {
       .skip(offset)
       .limit(defaultLimit)
       .sort(sort as any)
-      .select('-password')
+      .select('')
       .populate(population)
       .exec();
 
@@ -81,6 +81,6 @@ export class NotificationsService {
   async sendNotificationCouponToUsers(listUser: [{ point: number, _id: any, couponsUser: [{}] }], coupon: {
     _id: any, code: string, description: {}
   }) {
-    
+
   }
 }

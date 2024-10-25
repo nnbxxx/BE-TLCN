@@ -42,7 +42,7 @@ export class ReceiptsController {
   }
 
   @ResponseMessage("auto confirm receipts")
-  @Get('/auto_active')
+  @Get('auto/auto_active')
   @Public()
   @Cron(CronExpression.EVERY_MINUTE)
   autoUpdateConfirm() {
