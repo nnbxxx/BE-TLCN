@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { CouponsService } from './coupons.service';
-import { CreateCouponDto } from './dto/create-coupon.dto';
+import { CheckValidCoupon, CreateCouponDto } from './dto/create-coupon.dto';
 import { UpdateCouponDto } from './dto/update-coupon.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { Public, ResponseMessage, User } from 'src/decorator/customize';
@@ -48,5 +48,11 @@ export class CouponsController {
   @Cron(CronExpression.EVERY_MINUTE)
   autoSendNotificationCouponsToUser() {
     return this.couponsService.autoNotificationCoupons();
+  }
+  // check is valid coupon
+  @ResponseMessage("check is valid coupon")
+  @Post(`/check`)
+  checkValidCoupon(@Body() checkValidCouponDto: CheckValidCoupon, @User() user: IUser) {
+    return this.couponsService.checkValidCoupon(checkValidCouponDto, user);
   }
 }

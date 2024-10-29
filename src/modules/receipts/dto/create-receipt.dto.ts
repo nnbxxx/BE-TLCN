@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, Min, ValidateNested } from "class-validator"
+import { IsArray, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, Min, ValidateNested } from "class-validator"
 import { Interface } from "readline";
 import { AddressReceipt } from "./update-receipt.dto";
 
@@ -30,6 +30,11 @@ export class CreateReceiptDto {
     @ValidateNested({ each: true })
     @Type(() => ReceiptDetailDTo)
     items: ReceiptDetailDTo[]
+
+    @IsArray({ message: 'coupons phải là array' })
+    @IsOptional()
+    @IsString({ each: true, message: "mã coupon phải là string" })
+    coupons: string[];
 
     @IsNotEmpty({ message: 'supplier không được để trống' })
     @IsString({ message: "supplier phải là string" })

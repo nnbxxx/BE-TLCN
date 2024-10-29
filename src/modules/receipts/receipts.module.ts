@@ -7,9 +7,11 @@ import { ProductsModule } from '../products/products.module';
 import { CartsModule } from '../carts/carts.module';
 import { UsersModule } from '../users/users.module';
 import { InventoryProductModule } from '../inventory-product/inventory-product.module';
+import { CouponsService } from '../coupons/coupons.service';
+import { CouponsModule } from '../coupons/coupons.module';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: Receipt.name, schema: ReceiptSchema }]), ProductsModule, CartsModule, UsersModule, InventoryProductModule],
+  imports: [MongooseModule.forFeature([{ name: Receipt.name, schema: ReceiptSchema }]), ProductsModule, CartsModule, UsersModule, InventoryProductModule, CouponsModule],
   controllers: [ReceiptsController],
   providers: [ReceiptsService],
   exports: [ReceiptsService]

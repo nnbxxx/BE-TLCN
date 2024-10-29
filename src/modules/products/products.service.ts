@@ -81,8 +81,9 @@ export class ProductsService {
     }
     const data = await this.productModel.findById(id);
     const quantityComments = await this.reviewService.getQuantityComment(id as any)
-    const quantityProductPurchased = await this.inventoryProductService.getProductPurchased(id as any)
-    const newData = { ...data.toObject(), quantityComments: +quantityComments, quantityProductPurchased: +quantityProductPurchased }
+    const productPurchased = await this.inventoryProductService.getProductPurchased(id as any) as any
+    const { _id, reservations } = productPurchased
+    const newData = { ...data.toObject(), quantityComments: +quantityComments, quantityProductPurchased: reservations.length }
     return newData;
   }
   async findOneForUser(id: Types.ObjectId, user: IUser) {

@@ -14,13 +14,16 @@ import { MailerService } from '@nestjs-modules/mailer';
 import dayjs from 'dayjs';
 import { ChangePasswordAuthDto, CodeAuthDto } from 'src/auth/dto/create-auth.dto';
 import * as crypto from 'crypto';
+import { ReceiptsService } from '../receipts/receipts.service';
+import { RECEIPT_STATUS } from 'src/constants/schema.enum';
 @Injectable()
 export class UsersService {
 
   constructor(
     @InjectModel(UserM.name)
     private userModel: SoftDeleteModel<UserDocument>,
-    private readonly mailerService: MailerService
+    private readonly mailerService: MailerService,
+
   ) { }
 
 
@@ -373,4 +376,28 @@ export class UsersService {
     const user = await this.findOne(userId) as any;
     return user.socketId;
   }
+  async checkIsActiveCode(userId: string, couponId: string, active: boolean = true) {
+    const user = await this.userModel.findOne({
+      _id: userId
+    });
+
+    const coupon = user.couponsUser.find(coupon => {
+      // so sánh string vs mongo id
+      return (new mongoose.Types.ObjectId(coupon._id.toString())).equals(couponId) && coupon.isActive === !active
+    })
+
+    if (!coupon && active === true) {
+      throw new NotFoundException(`Coupon with ID ${couponId} for this user is actived`);
+    }
+    if (coupon) {
+      coupon.isActive = active;
+      await user.save();
+    }
+    else {
+      throw new NotFoundException(`Coupon with ID ${couponId} for this user is actived`);
+    }
+
+  }
+
+
 }

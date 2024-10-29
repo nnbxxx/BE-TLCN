@@ -74,11 +74,11 @@ export class InventoryProductService {
     if (!mongoose.Types.ObjectId.isValid(productId)) {
       throw new NotFoundException(`not found product with id=${productId}`);
     }
-    return this.inventoryProductModel.countDocuments({ productId }).exec();
+    return this.inventoryProductModel.findOne({ productId }).select(['reservations']);
   }
   async updateReceiptUser(receiptItems: ReceiptItem[], user: IUser) {
     receiptItems.map(async (item) => {
-      const { product, name, price, quantity } = item as any
+      const { product, price, quantity } = item as any
       const productInventory = await this.findByProductId(product);
       if (!productInventory) {
         throw new NotFoundException('Product not found');

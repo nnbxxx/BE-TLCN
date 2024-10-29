@@ -35,7 +35,6 @@ export class CouponDiscount {
 export class CreateCouponDto {
     @IsNotEmpty({ message: 'Mã code không được để trống' })
     @ApiProperty({ example: 'COUPOUNS01', description: 'Mã code' })
-
     code: string;
     @IsNotEmpty({ message: 'Mô tả không được để trống' })
     @ApiProperty({ example: 'Khuyến mãi 1: giảm 10k', description: 'Mô tả tên code' })
@@ -64,4 +63,9 @@ export class CreateCouponDto {
     @IsNotEmpty()
     description: CouponPrice | CouponDiscount;
 
+}
+export class CheckValidCoupon {
+    @IsNotEmpty({ message: 'Mã code không được để trống' })
+    @ApiProperty({ example: 'COUPOUNS01', description: 'Mã code' })
+    code: string;
 }

@@ -1,5 +1,5 @@
-import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
-import { CreateCouponDto } from './dto/create-coupon.dto';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { CheckValidCoupon, CreateCouponDto } from './dto/create-coupon.dto';
 import { UpdateCouponDto } from './dto/update-coupon.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Coupon, CouponDocument } from './schemas/coupon.schemas';
@@ -147,5 +147,22 @@ export class CouponsService {
       })
 
     })
+  }
+  async checkValidCoupon(checkValidCouponDto: CheckValidCoupon, user: IUser, active: boolean = true) {
+    const { code } = checkValidCouponDto
+    const codeCheck = await this.couponModel.findOne({ code: code })
+    if (codeCheck.quantity === 0) {
+      throw new BadRequestException(`Coupon có mã code ${code} hết hiệu lực`)
+    }
+    if (codeCheck) {
+      // xử lý active code
+      codeCheck.quantity += active ? -1 : 1;
+      await this.userService.checkIsActiveCode(user._id, codeCheck._id as any, active)
+      await codeCheck.save();
+      return codeCheck
+    }
+    else {
+      throw new NotFoundException(`Not found Coupon with code = ${code}`)
+    }
   }
 }

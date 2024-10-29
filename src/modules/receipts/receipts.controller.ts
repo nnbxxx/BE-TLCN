@@ -7,6 +7,7 @@ import { Public, ResponseMessage, User } from 'src/decorator/customize';
 import { IUser } from '../users/users.interface';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { EmailSW } from '../users/dto/update-user.dto';
+import { CheckValidCoupon } from '../coupons/dto/create-coupon.dto';
 
 @ApiTags('receipts')
 @Controller('receipts')
@@ -16,6 +17,17 @@ export class ReceiptsController {
   @Post()
   create(@Body() createReceiptDto: CreateReceiptDto, @User() user: IUser) {
     return this.receiptsService.create(createReceiptDto, user);
+
+  }
+  @ResponseMessage("active coupon of receipt")
+  @Post(`coupon/active:id`)
+  activeCoupon(@Body() checkValidCoupon: CheckValidCoupon, @Param('id') id: string, @User() user: IUser) {
+    return this.receiptsService.activeCoupons(checkValidCoupon, id, user);
+  }
+  @ResponseMessage("active coupon of receipt")
+  @Post(`coupon/unactive:id`)
+  unactiveCoupon(@Body() checkValidCoupon: CheckValidCoupon, @Param('id') id: string, @User() user: IUser) {
+    return this.receiptsService.activeCoupons(checkValidCoupon, id, user, false);
   }
 
   @ResponseMessage("View history receipt")
@@ -58,5 +70,9 @@ export class ReceiptsController {
     return this.receiptsService.confirmPayment(id, user);
   }
 
-
+  @Get('/user/cash-flow')
+  @ResponseMessage("Cash flow statistics a User")
+  getCashFlow(@User() user: IUser) {
+    return this.receiptsService.getCashFlow(user);
+  }
 }

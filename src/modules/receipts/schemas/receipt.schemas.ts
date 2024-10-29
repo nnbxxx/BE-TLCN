@@ -25,6 +25,11 @@ export class Receipt {
     }]
   })
   items: ReceiptItem[];
+  @Prop({
+    default: [],
+    type: [String]
+  })
+  coupons: string[];
   // nhà cung cấp 
   @Prop({ required: true })
   supplier: string;

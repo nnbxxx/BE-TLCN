@@ -8,12 +8,14 @@ import { ProductsService } from '../products/products.service';
 import { IUser } from '../users/users.interface';
 import dayjs from 'dayjs';
 import mongoose from 'mongoose';
-import { RECEIPT_STATUS } from 'src/constants/schema.enum';
+import { RECEIPT_STATUS, TYPE_COUPONS } from 'src/constants/schema.enum';
 import aqp from 'api-query-params';
 import { AddressService } from '../address/addresses.service';
 import { CartsService } from '../carts/carts.service';
 import { UsersService } from '../users/users.service';
 import { InventoryProductService } from '../inventory-product/inventory-product.service';
+import { CouponsService } from '../coupons/coupons.service';
+import { CheckValidCoupon } from '../coupons/dto/create-coupon.dto';
 
 @Injectable()
 export class ReceiptsService {
@@ -23,7 +25,8 @@ export class ReceiptsService {
     private productService: ProductsService,
     private cartService: CartsService,
     private userService: UsersService,
-    private inventoryProductService: InventoryProductService
+    private inventoryProductService: InventoryProductService,
+    private couponService: CouponsService
 
   ) { }
   async create(createReceiptDto: CreateReceiptDto, user: IUser) {
@@ -196,5 +199,63 @@ export class ReceiptsService {
     );
 
   }
+  async activeCoupons(checkValidCoupon: CheckValidCoupon, receiptId: string, user: IUser, active: boolean = true) {
+    const coupon = await this.couponService.checkValidCoupon(checkValidCoupon, user, active)
+    if (coupon) {
+      // kích hoặc coupon
+      const receipt = await this.receiptModel.findOne({ _id: receiptId });
+      if (receipt) {
+        const { value } = coupon.description
+        if (coupon.type === TYPE_COUPONS.PRICE) {
+          receipt.total += active ? -value : +value
+        }
+        else if (coupon.type === TYPE_COUPONS.PERCENT) {
+          receipt.total += active ? -receipt.total * value / 100 : +receipt.total * value / (100 - value)
+        }
 
+        // check lại logic
+        if (active && !receipt.coupons.includes(checkValidCoupon.code)) {
+          receipt.coupons.push(checkValidCoupon.code);
+          await receipt.save();
+        }
+        else if (!active && receipt.coupons.includes(checkValidCoupon.code)) {
+          receipt.coupons = receipt.coupons.filter(coupon => coupon !== checkValidCoupon.code);
+          await receipt.save();
+
+        }
+        await receipt.save();
+        return receipt
+      }
+      else {
+        throw new NotFoundException(` Không tìm thấy hóa đơn Id ${receiptId} `)
+      }
+    }
+    else {
+      throw new NotFoundException(` Không tìm thấy hóa đơn Id ${receiptId} `)
+    }
+  }
+  async findByStatus(user: IUser, statusUser: RECEIPT_STATUS, statusSupplier: RECEIPT_STATUS) {
+    const result = await this.receiptModel.find({ user: user._id, statusUser: statusUser, statusSupplier: statusSupplier }).select(['total']).exec();
+    return result;
+  }
+  async getCashFlow(user: IUser) {
+    /**user-shop
+     * UNCONFIRMED UNCONFIRMED ->đơn chờ xác nhận
+     * CONFIRMED ON_DELIVERY -> đơn hàng đang giao
+     * CONFIRMED DELIVERED -> đơn hàng đã giao
+     */
+    const confirmReceipt = await this.findByStatus(user, RECEIPT_STATUS.UNCONFIRMED, RECEIPT_STATUS.UNCONFIRMED)
+    const totalConfirmReceipt = confirmReceipt.reduce((sum, item) => sum + item.total, 0);
+
+    const onDeliveryReceipt = await this.findByStatus(user, RECEIPT_STATUS.CONFIRMED, RECEIPT_STATUS.ON_DELIVERY)
+    const totalOnDeliveryReceipt = onDeliveryReceipt.reduce((sum, item) => sum + item.total, 0);
+
+    const deliveredReceipt = await this.findByStatus(user, RECEIPT_STATUS.CONFIRMED, RECEIPT_STATUS.DELIVERED)
+    const totalDeliveredReceipt = deliveredReceipt.reduce((sum, item) => sum + item.total, 0);
+
+    return {
+      totalConfirmReceipt, totalOnDeliveryReceipt, totalDeliveredReceipt
+    }
+
+  }
 }
