@@ -113,6 +113,19 @@ export class LikeProductsService {
     });
     return (itemExist.length === 0)
   }
+  async checkProductFavorite(productId: string, user: IUser) {
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      throw new BadRequestException(`not found product with id=${productId}`);
+    }
+    const foundProducts = await this.findByUser(user)
+    const item = foundProducts.items.find(item => {
+      return (new mongoose.Types.ObjectId(item.product.toString())).equals(productId);
+    })
+
+    return {
+      checkProduct: item ? true : false
+    }
+  }
   findAll() {
     return `This action returns all likeProducts`;
   }

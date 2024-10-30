@@ -75,7 +75,7 @@ export class ProductsService {
   }
 
 
-  async findOne(id: Types.ObjectId) {
+  async findOne(id: string) {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new BadRequestException(`not found product with id=${id}`);
     }
@@ -86,7 +86,7 @@ export class ProductsService {
     const newData = { ...data.toObject(), quantityComments: +quantityComments, quantityProductPurchased: reservations.length }
     return newData;
   }
-  async findOneForUser(id: Types.ObjectId, user: IUser) {
+  async findOneForUser(id: string, user: IUser) {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new BadRequestException(`not found product with id=${id}`);
     }

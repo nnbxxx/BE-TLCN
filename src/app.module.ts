@@ -26,6 +26,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { FilesModule } from './modules/files/files.module';
 import { InventoryProduct } from './modules/inventory-product/schemas/inventory-product.schemas';
 import { InventoryProductModule } from './modules/inventory-product/inventory-product.module';
+import { AddressUserModule } from './modules/address-user/address-user.module';
 
 
 @Module({
@@ -66,7 +67,8 @@ import { InventoryProductModule } from './modules/inventory-product/inventory-pr
     NotificationsModule,
     CloudinaryModule,
     FilesModule,
-    InventoryProductModule
+    InventoryProductModule,
+    AddressUserModule
 
   ],
   controllers: [AppController],

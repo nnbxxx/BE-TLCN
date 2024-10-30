@@ -45,7 +45,7 @@ export class AuthController {
         return { user };
     }
     @Public()
-    @ResponseMessage("Get User by refresh token")
+    @ResponseMessage("Get User handleRefreshToken")
     @Get('/refresh')
     handleRefreshToken(@Req() request: Request, @Res({ passthrough: true }) response: Response) {
         const refreshToken = request.cookies["refresh_token"];

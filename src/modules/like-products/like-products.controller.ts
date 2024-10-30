@@ -31,6 +31,11 @@ export class LikeProductsController {
   removeCartItem(@Param('id') id: string, @User() user: IUser) {
     return this.likeProductsService.removeProduct(id, user);
   }
+  @ResponseMessage("Check product to is like")
+  @Get('/user/:id')
+  checkCartItem(@Param('id') id: string, @User() user: IUser) {
+    return this.likeProductsService.checkProductFavorite(id, user);
+  }
   @ResponseMessage("Remove All Cart User")
   @Post('/remove')
   removeCart(@User() user: IUser) {

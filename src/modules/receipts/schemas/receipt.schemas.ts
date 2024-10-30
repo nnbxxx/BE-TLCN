@@ -1,7 +1,7 @@
 
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { HydratedDocument, Types } from "mongoose";
-import { RECEIPT_STATUS } from "src/constants/schema.enum";
+import { PAYMENT_METHOD, RECEIPT_STATUS } from "src/constants/schema.enum";
 import { Product } from "src/modules/products/schemas/product.schemas";
 import { User } from "src/modules/users/schemas/user.schema";
 import { AddressReceipt, ReceiptItem } from "../dto/update-receipt.dto";
@@ -62,6 +62,8 @@ export class Receipt {
 
   @Prop({ type: String, enum: RECEIPT_STATUS, default: RECEIPT_STATUS.UNCONFIRMED, required: true })
   statusSupplier: RECEIPT_STATUS;
+  @Prop({ type: String, enum: PAYMENT_METHOD, default: PAYMENT_METHOD.COD, required: true })
+  paymentMethod: PAYMENT_METHOD;
 
   @Prop({ type: Boolean, default: false })
   isCheckout: boolean

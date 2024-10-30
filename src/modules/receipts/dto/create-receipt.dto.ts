@@ -1,7 +1,9 @@
 import { Type } from "class-transformer";
-import { IsArray, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, Min, ValidateNested } from "class-validator"
+import { IsArray, IsEnum, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, Min, ValidateNested } from "class-validator"
 import { Interface } from "readline";
 import { AddressReceipt } from "./update-receipt.dto";
+import { PAYMENT_METHOD } from "src/constants/schema.enum";
+import { ApiProperty } from "@nestjs/swagger";
 
 export interface IReceipt {
 
@@ -53,4 +55,9 @@ export class CreateReceiptDto {
         ward: string,
         detail: string
     }
+    @IsNotEmpty({ message: 'paymentMethod không được để trống' })
+    @IsEnum(PAYMENT_METHOD, { message: 'paymentMethod phải là enum ' })
+    @ApiProperty({ example: PAYMENT_METHOD.COD, description: 'phương thức thanh toán' })
+
+    paymentMethod: PAYMENT_METHOD
 }

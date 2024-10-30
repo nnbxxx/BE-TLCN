@@ -6,6 +6,8 @@ export type CategoryDocument = HydratedDocument<Category>;
 export class Category {
     @Prop({ required: true })
     name: string;
+    @Prop({ required: true })
+    url: string;
 
     @Prop({ type: Object })
     createdBy: {

@@ -10,6 +10,8 @@ export type UserDocument = HydratedDocument<User>;
 export class User {
     @Prop()
     name: string;
+    @Prop({ required: true, type: String, default: 'http://res.cloudinary.com/dyhpycx4c/image/upload/v1730186934/new-img/eh8udjbm4x4zossupogb.png' })
+    avatar: string;
 
     @Prop({ required: true })
     email: string; // unique

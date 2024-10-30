@@ -17,6 +17,8 @@ export class Review {
 
     @Prop({ default: '0' })
     rating: string;
+    @Prop({ required: true, type: String })
+    comment: string;
 
     @Prop({ type: Object })
     createdBy: {

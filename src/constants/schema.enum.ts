@@ -10,3 +10,7 @@ export enum TYPE_COUPONS {
     PRICE = 'PRICE',
     PERCENT = 'PERCENT'
 }
+export enum PAYMENT_METHOD {
+    COD = 'COD',
+    VNPAY = 'VNPAY'
+}
