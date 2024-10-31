@@ -41,7 +41,6 @@ export class ReviewsService {
   }
   async findAll(currentPage: number, limit: number, qs: string) {
     const { filter, sort, population } = aqp(qs);
-    console.log("🚀 ~ ReviewsService ~ findAll ~ population:", population)
     delete filter.current;
     delete filter.pageSize;
 
@@ -85,4 +84,6 @@ export class ReviewsService {
   remove(id: number) {
     return `This action removes a #${id} review`;
   }
+
+
 }

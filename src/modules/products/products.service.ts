@@ -54,7 +54,7 @@ export class ProductsService {
     const totalItems = (await this.productModel.find(filter)).length;
     const totalPages = Math.ceil(totalItems / defaultLimit);
     let result;
-    if (min && max) {
+    if (min >= 0 && max >= 0) {
       result = await this.productModel.find({
         price: { $gte: min, $lte: max }
       })
