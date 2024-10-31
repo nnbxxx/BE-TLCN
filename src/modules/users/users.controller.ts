@@ -38,6 +38,13 @@ export class UsersController {
     return foundUser;
   }
 
+  @Get('/coupon/:id')
+  @ResponseMessage("Fetch user by id")
+  async findOneCoupon(@Param('id') id: string) {
+    const foundUser = await this.usersService.findOneCoupon(id);
+    return foundUser;
+  }
+
   @ResponseMessage("Update a User")
   @Patch()
   async update(@Body() updateUserDto: UpdateUserDto, @User() user: IUser) {

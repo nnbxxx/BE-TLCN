@@ -23,9 +23,9 @@ export class ProductsService {
   ) { }
 
   async create(createProductDto: CreateProductDto, user: IUser) {
-    const { brand, category, description, image, name, price, shopName, quantity } = createProductDto
+    const { brand, category, description, images, name, price, shopName, quantity } = createProductDto
     const product = await this.productModel.create({
-      brand, category, description, image, name, price, shopName,
+      brand, category, description, images, name, price, shopName,
       createdBy: {
         _id: user._id,
         email: user.email
@@ -42,26 +42,38 @@ export class ProductsService {
   }
 
   async findAll(currentPage: number, limit: number, qs: string) {
+
     const { filter, sort, population } = aqp(qs);
+    const { min, max } = filter
+
     delete filter.current;
     delete filter.pageSize;
-
     let offset = (+currentPage - 1) * (+limit);
     let defaultLimit = +limit ? +limit : 10;
 
     const totalItems = (await this.productModel.find(filter)).length;
     const totalPages = Math.ceil(totalItems / defaultLimit);
-
-
-    const result = await this.productModel.find(filter)
-      .skip(offset)
-      .limit(defaultLimit)
-      .sort(sort as any)
-      .select([''])
-      .populate(population)
-      .exec();
-
-
+    let result;
+    if (min && max) {
+      result = await this.productModel.find({
+        price: { $gte: min, $lte: max }
+      })
+        .skip(offset)
+        .limit(defaultLimit)
+        .sort(sort as any)
+        .select([''])
+        .populate(population)
+        .exec();
+    }
+    else {
+      result = await this.productModel.find(filter)
+        .skip(offset)
+        .limit(defaultLimit)
+        .sort(sort as any)
+        .select([''])
+        .populate(population)
+        .exec();
+    }
     return {
       meta: {
         current: currentPage, //trang hiện tại

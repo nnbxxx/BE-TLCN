@@ -1,8 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
-import { ResponseMessage, User } from 'src/decorator/customize';
+import { Public, ResponseMessage, User } from 'src/decorator/customize';
 import { IUser } from '../users/users.interface';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -17,8 +17,12 @@ export class ReviewsController {
   }
 
   @Get()
-  findAll() {
-    return this.reviewsService.findAll();
+  @Public()
+  @ResponseMessage("Fetch Reviews with paginate")
+  findAll(@Query("current") currentPage: number,
+    @Query("pageSize") limit: number,
+    @Query() qs: string,) {
+    return this.reviewsService.findAll(currentPage, limit, qs);
   }
 
   @Get(':id')

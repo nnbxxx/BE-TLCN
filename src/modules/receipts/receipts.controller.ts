@@ -20,12 +20,12 @@ export class ReceiptsController {
 
   }
   @ResponseMessage("active coupon of receipt")
-  @Post(`coupon/active:id`)
+  @Post(`coupon/active/:id`)
   activeCoupon(@Body() checkValidCoupon: CheckValidCoupon, @Param('id') id: string, @User() user: IUser) {
     return this.receiptsService.activeCoupons(checkValidCoupon, id, user);
   }
   @ResponseMessage("active coupon of receipt")
-  @Post(`coupon/unactive:id`)
+  @Post(`coupon/unactive/:id`)
   unactiveCoupon(@Body() checkValidCoupon: CheckValidCoupon, @Param('id') id: string, @User() user: IUser) {
     return this.receiptsService.activeCoupons(checkValidCoupon, id, user, false);
   }

@@ -95,6 +95,7 @@ export class UsersService {
   }
 
   async findAll(currentPage: number, limit: number, qs: string) {
+    console.log("🚀 ~ UsersService ~ findAll ~ qs:", qs)
     const { filter, sort, population } = aqp(qs);
     delete filter.current;
     delete filter.pageSize;
@@ -135,6 +136,14 @@ export class UsersService {
     return await this.userModel.findOne({
       _id: id
     }).select("-password") //exclude >< include
+  }
+  async findOneCoupon(id: string) {
+    if (!mongoose.Types.ObjectId.isValid(id))
+      return `not found user`;
+
+    return await this.userModel.findOne({
+      _id: id
+    }).select(["couponsUser", "name", "email"])
   }
 
   findOneByUsername(username: string) {

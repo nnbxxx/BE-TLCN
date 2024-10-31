@@ -24,11 +24,16 @@ export class Product {
     @Prop({ required: true })
     shopName: string;
 
-    @Prop({ required: true })
-    image: string;
+    @Prop({
+        default: [],
+        type: [String]
+    })
+    images: string[];
 
     @Prop({ default: 0 })
-    rating: string;
+    rating: number;
+    @Prop({ default: 0 })
+    discount: number;
 
     @Prop({ type: Object })
     createdBy: {
