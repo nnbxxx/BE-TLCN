@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto, RegisterUserDto } from './dto/create-user.dto';
-import { ProfileUserDto, UpdateUserDto } from './dto/update-user.dto';
+import { ProfileUserDto, UpdateProfileUser, UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User as UserM, UserDocument } from './schemas/user.schema';
 import mongoose, { Model } from 'mongoose';
@@ -62,7 +62,8 @@ export class UsersService {
   }
 
   async register(user: RegisterUserDto) {
-    const { name, email, password, age, gender, address } = user;
+    // const { name, email, password, age, gender, address } = user;
+    const { name, email, password } = user;
     //add logic check email
     const isExist = await this.userModel.findOne({ email });
     if (isExist) {
@@ -73,9 +74,9 @@ export class UsersService {
     let newRegister = await this.userModel.create({
       name, email,
       password: hashPassword,
-      age,
-      gender,
-      address,
+      // age,
+      // gender,
+      // address,
       role: "USER",
       isActive: false,
       codeId: codeId,
@@ -407,6 +408,17 @@ export class UsersService {
     }
 
   }
-
+  async updateUserProfile(user: IUser, data: UpdateProfileUser) {
+    const updated = await this.userModel.updateOne(
+      { _id: user._id },
+      {
+        ...data,
+        updatedBy: {
+          _id: user._id,
+          email: user.email
+        }
+      });
+    return updated;
+  }
 
 }

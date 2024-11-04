@@ -136,11 +136,11 @@ export class ReceiptsService {
 
   async findOne(receiptId: string) {
     if (!mongoose.Types.ObjectId.isValid(receiptId)) {
-      throw new NotFoundException(`not found product with id=${receiptId}`);
+      throw new NotFoundException(`not found receipt with id=${receiptId}`);
     }
     const receipt = await this.receiptModel.findById(receiptId)
     if (!receipt) {
-      throw new NotFoundException(`not found product with id=${receiptId}`);
+      throw new NotFoundException(`not found receipt with id=${receiptId}`);
     }
     return receipt;
   }
@@ -255,6 +255,25 @@ export class ReceiptsService {
 
     return {
       totalConfirmReceipt, totalOnDeliveryReceipt, totalDeliveredReceipt
+    }
+
+  }
+  async returnReceipt(receiptId: string, user: IUser) {
+    const receipt = await this.receiptModel.findOne({ _id: receiptId, user: user._id });
+    if (receipt) {
+      if (receipt.statusUser === RECEIPT_STATUS.UNCONFIRMED && receipt.statusSupplier === RECEIPT_STATUS.UNCONFIRMED) {
+        receipt.statusUser = RECEIPT_STATUS.CANCEL;
+        receipt.statusSupplier = RECEIPT_STATUS.CANCEL;
+        await receipt.save();
+        return receipt;
+      }
+      else {
+        throw new BadRequestException(` Đơn hàng hóa đơn Id ${receiptId} đã xác nhận, không thể hủy được, vui lòng liên hệ shop hoặc admin để hủy đơn hàng`)
+
+      }
+    }
+    else {
+      throw new NotFoundException(` Không tìm thấy hóa đơn Id ${receiptId} `)
     }
 
   }

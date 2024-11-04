@@ -44,8 +44,6 @@ export class ProductsService {
   async findAll(currentPage: number, limit: number, qs: string) {
 
     const { filter, sort, population } = aqp(qs);
-    const { min, max } = filter
-
     delete filter.current;
     delete filter.pageSize;
     let offset = (+currentPage - 1) * (+limit);
@@ -53,27 +51,16 @@ export class ProductsService {
 
     const totalItems = (await this.productModel.find(filter)).length;
     const totalPages = Math.ceil(totalItems / defaultLimit);
-    let result;
-    if (min >= 0 && max >= 0) {
-      result = await this.productModel.find({
-        price: { $gte: min, $lte: max }
-      })
-        .skip(offset)
-        .limit(defaultLimit)
-        .sort(sort as any)
-        .select([''])
-        .populate(population)
-        .exec();
-    }
-    else {
-      result = await this.productModel.find(filter)
-        .skip(offset)
-        .limit(defaultLimit)
-        .sort(sort as any)
-        .select([''])
-        .populate(population)
-        .exec();
-    }
+
+
+    let result = await this.productModel.find(filter)
+      .skip(offset)
+      .limit(defaultLimit)
+      .sort(sort as any)
+      .select([''])
+      .populate(population)
+      .exec();
+
     return {
       meta: {
         current: currentPage, //trang hiện tại

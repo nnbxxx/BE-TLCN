@@ -29,7 +29,14 @@ export class ProfileUserDtoSw {
     address: string;
 
 }
-
+export class UpdateProfileUser {
+    @ApiProperty({ example: 'abc XYZ', description: 'Username' })
+    @IsNotEmpty({ message: 'Name không được để trống' })
+    name: string;
+    @ApiProperty({ example: 'Female', description: 'Gender' })
+    @IsNotEmpty({ message: 'Gender không được để trống' })
+    gender: string;
+}
 export class EmailSW {
     @ApiProperty({ example: 'uyenbao4a5@gmail.com', description: 'Email' })
     @IsNotEmpty({ message: 'Email không được để trống' })

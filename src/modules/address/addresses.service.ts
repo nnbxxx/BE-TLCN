@@ -55,6 +55,10 @@ export class AddressService {
       result //kết quả query
     }
   }
+  async getProvince() {
+    const re = await this.addressModel.find({}).select(['Id', 'Name']).exec();
+    return re
+  }
   async getDistrictsByCityId(id: string) {
     const result = await this.addressModel.findOne({ Id: id })
     if (!result) {

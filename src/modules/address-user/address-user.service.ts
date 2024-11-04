@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAddressUserDto } from './dto/create-address-user.dto';
 import { UpdateAddressUserDto } from './dto/update-address-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -6,6 +6,7 @@ import { AddressUser, AddressUserDocument } from './schemas/address-user.schemas
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from '../users/users.interface';
 import aqp from 'api-query-params';
+import mongoose from 'mongoose';
 
 @Injectable()
 export class AddressUserService {
@@ -88,7 +89,44 @@ export class AddressUserService {
       },
     );
   }
-  remove(id: number) {
-    return `This action removes a #${id} addressUser`;
+  async removeForUser(id: string, user: IUser) {
+    if (!mongoose.Types.ObjectId.isValid(id))
+      throw new NotFoundException(`not found address user`);
+
+    const address = await this.addressUserModel.findOne(
+      { _id: id, user: user._id },
+    )
+    if (address) {
+      if (address.isDefault === true) {
+        throw new BadRequestException(`Địa chỉ mặc định không thể xóa được`)
+      }
+      return this.addressUserModel.softDelete({
+        _id: id
+      })
+    }
+    else {
+      throw new NotFoundException(`not found address user`);
+    }
+
+  }
+  async updateDefaultAddressUser(id: string, user: IUser) {
+    if (!mongoose.Types.ObjectId.isValid(id))
+      throw new NotFoundException(`not found address user`);
+    const address = await this.addressUserModel.findOne(
+      { _id: id, user: user._id },
+    )
+    const oldDefaultAddress = await this.addressUserModel.findOne({ user: user._id, isDefault: true });
+    if (oldDefaultAddress) {
+      oldDefaultAddress.isDefault = false;
+      await oldDefaultAddress.save();
+    }
+    if (address) {
+      address.isDefault = true;
+      await address.save();
+      return address;
+    }
+    else {
+      throw new NotFoundException(`not found address user`);
+    }
   }
 }

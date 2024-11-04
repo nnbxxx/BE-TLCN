@@ -69,6 +69,12 @@ export class ReceiptsController {
     // console.log("🚀 ~ ReceiptsController ~ autoUpdateConfirm ~ autoUpdateConfirm")
     return this.receiptsService.confirmPayment(id, user);
   }
+  @ResponseMessage("return receipts")
+  @Post('/user/return')
+  @ApiBody({ type: IdSW })
+  returnReceipt(@Body("id") id: string, @User() user: IUser) {
+    return this.receiptsService.returnReceipt(id, user);
+  }
 
   @Get('/user/cash-flow')
   @ResponseMessage("Cash flow statistics a User")

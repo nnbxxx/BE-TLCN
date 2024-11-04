@@ -36,14 +36,20 @@ export class AddressUserController {
     return this.addressUserService.findDefaultAddress(user);
   }
 
-  @Patch(':id')
+  @Patch('/:id')
   @ResponseMessage("Update address user ")
   update(@Param('id') id: string, @Body() updateAddressUserDto: UpdateAddressUserDto, @User() user: IUser) {
     return this.addressUserService.update(updateAddressUserDto, user);
   }
+  @Patch('/user/default/:id')
+  @ResponseMessage("Update address user ")
+  updateDefaultAddress(@User() user: IUser, @Param('id') id: string) {
+    return this.addressUserService.updateDefaultAddressUser(id, user);
+  }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.addressUserService.remove(+id);
+  @Delete('/user/remove/:id')
+  @ResponseMessage("Delete address user for user")
+  remove(@User() user: IUser, @Param('id') id: string) {
+    return this.addressUserService.removeForUser(id, user);
   }
 }

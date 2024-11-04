@@ -32,12 +32,17 @@ export class AddressController {
   }
 
   @Get('/province')
+  @ResponseMessage("Fetch Province ")
+  findProvince() {
+    return this.addressService.getProvince();
+  }
+  @Get('/district')
   @ResponseMessage("Fetch Districts by province")
-  findProvince(@Query('idProvince') idProvince: string) {
+  findDistricts(@Query('idProvince') idProvince: string) {
     return this.addressService.getDistrictsByCityId(idProvince);
   }
   @Get('/ward')
-  @ResponseMessage("Fetch Districts by province")
+  @ResponseMessage("Fetch Ward by Districts")
   findWards(@Query('provinceId') provinceId: string, @Query('districtId') districtId: string) {
     return this.addressService.getWardByCityId(provinceId, districtId);
   }

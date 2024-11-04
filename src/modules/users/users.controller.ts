@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { ProfileUserDtoSw, UpdateUserDto } from './dto/update-user.dto';
+import { ProfileUserDtoSw, UpdateProfileUser, UpdateUserDto } from './dto/update-user.dto';
 import { Public, ResponseMessage, User } from 'src/decorator/customize';
 import { IUser } from './users.interface';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
@@ -49,6 +49,12 @@ export class UsersController {
   @Patch()
   async update(@Body() updateUserDto: UpdateUserDto, @User() user: IUser) {
     let updatedUser = await this.usersService.update(updateUserDto, user);
+    return updatedUser;
+  }
+  @ResponseMessage("Update a User")
+  @Patch('/profile')
+  async updateProfileUser(@Body() updateUserDto: UpdateProfileUser, @User() user: IUser) {
+    let updatedUser = await this.usersService.updateUserProfile(user, updateUserDto);
     return updatedUser;
   }
 

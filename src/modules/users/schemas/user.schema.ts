@@ -19,27 +19,21 @@ export class User {
     @Prop({ required: true })
     password: string;
 
-    @Prop()
+    @Prop({ default: 0 })
     age: number;
 
-    @Prop()
+    @Prop({ default: '' })
     gender: string;
 
-    @Prop()
+    @Prop({ default: '' })
     address: string;
-
-    // @Prop({ type: Object })
-    // company: {
-    //     _id: mongoose.Schema.Types.ObjectId;
-    //     email: string;
-    // };
 
     // @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Role.name })
     // role: mongoose.Schema.Types.ObjectId;
 
-    @Prop({ required: true, type: [mongoose.Schema.Types.ObjectId], ref: Product.name })
+    @Prop({ required: true, type: [mongoose.Schema.Types.ObjectId], ref: Product.name, default: [] },)
     purchasedProducts: [mongoose.Schema.Types.ObjectId];
-    @Prop({ required: true, type: [mongoose.Schema.Types.ObjectId], ref: Product.name })
+    @Prop({ required: true, type: [mongoose.Schema.Types.ObjectId], ref: Product.name, default: [] })
     recentViewProducts: [mongoose.Schema.Types.ObjectId];
 
     @Prop({

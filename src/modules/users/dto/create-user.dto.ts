@@ -53,17 +53,17 @@ export class RegisterUserDto {
     @IsNotEmpty({ message: 'Password không được để trống', })
     password: string;
 
-    @ApiProperty({ example: 21, description: 'age' })
-    @IsNotEmpty({ message: 'Age không được để trống', })
-    age: number;
+    // @ApiProperty({ example: 21, description: 'age' })
+    // @IsNotEmpty({ message: 'Age không được để trống', })
+    // age: number;
 
-    @ApiProperty({ example: 'female', description: 'gender' })
-    @IsNotEmpty({ message: 'Gender không được để trống', })
-    gender: string;
+    // @ApiProperty({ example: 'female', description: 'gender' })
+    // @IsNotEmpty({ message: 'Gender không được để trống', })
+    // gender: string;
 
-    @ApiProperty({ example: '1 vvn hcm tp', description: 'address' })
-    @IsNotEmpty({ message: 'Address không được để trống', })
-    address: string;
+    // @ApiProperty({ example: '1 vvn hcm tp', description: 'address' })
+    // @IsNotEmpty({ message: 'Address không được để trống', })
+    // address: string;
 }
 export class UserLoginDto {
     @IsString()
