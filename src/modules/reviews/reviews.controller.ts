@@ -25,18 +25,18 @@ export class ReviewsController {
     return this.reviewsService.findAll(currentPage, limit, qs);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.reviewsService.findOne(+id);
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.reviewsService.findOne(+id);
+  // }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateReviewDto: UpdateReviewDto) {
-    return this.reviewsService.update(+id, updateReviewDto);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateReviewDto: UpdateReviewDto) {
+  //   return this.reviewsService.update(+id, updateReviewDto);
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.reviewsService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.reviewsService.remove(+id);
+  // }
 }

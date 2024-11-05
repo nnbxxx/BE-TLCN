@@ -63,18 +63,18 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
     // return this.notificationsService.findAll();
   }
 
-  @SubscribeMessage('findOneNotification')
-  findOne(@MessageBody() id: number) {
-    return this.notificationsService.findOne(id);
-  }
+  // @SubscribeMessage('findOneNotification')
+  // findOne(@MessageBody() id: number) {
+  //   return this.notificationsService.findOne(id);
+  // }
 
-  @SubscribeMessage('updateNotification')
-  update(@MessageBody() updateNotificationDto: UpdateNotificationDto) {
-    return this.notificationsService.update(updateNotificationDto.id, updateNotificationDto);
-  }
+  // @SubscribeMessage('updateNotification')
+  // update(@MessageBody() updateNotificationDto: UpdateNotificationDto) {
+  //   return this.notificationsService.update(updateNotificationDto.id, updateNotificationDto);
+  // }
 
-  @SubscribeMessage('removeNotification')
-  remove(@MessageBody() id: number) {
-    return this.notificationsService.remove(id);
-  }
+  // @SubscribeMessage('removeNotification')
+  // remove(@MessageBody() id: number) {
+  //   return this.notificationsService.remove(id);
+  // }
 }

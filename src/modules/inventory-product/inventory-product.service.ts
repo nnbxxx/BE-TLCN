@@ -93,11 +93,11 @@ export class InventoryProductService {
 
     })
   }
-  update(id: number, updateInventoryProductDto: UpdateInventoryProductDto) {
-    return `This action updates a #${id} inventoryProduct`;
-  }
+  // update(id: number, updateInventoryProductDto: UpdateInventoryProductDto) {
+  //   return `This action updates a #${id} inventoryProduct`;
+  // }
 
-  remove(id: number) {
-    return `This action removes a #${id} inventoryProduct`;
-  }
+  // remove(id: number) {
+  //   return `This action removes a #${id} inventoryProduct`;
+  // }
 }

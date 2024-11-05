@@ -126,19 +126,19 @@ export class LikeProductsService {
       checkProduct: item ? true : false
     }
   }
-  findAll() {
-    return `This action returns all likeProducts`;
-  }
+  // findAll() {
+  //   return `This action returns all likeProducts`;
+  // }
 
-  findOne(id: number) {
-    return `This action returns a #${id} likeProduct`;
-  }
+  // findOne(id: number) {
+  //   return `This action returns a #${id} likeProduct`;
+  // }
 
-  update(id: number, updateLikeProductDto: UpdateLikeProductDto) {
-    return `This action updates a #${id} likeProduct`;
-  }
+  // update(id: number, updateLikeProductDto: UpdateLikeProductDto) {
+  //   return `This action updates a #${id} likeProduct`;
+  // }
 
-  remove(id: number) {
-    return `This action removes a #${id} likeProduct`;
-  }
+  // remove(id: number) {
+  //   return `This action removes a #${id} likeProduct`;
+  // }
 }

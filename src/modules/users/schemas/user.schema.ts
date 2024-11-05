@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
 import { Coupon } from 'src/modules/coupons/schemas/coupon.schemas';
 import { Product } from 'src/modules/products/schemas/product.schemas';
+import { Role } from 'src/modules/roles/schemas/role.schemas';
 // import { Role } from 'src/roles/schemas/role.schemas';
 
 export type UserDocument = HydratedDocument<User>;
@@ -65,8 +66,9 @@ export class User {
     @Prop()
     image: string;
 
-    @Prop({ default: "USERS" })
-    role: string;
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Role.name })
+    role: mongoose.Schema.Types.ObjectId;
+
     @Prop({ default: 0 })
     point: number;
 

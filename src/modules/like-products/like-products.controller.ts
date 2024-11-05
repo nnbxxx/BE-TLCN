@@ -43,28 +43,18 @@ export class LikeProductsController {
   }
 
 
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.likeProductsService.findOne(+id);
+  // }
 
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateLikeProductDto: UpdateLikeProductDto) {
+  //   return this.likeProductsService.update(+id, updateLikeProductDto);
+  // }
 
-
-
-
-
-
-
-
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.likeProductsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateLikeProductDto: UpdateLikeProductDto) {
-    return this.likeProductsService.update(+id, updateLikeProductDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.likeProductsService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.likeProductsService.remove(+id);
+  // }
 }

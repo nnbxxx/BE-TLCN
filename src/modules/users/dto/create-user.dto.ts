@@ -31,13 +31,9 @@ export class CreateUserDto {
     address: string;
 
     @IsNotEmpty({ message: 'role không được để trống' })
-    // @IsMongoId({ message: 'role có định dạng là mongo object id' })
-    // role: mongoose.Schema.Types.ObjectId;
-    role: string;
-    // @IsObject()
-    // @ValidateNested()
-    // @Type(() => Company)
-    // company: Company;
+    @IsMongoId({ message: 'Role có định dạng là mongo id', })
+    role: mongoose.Schema.Types.ObjectId;
+
 }
 export class RegisterUserDto {
     @ApiProperty({ example: 'ngô nguyên bảo', description: 'name' })

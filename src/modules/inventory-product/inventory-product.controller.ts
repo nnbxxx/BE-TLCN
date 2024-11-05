@@ -30,13 +30,13 @@ export class InventoryProductController {
     return this.inventoryProductService.findOne(id as any);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateInventoryProductDto: UpdateInventoryProductDto) {
-    return this.inventoryProductService.update(+id, updateInventoryProductDto);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateInventoryProductDto: UpdateInventoryProductDto) {
+  //   return this.inventoryProductService.update(+id, updateInventoryProductDto);
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.inventoryProductService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.inventoryProductService.remove(+id);
+  // }
 }

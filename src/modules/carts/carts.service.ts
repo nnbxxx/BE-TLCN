@@ -150,19 +150,19 @@ export class CartsService {
     })
     if (!isItemExist) throw new BadRequestException("Product does not exist in the cart.");
   }
-  findAll() {
-    return `This action returns all carts`;
-  }
+  // findAll() {
+  //   return `This action returns all carts`;
+  // }
 
-  findOne(id: number) {
-    return `This action returns a #${id} cart`;
-  }
+  // findOne(id: number) {
+  //   return `This action returns a #${id} cart`;
+  // }
 
-  update(id: number,) {
-    return `This action updates a #${id} cart`;
-  }
+  // update(id: number,) {
+  //   return `This action updates a #${id} cart`;
+  // }
 
-  remove(id: number) {
-    return `This action removes a #${id} cart`;
-  }
+  // remove(id: number) {
+  //   return `This action removes a #${id} cart`;
+  // }
 }

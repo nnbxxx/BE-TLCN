@@ -136,7 +136,10 @@ export class UsersService {
 
     return await this.userModel.findOne({
       _id: id
-    }).select("-password") //exclude >< include
+    })
+      .select("-password")
+      .populate({ path: "role", select: { name: 1, _id: 1 } })
+
   }
   async findOneCoupon(id: string) {
     if (!mongoose.Types.ObjectId.isValid(id))
@@ -150,7 +153,7 @@ export class UsersService {
   findOneByUsername(username: string) {
     return this.userModel.findOne({
       email: username
-    })
+    }).populate({ path: "role", select: { name: 1, permissions: 1 } })
   }
 
   isValidPassword(password: string, hash: string) {

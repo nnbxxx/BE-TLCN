@@ -66,21 +66,21 @@ export class NotificationsService {
 
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} notification`;
-  }
+  // findOne(id: number) {
+  //   return `This action returns a #${id} notification`;
+  // }
 
-  update(id: number, updateNotificationDto: UpdateNotificationDto) {
-    return `This action updates a #${id} notification`;
-  }
+  // update(id: number, updateNotificationDto: UpdateNotificationDto) {
+  //   return `This action updates a #${id} notification`;
+  // }
 
-  remove(id: number) {
-    return `This action removes a #${id} notification`;
-  }
+  // remove(id: number) {
+  //   return `This action removes a #${id} notification`;
+  // }
 
-  async sendNotificationCouponToUsers(listUser: [{ point: number, _id: any, couponsUser: [{}] }], coupon: {
-    _id: any, code: string, description: {}
-  }) {
+  // async sendNotificationCouponToUsers(listUser: [{ point: number, _id: any, couponsUser: [{}] }], coupon: {
+  //   _id: any, code: string, description: {}
+  // }) {
 
-  }
+  // }
 }

@@ -85,15 +85,5 @@ export class AddressService {
       Name: ward.Name,
     }));
   }
-  findOne(id: string) {
-    return `This action returns a #${id} address`;
-  }
 
-  update(id: number, updateAddressDto: UpdateAddressDto) {
-    return `This action updates a #${id} address`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} address`;
-  }
 }

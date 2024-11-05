@@ -84,28 +84,28 @@ export class FilesController {
     }
 
   }
-  @Post()
-  create(@Body() createFileDto: CreateFileDto) {
-    return this.filesService.create(createFileDto);
-  }
+  // @Post()
+  // create(@Body() createFileDto: CreateFileDto) {
+  //   return this.filesService.create(createFileDto);
+  // }
 
-  @Get()
-  findAll() {
-    return this.filesService.findAll();
-  }
+  // @Get()
+  // findAll() {
+  //   return this.filesService.findAll();
+  // }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.filesService.findOne(+id);
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.filesService.findOne(+id);
+  // }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFileDto: UpdateFileDto) {
-    return this.filesService.update(+id, updateFileDto);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateFileDto: UpdateFileDto) {
+  //   return this.filesService.update(+id, updateFileDto);
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.filesService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.filesService.remove(+id);
+  // }
 }

@@ -27,6 +27,9 @@ import { FilesModule } from './modules/files/files.module';
 import { InventoryProduct } from './modules/inventory-product/schemas/inventory-product.schemas';
 import { InventoryProductModule } from './modules/inventory-product/inventory-product.module';
 import { AddressUserModule } from './modules/address-user/address-user.module';
+import { PermissionsModule } from './modules/permissions/permissions.module';
+import { RolesModule } from './modules/roles/roles.module';
+import { DatabasesModule } from './databases/databases.module';
 
 
 @Module({
@@ -68,7 +71,11 @@ import { AddressUserModule } from './modules/address-user/address-user.module';
     CloudinaryModule,
     FilesModule,
     InventoryProductModule,
-    AddressUserModule
+    AddressUserModule,
+    PermissionsModule,
+    RolesModule,
+    DatabasesModule
+
 
   ],
   controllers: [AppController],

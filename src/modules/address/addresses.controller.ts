@@ -47,13 +47,13 @@ export class AddressController {
     return this.addressService.getWardByCityId(provinceId, districtId);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAddressDto: UpdateAddressDto) {
-    return this.addressService.update(+id, updateAddressDto);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateAddressDto: UpdateAddressDto) {
+  //   return this.addressService.update(+id, updateAddressDto);
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.addressService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.addressService.remove(+id);
+  // }
 }

@@ -16,9 +16,12 @@ import { UsersService } from '../users/users.service';
 import { InventoryProductService } from '../inventory-product/inventory-product.service';
 import { CouponsService } from '../coupons/coupons.service';
 import { CheckValidCoupon } from '../coupons/dto/create-coupon.dto';
+import { ProductCode, VNPay, VnpLocale } from 'vnpay';
+import { PaymentUrlDto } from './dto/payment-url.dto';
 
 @Injectable()
 export class ReceiptsService {
+  private vnpay: VNPay;
   constructor(
     @InjectModel(Receipt.name)
     private receiptModel: SoftDeleteModel<ReceiptDocument>,
@@ -28,7 +31,14 @@ export class ReceiptsService {
     private inventoryProductService: InventoryProductService,
     private couponService: CouponsService
 
-  ) { }
+  ) {
+    this.vnpay = new VNPay({
+      vnpayHost: 'https://sandbox.vnpayment.vn',
+      tmnCode: process.env.VNP_TMNCODE,
+      secureSecret: process.env.VNP_HASHSECRET,
+    });
+
+  }
   async create(createReceiptDto: CreateReceiptDto, user: IUser) {
     await this.validate(createReceiptDto)
     const receipt = await this.receiptModel.create({
@@ -276,5 +286,31 @@ export class ReceiptsService {
       throw new NotFoundException(` Không tìm thấy hóa đơn Id ${receiptId} `)
     }
 
+  }
+  // ===== VNPAY =====
+  async generatePaymentUrl(paymentUrlDto: PaymentUrlDto) {
+    const params = {
+      vnp_TxnRef: paymentUrlDto.orderId,
+      vnp_IpAddr: "1.1.1.1",
+      vnp_Amount: paymentUrlDto.total,
+      vnp_OrderInfo: 'Payment for order ' + paymentUrlDto.orderId,
+      vnp_OrderType: ProductCode.Fashion,
+      vnp_Locale: VnpLocale.VN,
+      vnp_ReturnUrl: process.env.VNP_RETURNURL,
+    };
+
+    return this.vnpay.buildPaymentUrl(params);
+  }
+
+  validatePaymentCallback(query: any) {
+    return this.vnpay.verifyIpnCall({ ...query });
+  }
+  async confirmPaid(orderId: string) {
+    const result = await this.receiptModel.findOne({ _id: orderId });
+
+    if (!result) throw new NotFoundException("Order not found.");
+    result.isCheckout = true;
+    await result.save();
+    return result
   }
 }
