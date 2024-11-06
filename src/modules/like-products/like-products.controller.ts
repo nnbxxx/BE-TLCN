@@ -37,7 +37,7 @@ export class LikeProductsController {
     return this.likeProductsService.checkProductFavorite(id, user);
   }
   @ResponseMessage("Remove All Cart User")
-  @Post('/remove')
+  @Post('/remove-all')
   removeCart(@User() user: IUser) {
     return this.likeProductsService.removeAll(user);
   }

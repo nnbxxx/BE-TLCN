@@ -6,6 +6,7 @@ import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { Notification, NotificationDocument } from './schemas/notification.schemas';
 import aqp from 'api-query-params';
 import mongoose from 'mongoose';
+import { IUser } from 'src/modules/users/users.interface';
 
 @Injectable()
 export class NotificationsService {
@@ -26,11 +27,11 @@ export class NotificationsService {
     return await this.notificationModel.find({}).exec();
     // return await this.notificationModel.find({ userId }).sort({ createdAt: -1 });
   }
-  async markAsRead(notificationId: string) {
+  async markAsRead(notificationId: string, user: IUser) {
     if (!mongoose.Types.ObjectId.isValid(notificationId)) {
       throw new BadRequestException(`not found notification with id=${notificationId}`);
     }
-    return await this.notificationModel.findByIdAndUpdate(notificationId, { isRead: true }, { new: true });
+    return await this.notificationModel.findOneAndUpdate({ _id: notificationId, userId: user._id }, { isRead: true }, { new: true });
   }
   async findAll(currentPage: number, limit: number, qs: string) {
     const { filter, sort, population } = aqp(qs);

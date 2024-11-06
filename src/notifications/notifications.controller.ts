@@ -47,10 +47,10 @@ export class NotificationsController {
 
   }
   // API để đánh dấu thông báo đã đọc
-  @Public()
+  // @Public()
   @Patch('mark-as-read/:notificationId')
-  async markAsRead(@Param('notificationId') notificationId: string) {
-    return await this.notificationsService.markAsRead(notificationId);
+  async markAsRead(@Param('notificationId') notificationId: string, @User() user: IUser) {
+    return await this.notificationsService.markAsRead(notificationId, user);
   }
 
 

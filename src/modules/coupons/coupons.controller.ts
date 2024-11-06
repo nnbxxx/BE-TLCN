@@ -50,9 +50,9 @@ export class CouponsController {
     return this.couponsService.autoNotificationCoupons();
   }
   // check is valid coupon
-  @ResponseMessage("check is valid coupon")
-  @Post(`/check`)
-  checkValidCoupon(@Body() checkValidCouponDto: CheckValidCoupon, @User() user: IUser) {
-    return this.couponsService.checkValidCoupon(checkValidCouponDto, user);
-  }
+  // @ResponseMessage("check is valid coupon")
+  // @Post(`/check`)
+  // checkValidCoupon(@Body() checkValidCouponDto: CheckValidCoupon, @User() user: IUser) {
+  //   return this.couponsService.checkValidCoupon(checkValidCouponDto, user);
+  // }
 }

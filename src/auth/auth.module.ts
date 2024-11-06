@@ -12,9 +12,10 @@ import { LocalStrategy } from './passport/local.strategy';
 import { UsersModule } from 'src/modules/users/users.module';
 import { CartsModule } from 'src/modules/carts/carts.module';
 import { LikeProductsModule } from 'src/modules/like-products/like-products.module';
+import { RolesModule } from 'src/modules/roles/roles.module';
 
 @Module({
-  imports: [PassportModule, UsersModule, CartsModule, LikeProductsModule,
+  imports: [PassportModule, UsersModule, CartsModule, LikeProductsModule, RolesModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({

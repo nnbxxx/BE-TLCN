@@ -23,13 +23,13 @@ export class AddressController {
   //   return this.addressService.createMultiple(createAddressMultipleDto);
   // }
 
-  @Get()
-  @ResponseMessage("Fetch Address with paginate")
-  findAll(@Query("current") currentPage: number,
-    @Query("pageSize") limit: number,
-    @Query() qs: string,) {
-    return this.addressService.findAll(currentPage, limit, qs);
-  }
+  // @Get()
+  // @ResponseMessage("Fetch Address with paginate")
+  // findAll(@Query("current") currentPage: number,
+  //   @Query("pageSize") limit: number,
+  //   @Query() qs: string,) {
+  //   return this.addressService.findAll(currentPage, limit, qs);
+  // }
 
   @Get('/province')
   @ResponseMessage("Fetch Province ")

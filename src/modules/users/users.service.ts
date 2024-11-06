@@ -16,12 +16,17 @@ import { ChangePasswordAuthDto, CodeAuthDto } from 'src/auth/dto/create-auth.dto
 import * as crypto from 'crypto';
 import { ReceiptsService } from '../receipts/receipts.service';
 import { RECEIPT_STATUS } from 'src/constants/schema.enum';
+import { Role, RoleDocument } from '../roles/schemas/role.schemas';
+import { USER_ROLE } from 'src/databases/sample';
 @Injectable()
 export class UsersService {
 
   constructor(
     @InjectModel(UserM.name)
     private userModel: SoftDeleteModel<UserDocument>,
+    @InjectModel(Role.name)
+    private roleModel: SoftDeleteModel<RoleDocument>,
+
     private readonly mailerService: MailerService,
 
   ) { }
@@ -45,6 +50,8 @@ export class UsersService {
     if (isExist) {
       throw new BadRequestException(`Email: ${email} đã tồn tại trên hệ thống. Vui lòng sử dụng email khác.`)
     }
+    //fetch user role
+    const userRole = await this.roleModel.findOne({ name: USER_ROLE });
 
     const hashPassword = this.getHashPassword(password);
 
@@ -53,6 +60,7 @@ export class UsersService {
       password: hashPassword,
       age,
       gender, address,
+      role: userRole?._id,
       createdBy: {
         _id: user._id,
         email: user.email
@@ -69,6 +77,9 @@ export class UsersService {
     if (isExist) {
       throw new BadRequestException(`Email: ${email} đã tồn tại trên hệ thống. Vui lòng sử dụng email khác.`)
     }
+    //fetch user role
+    const userRole = await this.roleModel.findOne({ name: USER_ROLE });
+
     const hashPassword = this.getHashPassword(password);
     const codeId = crypto.randomInt(100000, 999999);
     let newRegister = await this.userModel.create({
@@ -77,7 +88,7 @@ export class UsersService {
       // age,
       // gender,
       // address,
-      role: "USER",
+      role: userRole?._id,
       isActive: false,
       codeId: codeId,
       codeExpired: dayjs().add(5, 'minutes')
@@ -96,7 +107,7 @@ export class UsersService {
   }
 
   async findAll(currentPage: number, limit: number, qs: string) {
-    console.log("🚀 ~ UsersService ~ findAll ~ qs:", qs)
+
     const { filter, sort, population } = aqp(qs);
     delete filter.current;
     delete filter.pageSize;
@@ -153,7 +164,11 @@ export class UsersService {
   findOneByUsername(username: string) {
     return this.userModel.findOne({
       email: username
-    }).populate({ path: "role", select: { name: 1, permissions: 1 } })
+    }).populate({
+      path: "role",
+      select: { name: 1 }
+    });
+
   }
 
   isValidPassword(password: string, hash: string) {
@@ -199,7 +214,11 @@ export class UsersService {
   }
 
   findUserByToken = async (refreshToken: string) => {
-    return await this.userModel.findOne({ refreshToken })
+    return await this.userModel.findOne({ refreshToken }).populate({
+      path: "role",
+      select: { name: 1 }
+    });
+
   }
   async handleActive(data: CodeAuthDto) {
 
@@ -208,7 +227,7 @@ export class UsersService {
       codeId: data.code
     })
     if (!user) {
-      throw new BadRequestException("Mã code không hợp lệ hoặc đã hết hạn")
+      throw new BadRequestException("Mã OTP không hợp lệ hoặc đã hết hạn")
     }
 
     //check expire code

@@ -14,14 +14,15 @@ import { ChangePasswordAuthDto, CodeAuthDto } from './dto/create-auth.dto';
 import { UsersService } from '../modules/users/users.service';
 import { ForgotPassUserDto } from './dto/update-auth.dto';
 import { EmailSW, ProfileUserDto, ProfileUserDtoSw } from 'src/modules/users/dto/update-user.dto';
+import { RolesService } from 'src/modules/roles/roles.service';
 
 @ApiTags('auth')
 @Controller("auth")
 export class AuthController {
     constructor(
         private authService: AuthService,
-        private userService: UsersService
-
+        private userService: UsersService,
+        private rolesService: RolesService
     ) { }
     @Public()
     @ApiBody({ type: UserLoginDto, })
@@ -41,7 +42,10 @@ export class AuthController {
     }
     @ResponseMessage("Get user information")
     @Get('/account')
-    handleGetAccount(@User() user: IUser) {
+    async handleGetAccount(@User() user: IUser) {
+        const temp = await this.rolesService.findOne(user.role._id) as any;
+        user.permissions = temp.permissions;
+
         return { user };
     }
     @Public()

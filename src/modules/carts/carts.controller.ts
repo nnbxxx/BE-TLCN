@@ -40,7 +40,7 @@ export class CartsController {
     return this.cartsService.removeProductToCart(id, user);
   }
   @ResponseMessage("Remove All Cart User")
-  @Post('/remove')
+  @Post('/remove-all')
   removeCart(@User() user: IUser) {
     return this.cartsService.removeAllCartItem(user);
   }
