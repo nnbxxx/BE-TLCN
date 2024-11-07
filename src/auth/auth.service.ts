@@ -36,11 +36,12 @@ export class AuthService {
     }
 
     async login(user: IUser, response: Response) {
-        const { _id, name, email, role, age, gender, address } = user;
+        const { _id, name, email, role, age, gender, address, avatar } = user;
 
         const payload = {
             sub: "token login",
             iss: "from server",
+            avatar,
             _id,
             name,
             email,
@@ -65,7 +66,7 @@ export class AuthService {
                 _id,
                 name,
                 email,
-                role, age, gender, address
+                role, age, gender, address, avatar
             }
         };
 
@@ -111,14 +112,14 @@ export class AuthService {
             })
             let user = await this.usersService.findUserByToken(refreshToken);
             if (user) {
-                const { _id, name, email, role, age, gender, address } = user;
+                const { _id, name, email, role, age, gender, address, avatar } = user;
                 const payload = {
                     sub: "token refresh",
                     iss: "from server",
                     _id,
                     name,
                     email,
-                    role, age, gender, address
+                    role, age, gender, address, avatar
                 };
 
                 const refresh_token = this.createRefreshToken(payload);
@@ -140,7 +141,7 @@ export class AuthService {
                         _id,
                         name,
                         email,
-                        role, age, gender, address
+                        role, age, gender, address, avatar
                     }
                 };
             } else {

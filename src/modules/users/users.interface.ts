@@ -4,6 +4,7 @@ export interface IUser {
   email: string;
   gender: string;
   age: string;
+  avatar: string,
   address: string;
   role: {
     _id: string;
