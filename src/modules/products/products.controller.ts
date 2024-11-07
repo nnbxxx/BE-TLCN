@@ -34,7 +34,13 @@ export class ProductsController {
   @Get('/user/:id')
   @ResponseMessage("Fetch Product by id for members")
   findOneForUser(@Param('id') id: string, @User() user: IUser) {
+    this.productsService.getProductsRecentViewByUser(user);
     return this.productsService.findOneForUser(id as any, user);
+  }
+  @Get('/product/recent')
+  @ResponseMessage("Fetch Products Recent View for members")
+  findProductsRecentViewForUser(@User() user: IUser) {
+    return this.productsService.getProductsRecentViewByUser(user);;
   }
 
   @ResponseMessage("Update a Product")

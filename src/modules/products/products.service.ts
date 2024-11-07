@@ -98,7 +98,7 @@ export class ProductsService {
     const { _id, reservations } = productPurchased
     const newData = { ...data.toObject(), quantityComments: +quantityComments, quantityProductPurchased: reservations.length, quantity: productInventory.quantity }
     return newData;
-    return await this.productModel.findById(id);
+
   }
 
   async update(updateProductDto: UpdateProductDto, user: IUser) {
@@ -130,4 +130,10 @@ export class ProductsService {
     );
     return this.productModel.softDelete({ _id: id });
   }
+  async getProductsRecentViewByUser(user: IUser) {
+    const userDB = await this.userService.findOne(user._id) as any;
+    // console.log("🚀 ~ ProductsService ~ getProductsRecentViewByUser ~ userDB:", userDB)
+    return this.productModel.find({ _id: { $in: userDB.recentViewProducts } }).exec();
+  }
+
 }
