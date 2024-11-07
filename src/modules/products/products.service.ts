@@ -91,6 +91,13 @@ export class ProductsService {
       throw new BadRequestException(`not found product with id=${id}`);
     }
     this.userService.updateRecentViewProduct(user, id as any);
+    const data = await this.productModel.findById(id);
+    const productInventory = await this.inventoryProductService.findByProductId(id);
+    const quantityComments = await this.reviewService.getQuantityComment(id as any)
+    const productPurchased = await this.inventoryProductService.getProductPurchased(id as any) as any
+    const { _id, reservations } = productPurchased
+    const newData = { ...data.toObject(), quantityComments: +quantityComments, quantityProductPurchased: reservations.length, quantity: productInventory.quantity }
+    return newData;
     return await this.productModel.findById(id);
   }
 

@@ -32,7 +32,7 @@ export class ProductsController {
     return this.productsService.findOne(id as any);
   }
   @Get('/user/:id')
-  @ResponseMessage("Fetch Product by id for non-members")
+  @ResponseMessage("Fetch Product by id for members")
   findOneForUser(@Param('id') id: string, @User() user: IUser) {
     return this.productsService.findOneForUser(id as any, user);
   }
