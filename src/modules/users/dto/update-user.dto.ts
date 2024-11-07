@@ -1,6 +1,6 @@
 import { OmitType, PartialType } from '@nestjs/mapped-types';
 import { CreateUserDto } from './create-user.dto';
-import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { TYPE_GENDER } from 'src/constants/schema.enum';
 export class UpdateUserDto extends OmitType(CreateUserDto, [
@@ -49,7 +49,8 @@ export class ProfileUserDtoSwWeb {
 
     @ApiProperty({ example: 'avt.com.vn', description: 'avatar' })
     @IsString({ message: 'avatar phải là string' })
-    @IsNotEmpty({ message: 'avatar không được để trống' })
+    @IsOptional()
+    // @IsNotEmpty({ message: 'avatar không được để trống' })
     avatar: string;
 
 }
