@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { HydratedDocument } from 'mongoose';
+import { TYPE_GENDER } from 'src/constants/schema.enum';
 import { Coupon } from 'src/modules/coupons/schemas/coupon.schemas';
 import { Product } from 'src/modules/products/schemas/product.schemas';
 import { Role } from 'src/modules/roles/schemas/role.schemas';
@@ -23,8 +24,8 @@ export class User {
     @Prop({ default: 0 })
     age: number;
 
-    @Prop({ default: '' })
-    gender: string;
+    @Prop({ type: String, enum: TYPE_GENDER, default: TYPE_GENDER.MALE, required: true })
+    gender: TYPE_GENDER;
 
     @Prop({ default: '' })
     address: string;

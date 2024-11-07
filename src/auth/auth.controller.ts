@@ -13,7 +13,7 @@ import { IUser } from 'src/modules/users/users.interface';
 import { ChangePasswordAuthDto, CodeAuthDto } from './dto/create-auth.dto';
 import { UsersService } from '../modules/users/users.service';
 import { ForgotPassUserDto } from './dto/update-auth.dto';
-import { EmailSW, ProfileUserDto, ProfileUserDtoSw } from 'src/modules/users/dto/update-user.dto';
+import { EmailSW, ProfileUserDto, ProfileUserDtoSw, ProfileUserDtoSwWeb } from 'src/modules/users/dto/update-user.dto';
 import { RolesService } from 'src/modules/roles/roles.service';
 
 @ApiTags('auth')
@@ -75,6 +75,15 @@ export class AuthController {
     @ApiBody({ type: ProfileUserDtoSw })
     @ResponseMessage('Update profile User')
     async handleUpdateProfile(
+        @Body() userDto: ProfileUserDto,
+        @User() user: IUser,
+    ) {
+        return this.userService.updateProfile(userDto, user);
+    }
+    @Patch('/update-web-profile') // ""
+    @ApiBody({ type: ProfileUserDtoSwWeb })
+    @ResponseMessage('Update profile User')
+    async handleUpdateProfileWeb(
         @Body() userDto: ProfileUserDto,
         @User() user: IUser,
     ) {

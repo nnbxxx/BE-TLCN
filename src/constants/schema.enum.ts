@@ -14,3 +14,8 @@ export enum PAYMENT_METHOD {
     COD = 'COD',
     VNPAY = 'VNPAY'
 }
+export enum TYPE_GENDER {
+    FEMALE = 'FEMALE',
+    MALE = 'MALE',
+    OTHER = 'OTHER'
+}
