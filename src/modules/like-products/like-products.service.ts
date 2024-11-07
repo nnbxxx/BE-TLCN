@@ -6,12 +6,16 @@ import { LikeProduct, LikeProductDocument } from './schemas/like-product.schemas
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { IUser } from '../users/users.interface';
 import mongoose, { Types } from 'mongoose';
+import { Product } from '../products/schemas/product.schemas';
+import { InventoryProductService } from '../inventory-product/inventory-product.service';
 
 @Injectable()
 export class LikeProductsService {
   constructor(
     @InjectModel(LikeProduct.name)
     private likeProductModel: SoftDeleteModel<LikeProductDocument>,
+    private inventoryProductService: InventoryProductService,
+
   ) { }
   create(user: IUser) {
 
@@ -25,9 +29,25 @@ export class LikeProductsService {
   }
   async findByUser(user: IUser) {
 
-    return await this.likeProductModel
+    const re = await this.likeProductModel
       .findOne({ user: user._id })
-      .select("-__v -updatedAt -createdAt");
+      .select("-__v -updatedAt -createdAt -isDeleted -deletedAt").populate({
+        path: "items.product",
+        model: Product.name,
+        select: "_id name price rating images discount"  // Lựa chọn chỉ lấy _id và tên sản phẩm
+      });
+
+    const handleRe = await Promise.all(re?.items.map(async (item: any) => {
+      const productPurchased = await this.inventoryProductService.getProductPurchased(item.product as any) as any
+      const { _id, reservations } = productPurchased
+      return {
+        ...item.toObject(),
+        quantityProductPurchased: +reservations.length
+      };
+    })
+    );
+
+    return { ...re.toObject(), items: handleRe };
   }
   async checkedItemLikeProducts(userId: Types.ObjectId, proId: Types.ObjectId) {
     const isItemExist = await this.likeProductModel.findOne({
@@ -118,7 +138,7 @@ export class LikeProductsService {
       throw new BadRequestException(`not found product with id=${productId}`);
     }
     const foundProducts = await this.findByUser(user)
-    const item = foundProducts.items.find(item => {
+    const item = foundProducts.items.find((item: any) => {
       return (new mongoose.Types.ObjectId(item.product.toString())).equals(productId);
     })
 
