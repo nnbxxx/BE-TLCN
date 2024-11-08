@@ -89,7 +89,9 @@ export class LikeProductsService {
     if (!mongoose.Types.ObjectId.isValid(productLikeItem.product._id)) {
       throw new BadRequestException(`not found product with id=${productLikeItem.product._id}`);
     }
-    const foundProducts = await this.findByUser(user)
+    const foundProducts = await this.likeProductModel
+      .findOne({ user: user._id })
+      .select("-__v -updatedAt -createdAt");
     const isItemExist = await this.checkIsItemExit(productLikeItem.product._id as any, foundProducts.items)
     if (!isItemExist) {
       return await this.likeProductModel.findOneAndUpdate(
@@ -125,6 +127,7 @@ export class LikeProductsService {
     }
   }
   async checkIsItemExit(productId: mongoose.Types.ObjectId, userProductList: any) {
+
     const itemExist = userProductList.filter(item => {
       if (item.product) {
         return item.product.equals(productId)
