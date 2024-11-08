@@ -13,6 +13,7 @@ export class ProfileUserDto extends OmitType(CreateUserDto, [
     'email',
     'password',
     'role',
+    'address'
 ] as const) { }
 
 export class ProfileUserDtoSw {
