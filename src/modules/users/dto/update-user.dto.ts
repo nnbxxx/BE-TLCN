@@ -14,7 +14,13 @@ export class ProfileUserDto extends OmitType(CreateUserDto, [
     'password',
     'role',
     'address'
-] as const) { }
+] as const) {
+    @ApiProperty({ example: 'avt.com.vn', description: 'avatar' })
+    @IsString({ message: 'avatar phải là string' })
+    @IsOptional()
+    // @IsNotEmpty({ message: 'avatar không được để trống' })
+    avatar: string;
+}
 
 export class ProfileUserDtoSw {
     @ApiProperty({ example: 'abc XYZ', description: 'Username' })
