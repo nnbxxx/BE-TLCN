@@ -35,11 +35,20 @@ async function bootstrap() {
   // config security
   app.use(helmet());
 
-  app.enableCors({
-    origin: "*",
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-    credentials: true,
-  });
+  // chayj cho mobile
+  // app.enableCors({
+  //   origin: "*",
+  //   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  //   credentials: true,
+  // });
+  app.enableCors(
+    {
+      "origin": true,
+      "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+      "preflightContinue": false,
+      credentials: true
+    }
+  );
 
 
   // config tools
