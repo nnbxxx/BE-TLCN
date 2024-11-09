@@ -1,8 +1,8 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { AddressUserService } from './address-user.service';
 import { CreateAddressUserDto } from './dto/create-address-user.dto';
-import { UpdateAddressUserDto } from './dto/update-address-user.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { UpdateAddressUserDto, UpdateAddressUserDtoSWG } from './dto/update-address-user.dto';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { Public, ResponseMessage, User } from 'src/decorator/customize';
 import { IUser } from '../users/users.interface';
 @ApiTags('address-user')
@@ -37,8 +37,17 @@ export class AddressUserController {
   }
 
   @Patch('/:id')
+  @ApiBody({ type: UpdateAddressUserDtoSWG })
+
   @ResponseMessage("Update address user ")
-  update(@Param('id') id: string, @Body() updateAddressUserDto: UpdateAddressUserDto, @User() user: IUser) {
+  update(@Body() updateAddressUserDto: UpdateAddressUserDto, @User() user: IUser) {
+    return this.addressUserService.update(updateAddressUserDto, user);
+  }
+  @Patch('/user/:id')
+  @ApiBody({ type: UpdateAddressUserDtoSWG })
+
+  @ResponseMessage("Update address user ")
+  updateAddressUser(@Body() updateAddressUserDto: UpdateAddressUserDto, @User() user: IUser) {
     return this.addressUserService.update(updateAddressUserDto, user);
   }
   @Patch('/user/default/:id')

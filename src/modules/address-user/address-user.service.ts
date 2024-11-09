@@ -89,6 +89,18 @@ export class AddressUserService {
       },
     );
   }
+  async updateUser(updateAddressUserDto: UpdateAddressUserDto, user: IUser) {
+    const re = await this.addressUserModel.updateOne(
+      {
+        _id: updateAddressUserDto._id,
+        user: user._id
+      },
+      {
+        ...updateAddressUserDto,
+      },
+    );
+    return re;
+  }
   async removeForUser(id: string, user: IUser) {
     if (!mongoose.Types.ObjectId.isValid(id))
       throw new NotFoundException(`not found address user`);
