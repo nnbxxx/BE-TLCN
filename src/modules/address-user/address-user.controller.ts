@@ -26,10 +26,10 @@ export class AddressUserController {
   }
 
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.addressUserService.findOne(+id);
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.addressUserService.findOne(+id);
+  // }
   @Get('/user/default-address')
   @ResponseMessage("Get default address user")
   findDefaultAddress(@User() user: IUser) {
@@ -38,7 +38,6 @@ export class AddressUserController {
 
   @Patch('/:id')
   @ApiBody({ type: UpdateAddressUserDtoSWG })
-
   @ResponseMessage("Update address user ")
   update(@Body() updateAddressUserDto: UpdateAddressUserDto, @User() user: IUser) {
     return this.addressUserService.update(updateAddressUserDto, user);

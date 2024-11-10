@@ -30,6 +30,8 @@ import { AddressUserModule } from './modules/address-user/address-user.module';
 import { PermissionsModule } from './modules/permissions/permissions.module';
 import { RolesModule } from './modules/roles/roles.module';
 import { DatabasesModule } from './databases/databases.module';
+import { MessageModule } from './modules/message/message.module';
+import { ChatRoomsModule } from './modules/chat-rooms/chat-rooms.module';
 
 
 @Module({
@@ -74,7 +76,9 @@ import { DatabasesModule } from './databases/databases.module';
     AddressUserModule,
     PermissionsModule,
     RolesModule,
-    DatabasesModule
+    DatabasesModule,
+    ChatRoomsModule,
+    MessageModule
 
 
   ],

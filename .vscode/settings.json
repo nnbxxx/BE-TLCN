@@ -3,6 +3,7 @@
     "actived",
     "autoconfirm",
     "autoupdate",
+    "ChatRooms",
     "oldpassword",
     "websockets"
   ]

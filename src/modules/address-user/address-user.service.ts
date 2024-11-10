@@ -77,9 +77,9 @@ export class AddressUserService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} addressUser`;
-  }
+  // findOne(id: number) {
+  //   return `This action returns a #${id} addressUser`;
+  // }
 
   async update(updateAddressUserDto: UpdateAddressUserDto, user: IUser) {
     return await this.addressUserModel.updateOne(

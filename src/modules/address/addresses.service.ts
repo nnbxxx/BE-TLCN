@@ -56,7 +56,7 @@ export class AddressService {
     }
   }
   async getProvince() {
-    const re = await this.addressModel.find({}).select(['Id', 'Name']).exec();
+    const re = await this.addressModel.find({}).select({ Id: 1, Name: 1, _id: 0 }).exec();
     return re
   }
   async getDistrictsByCityId(id: string) {
