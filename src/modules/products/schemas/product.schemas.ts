@@ -67,3 +67,38 @@ export class Product {
     deletedAt: Date;
 }
 export const ProductSchema = SchemaFactory.createForClass(Product);
+
+
+export class DescriptionProduct {
+    key: string;
+    value: [];
+}
+const x = {
+    decription: [
+        {
+            k: 'color',
+            v: [{
+                color: 'red',
+                img: 'abc xyz',
+            }, {
+                color: 'blue',
+                img: 'abc xyz',
+            }]
+        }, {
+            k: 'size',
+            v: [{
+                size: 'x',
+                decs: "cho x đến y kg"
+
+            }, {
+                size: 'xl',
+                decs: "cho x đến y kg"
+
+            }, {
+                size: 'xxl',
+                decs: "cho x đến y kg"
+
+            }]
+        }
+    ]
+}

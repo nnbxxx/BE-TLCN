@@ -57,3 +57,18 @@ export class InventoryProduct {
 
 
 export const InventoryProductSchema = SchemaFactory.createForClass(InventoryProduct);
+
+const test = {
+    productId: '123',
+    quantity: {
+        "total": 1000,
+        "red-xl": 1,
+        "red-l": 2,
+        "red-x": 3,
+        "blue-xl": 4,
+        "blue-xxl": 1,
+        "black-x": 1
+    },
+    reservations: [],
+
+}

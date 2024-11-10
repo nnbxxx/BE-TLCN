@@ -1,9 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Message, MessageDocument } from './schemas/message.schemas';
+import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 
 @Injectable()
 export class MessageService {
+  constructor(
+    @InjectModel(Message.name)
+    private messageModel: SoftDeleteModel<MessageDocument>,
+
+  ) { }
   create(createMessageDto: CreateMessageDto) {
     return 'This action adds a new message';
   }

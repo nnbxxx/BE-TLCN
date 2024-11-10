@@ -76,6 +76,15 @@ export class AddressUserService {
       throw new NotFoundException('Không tìm thấy default address')
     }
   }
+  async findUserAddress(user: IUser, id: string) {
+    const re = await this.addressUserModel.findOne({ user: user._id, _id: id });
+    if (re) {
+      return re;
+    }
+    else {
+      throw new NotFoundException('Không tìm thấy address')
+    }
+  }
 
   // findOne(id: number) {
   //   return `This action returns a #${id} addressUser`;

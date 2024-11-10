@@ -35,16 +35,20 @@ export class AddressUserController {
   findDefaultAddress(@User() user: IUser) {
     return this.addressUserService.findDefaultAddress(user);
   }
+  @Get('/user/:id')
+  @ResponseMessage("Get default address user")
+  findAddressUserById(@User() user: IUser, @Param('id') id: string) {
+    return this.addressUserService.findUserAddress(user, id);
+  }
 
-  @Patch('/:id')
+  @Patch('')
   @ApiBody({ type: UpdateAddressUserDtoSWG })
   @ResponseMessage("Update address user ")
   update(@Body() updateAddressUserDto: UpdateAddressUserDto, @User() user: IUser) {
     return this.addressUserService.update(updateAddressUserDto, user);
   }
-  @Patch('/user/:id')
+  @Patch('/user')
   @ApiBody({ type: UpdateAddressUserDtoSWG })
-
   @ResponseMessage("Update address user ")
   updateAddressUser(@Body() updateAddressUserDto: UpdateAddressUserDto, @User() user: IUser) {
     return this.addressUserService.update(updateAddressUserDto, user);
