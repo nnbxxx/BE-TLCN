@@ -12,11 +12,12 @@ import { IUser } from 'src/modules/users/users.interface';
 export class NotificationsService {
   constructor(@InjectModel('Notification') private notificationModel: SoftDeleteModel<NotificationDocument>) { }
   async create(createNotificationDto: CreateNotificationDto) {
-    const { message, title, userId } = createNotificationDto
+    const { message, title, userId, navigate } = createNotificationDto
     const oldNotification = await this.notificationModel.findOne({
       userId: userId,
       title: title,
       message: message,
+      navigate: navigate
     });
     if (oldNotification) return oldNotification
     return await this.notificationModel.create({

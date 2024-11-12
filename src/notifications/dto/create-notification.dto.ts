@@ -15,4 +15,10 @@ export class CreateNotificationDto {
     @ApiProperty({ example: 'tin nhắn abc xyz abc xyz', description: 'message' })
     @IsNotEmpty({ message: 'Message không được để trống', })
     message: string;
+
+    @ApiProperty({ example: 'https://www.google.com/', description: 'navigate' })
+    @IsNotEmpty({ message: 'Message không được để trống', })
+    navigate: string;
+
+
 }

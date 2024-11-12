@@ -133,7 +133,8 @@ export class CouponsService {
         this.notificationsService.create({
           message: `${name}`,
           title: `Bạn vừa nhận được mã khuyến mãi mới: ${code}`,
-          userId: user._id as any
+          userId: user._id as any,
+          navigate: 'https://www.google.com/'
         })
         const connectSocketId = await this.userService.checkConnectSocketIo(user._id as any);
         if (connectSocketId !== null) {

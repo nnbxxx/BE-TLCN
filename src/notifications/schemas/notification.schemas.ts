@@ -15,6 +15,8 @@ export class Notification {
     message: string;
     @Prop({ default: false })
     isRead: boolean;
+    @Prop({ default: `https://www.google.com/` })
+    navigate: string;
     @Prop({ default: Date.now })
     createdAt: Date;
     @Prop()
