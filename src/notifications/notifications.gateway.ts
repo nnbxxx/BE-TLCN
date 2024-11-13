@@ -19,7 +19,9 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
   async handleDisconnect(client: Socket) {
     // console.log("🚀 ~ NotificationsGateway ~ handleDisconnect ~ client:", client.id)
     const { _id } = client.handshake.headers
-    this.usersService.updateSocketId(_id as any)
+    if (_id) {
+      this.usersService.updateSocketId(_id as any)
+    }
   }
   afterInit(server: Server) {
 
@@ -27,7 +29,9 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
   handleConnection(client: Socket) {
     // console.log("🚀 ~ NotificationsGateway ~ handleConnection ~ client:", client.handshake.headers)
     const { _id } = client.handshake.headers
-    this.usersService.updateSocketId(_id as any, client.id)
+    if (_id) {
+      this.usersService.updateSocketId(_id as any, client.id)
+    }
 
   }
   // send all user or room
@@ -49,7 +53,7 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
   // send to user have createNotificationDto.userid = x
   @SubscribeMessage('sendNotificationToUser')
   async sendNotificationToSpecificUser(@MessageBody() createNotificationDto: CreateNotificationDto) {
-    const { message, title, userId } = createNotificationDto
+    const { message, title, userId, navigate } = createNotificationDto
     const user: any = await this.usersService.findOne(userId as any);
     const { socketId } = user
     if (socketId) {

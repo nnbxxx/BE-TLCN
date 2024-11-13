@@ -21,7 +21,7 @@ export class NotificationsService {
     });
     if (oldNotification) return oldNotification
     return await this.notificationModel.create({
-      message, title, userId
+      message, title, userId, navigate
     });;
   }
   async getNotificationsByUser(userId: string) {
