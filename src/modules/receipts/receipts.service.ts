@@ -209,6 +209,12 @@ export class ReceiptsService {
       await this.receiptModel.updateOne({ _id: updateStatusDto._id }, {
         ...updateStatusDto
       })
+      if(updateStatusDto.statusSupplier === RECEIPT_STATUS.DELIVERED){
+        const user  = {
+          _id: receipt.user
+        }
+        this.confirmPayment(receipt._id as any,user as any );
+      }
       return await this.calcTotal(receipt._id as any);
     }
     else {
@@ -237,6 +243,9 @@ export class ReceiptsService {
 
   // thanh toán thành công for user
   async confirmPayment(receiptId: string, user: IUser) {
+
+    console.log("🚀 ~ file: receipts.service.ts:247 ~ ReceiptsService ~ confirmPayment ~ user:", user);
+
     const receipt = await this.findOne(receiptId);
     const productIds = receipt.items.map(item => item.product._id.toString());
 
@@ -248,7 +257,7 @@ export class ReceiptsService {
 
       return await this.receiptModel.findOneAndUpdate(
         { _id: receiptId },
-        { $set: { statusUser: RECEIPT_STATUS.CONFIRMED, statusSupplier: RECEIPT_STATUS.DELIVERED } },
+        { $set: { isCheckout:true,statusUser: RECEIPT_STATUS.CONFIRMED, statusSupplier: RECEIPT_STATUS.DELIVERED ,} },
         { new: true }
       );
 
