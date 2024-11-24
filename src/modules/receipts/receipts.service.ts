@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateReceiptDto } from './dto/create-receipt.dto';
-import { UpdateReceiptDto } from './dto/update-receipt.dto';
+import { UpdateReceiptDto, UpdateStatusDto } from './dto/update-receipt.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Receipt, ReceiptDocument, ReceiptSchema } from './schemas/receipt.schemas';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
@@ -8,7 +8,7 @@ import { ProductsService } from '../products/products.service';
 import { IUser } from '../users/users.interface';
 import dayjs from 'dayjs';
 import mongoose from 'mongoose';
-import { RECEIPT_STATUS, TYPE_COUPONS } from 'src/constants/schema.enum';
+import { PAYMENT_METHOD, RECEIPT_STATUS, TYPE_COUPONS } from 'src/constants/schema.enum';
 import aqp from 'api-query-params';
 import { AddressService } from '../address/addresses.service';
 import { CartsService } from '../carts/carts.service';
@@ -18,6 +18,7 @@ import { CouponsService } from '../coupons/coupons.service';
 import { CheckValidCoupon } from '../coupons/dto/create-coupon.dto';
 import { ProductCode, VNPay, VnpLocale } from 'vnpay';
 import { PaymentUrlDto } from './dto/payment-url.dto';
+import path from 'path';
 
 @Injectable()
 export class ReceiptsService {
@@ -51,7 +52,18 @@ export class ReceiptsService {
       confirmationDate: dayjs().add(30, 'minutes')
     });
     this.cartService.removeAllCartItem(user);
-    return await this.calcTotal(receipt._id as any);
+    if (createReceiptDto?.coupons?.length > 0) {
+      createReceiptDto?.coupons.forEach((code) => {
+        this.activeCoupons({
+          code,
+        }, receipt._id as any, user)
+      })
+
+    }
+    const tmp = await this.calcTotal(receipt._id as any)
+    if (receipt.paymentMethod === PAYMENT_METHOD.VNPAY)
+      return await this.generatePaymentUrl({ orderId: tmp._id as any, total: tmp.total });
+    return tmp;
   }
   async validate(createReceiptDto: CreateReceiptDto) {
     const productsExist = await Promise.all(
@@ -110,25 +122,46 @@ export class ReceiptsService {
     }
     return false
   }
-  async findAll(currentPage: number, limit: number, qs: string, user: IUser) {
+  async findAll(currentPage: number, limit: number, qs: string, user?: IUser) {
     const { filter, sort, population } = aqp(qs);
-
     delete filter.current;
     delete filter.pageSize;
 
     let offset = (+currentPage - 1) * (+limit);
     let defaultLimit = +limit ? +limit : 10;
+    const populateProduct = {
+      path: 'items',
+      populate: { path: 'product', select: 'images' }
+    }
+    if (user) {
+      const totalItems = (await this.receiptModel.find({ ...filter, user: user._id })).length;
+      const totalPages = Math.ceil(totalItems / defaultLimit);
 
-    const totalItems = (await this.receiptModel.find({ ...filter, user: user._id })).length;
+      const result = await this.receiptModel.find({ ...filter, user: user._id })
+        .skip(offset)
+        .limit(defaultLimit)
+        .sort(sort as any)
+        .select([])
+        .populate(population)
+        .exec();
+      return {
+        meta: {
+          current: currentPage, //trang hiện tại
+          pageSize: limit, //số lượng bản ghi đã lấy
+          pages: totalPages,  //tổng số trang với điều kiện query
+          total: totalItems // tổng số phần tử (số bản ghi)
+        },
+        result //kết quả query
+      }
+    }
+    const totalItems = (await this.receiptModel.find({ ...filter })).length;
     const totalPages = Math.ceil(totalItems / defaultLimit);
-
-
-    const result = await this.receiptModel.find({ ...filter, user: user._id })
+    const result = await this.receiptModel.find({ ...filter })
       .skip(offset)
       .limit(defaultLimit)
       .sort(sort as any)
       .select([])
-      .populate(population)
+      .populate(populateProduct ? populateProduct : population)
       .exec();
 
 
@@ -163,6 +196,17 @@ export class ReceiptsService {
     // }
     await this.receiptModel.updateOne({ _id: updateReceiptDto._id }, {
       ...updateReceiptDto
+    })
+    return await this.calcTotal(receipt._id as any);
+  }
+  async updateStatus(updateStatusDto: UpdateStatusDto) {
+    const receipt = await this.findOne(updateStatusDto._id)
+    // chưa phân role
+    // if (receipt.statusUser === RECEIPT_STATUS.CONFIRMED) {
+    //   throw new BadRequestException(`Đơn hàng đã xác nhận, vui lòng liên hệ nhà cung cấp để cập nhật đơn hàng`)
+    // }
+    await this.receiptModel.updateOne({ _id: updateStatusDto._id }, {
+      ...updateStatusDto
     })
     return await this.calcTotal(receipt._id as any);
   }

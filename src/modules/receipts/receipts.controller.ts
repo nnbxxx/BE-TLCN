@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query, HttpStatus, Res, Redirect } from '@nestjs/common';
 import { ReceiptsService } from './receipts.service';
 import { CreateReceiptDto } from './dto/create-receipt.dto';
-import { IdSW, UpdateReceiptDto } from './dto/update-receipt.dto';
+import { IdSW, UpdateReceiptDto, UpdateStatusDto } from './dto/update-receipt.dto';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { Public, ResponseMessage, User } from 'src/decorator/customize';
 import { IUser } from '../users/users.interface';
@@ -25,18 +25,26 @@ export class ReceiptsController {
   activeCoupon(@Body() checkValidCoupon: CheckValidCoupon, @Param('id') id: string, @User() user: IUser) {
     return this.receiptsService.activeCoupons(checkValidCoupon, id, user);
   }
-  @ResponseMessage("active coupon of receipt")
+  @ResponseMessage("unactive coupon of receipt")
   @Post(`coupon/unactive/:id`)
   unactiveCoupon(@Body() checkValidCoupon: CheckValidCoupon, @Param('id') id: string, @User() user: IUser) {
     return this.receiptsService.activeCoupons(checkValidCoupon, id, user, false);
   }
 
   @ResponseMessage("View history receipt")
-  @Get()
+  @Get('/user')
   findAllByUser(@Query("current") currentPage: number,
     @Query("pageSize") limit: number,
     @Query() qs: string, @User() user: IUser) {
     return this.receiptsService.findAll(currentPage, limit, qs, user);
+  }
+  @ResponseMessage("View all receipt")
+  @Get('/admin')
+  @Public()
+  findAll(@Query("current") currentPage: number,
+    @Query("pageSize") limit: number,
+    @Query() qs: string) {
+    return this.receiptsService.findAll(currentPage, limit, qs);
   }
   @ResponseMessage("View detail receipt")
   @Get(':id')
@@ -47,6 +55,11 @@ export class ReceiptsController {
   @Patch()
   update(@Body() updateReceiptDto: UpdateReceiptDto) {
     return this.receiptsService.updateForUser(updateReceiptDto);
+  }
+  @ResponseMessage("Update receipt for user")
+  @Patch('/status')
+  updateStatus(@Body() updateStatusDto: UpdateStatusDto) {
+    return this.receiptsService.updateStatus(updateStatusDto);
   }
 
   @Delete(':id')

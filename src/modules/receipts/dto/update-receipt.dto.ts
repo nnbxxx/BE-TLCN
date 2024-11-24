@@ -5,6 +5,21 @@ import { Type } from 'class-transformer';
 import { RECEIPT_STATUS } from 'src/constants/schema.enum';
 import { ApiProperty } from '@nestjs/swagger';
 
+export class UpdateStatusDto {
+    @IsMongoId({ message: '_id phải là mongo id' })
+    @IsNotEmpty({ message: '_id không được để trống' })
+    _id: string;
+
+    @IsEnum(RECEIPT_STATUS, { message: 'statusUser không được hợp lệ' })
+    @IsNotEmpty({ message: 'statusUser không được để trống' })
+    statusUser: string;
+
+    @IsEnum(RECEIPT_STATUS, { message: 'statusSupplier không được hợp lệ' })
+    @IsNotEmpty({ message: 'statusSupplier không được để trống' })
+    statusSupplier: string;
+}
+
+
 export class UpdateReceiptDto {
     @IsMongoId({ message: '_id phải là mongo id' })
     @IsNotEmpty({ message: '_id không được để trống' })
