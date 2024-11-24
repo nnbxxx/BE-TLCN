@@ -10,10 +10,6 @@ export class UpdateStatusDto {
     @IsNotEmpty({ message: '_id không được để trống' })
     _id: string;
 
-    @IsEnum(RECEIPT_STATUS, { message: 'statusUser không được hợp lệ' })
-    @IsNotEmpty({ message: 'statusUser không được để trống' })
-    statusUser: string;
-
     @IsEnum(RECEIPT_STATUS, { message: 'statusSupplier không được hợp lệ' })
     @IsNotEmpty({ message: 'statusSupplier không được để trống' })
     statusSupplier: string;

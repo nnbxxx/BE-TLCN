@@ -40,7 +40,6 @@ export class ReceiptsController {
   }
   @ResponseMessage("View all receipt")
   @Get('/admin')
-  @Public()
   findAll(@Query("current") currentPage: number,
     @Query("pageSize") limit: number,
     @Query() qs: string) {

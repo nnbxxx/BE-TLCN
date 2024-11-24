@@ -205,10 +205,15 @@ export class ReceiptsService {
     // if (receipt.statusUser === RECEIPT_STATUS.CONFIRMED) {
     //   throw new BadRequestException(`Đơn hàng đã xác nhận, vui lòng liên hệ nhà cung cấp để cập nhật đơn hàng`)
     // }
-    await this.receiptModel.updateOne({ _id: updateStatusDto._id }, {
-      ...updateStatusDto
-    })
-    return await this.calcTotal(receipt._id as any);
+    if (receipt) {
+      await this.receiptModel.updateOne({ _id: updateStatusDto._id }, {
+        ...updateStatusDto
+      })
+      return await this.calcTotal(receipt._id as any);
+    }
+    else {
+      throw new NotFoundException(`Not found Receipt with Id = ${updateStatusDto._id}`)
+    }
   }
 
   async removeForUser(id: string, user: IUser) {
