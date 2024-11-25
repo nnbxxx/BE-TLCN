@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
@@ -6,6 +6,7 @@ import { Category, CategoryDocument } from './schemas/category.Schemas';
 import { InjectModel } from '@nestjs/mongoose';
 import { IUser } from '../users/users.interface';
 import aqp from 'api-query-params';
+import mongoose from 'mongoose';
 
 @Injectable()
 export class CategoriesService {
@@ -64,11 +65,33 @@ export class CategoriesService {
   //   return `This action returns a #${id} category`;
   // }
 
-  // update(id: number, updateCategoryDto: UpdateCategoryDto) {
-  //   return `This action updates a #${id} category`;
-  // }
 
-  // remove(id: number) {
-  //   return `This action removes a #${id} category`;
-  // }
+  async update(updateProductDto: UpdateCategoryDto, user: IUser) {
+
+    return await this.categoryModel.updateOne(
+      { _id: updateProductDto._id },
+      {
+        ...updateProductDto,
+        updatedBy: {
+          _id: user._id,
+          email: user.email,
+        },
+      },
+    );
+  }
+  async remove(id: string, user: IUser) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new BadRequestException(`not found category with id=${id}`); // status: 200 => 400
+    }
+    await this.categoryModel.updateOne(
+      { _id: id },
+      {
+        deletedBy: {
+          _id: user._id,
+          email: user.email,
+        },
+      },
+    );
+    return this.categoryModel.softDelete({ _id: id });
+  }
 }

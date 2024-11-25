@@ -30,13 +30,14 @@ export class CategoriesController {
   //   return this.categoriesService.findOne(+id);
   // }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
-  //   return this.categoriesService.update(+id, updateCategoryDto);
-  // }
+  @Patch()
+  update( @Body() updateCategoryDto: UpdateCategoryDto,@User() user: IUser) {
+    return this.categoriesService.update( updateCategoryDto,user);
+  }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.categoriesService.remove(+id);
-  // }
+  @Delete(':id')
+  @ResponseMessage("Delete a Product")
+  remove(@Param('id') id: string, @User() user: IUser) {
+    return this.categoriesService.remove(id, user);
+  }
 }
