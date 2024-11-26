@@ -6,9 +6,10 @@ import { Product, ProductSchema } from './schemas/product.schemas';
 import { UsersModule } from '../users/users.module';
 import { InventoryProductModule } from '../inventory-product/inventory-product.module';
 import { ReviewsModule } from '../reviews/reviews.module';
+import { CategoriesModule } from '../categories/categories.module';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: Product.name, schema: ProductSchema }]), UsersModule, InventoryProductModule, ReviewsModule],
+  imports: [MongooseModule.forFeature([{ name: Product.name, schema: ProductSchema }]), UsersModule, InventoryProductModule, ReviewsModule,CategoriesModule],
   controllers: [ProductsController],
   providers: [ProductsService],
   exports: [ProductsService]

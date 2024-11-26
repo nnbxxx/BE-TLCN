@@ -30,11 +30,11 @@ export class FilesController {
   })
   async uploadFile(@UploadedFile(
     new ParseFilePipeBuilder()
-      .addFileTypeValidator({
-        fileType: /^(jpg|jpeg|png|image\/png|gif|txt|pdf|application\/pdf|doc|docx|text\/plain)$/i,
-      })
+      // .addFileTypeValidator({
+      //   fileType: /^(jpg|jpeg|png|image\/png|gif|txt|pdf|application\/pdf|doc|docx|text\/plain)$/i,
+      // })
       .addMaxSizeValidator({
-        maxSize: 100 * 1024 * 1024 //kb = 1 MB
+        maxSize: 10000 * 1024 * 1024 //kb = 1 MB
       })
       .build({
         errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY

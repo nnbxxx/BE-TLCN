@@ -11,6 +11,7 @@ import { UsersService } from '../users/users.service';
 import { InventoryProductService } from '../inventory-product/inventory-product.service';
 import { CreateInventoryProductDto } from '../inventory-product/dto/create-inventory-product.dto';
 import { ReviewsService } from '../reviews/reviews.service';
+import { CategoriesService } from '../categories/categories.service';
 
 @Injectable()
 export class ProductsService {
@@ -19,7 +20,8 @@ export class ProductsService {
     private productModel: SoftDeleteModel<ProductDocument>,
     private userService: UsersService,
     private inventoryProductService: InventoryProductService,
-    private reviewService: ReviewsService
+    private reviewService: ReviewsService,
+    private categoriesService: CategoriesService
   ) { }
 
   async create(createProductDto: CreateProductDto, user: IUser) {
@@ -51,7 +53,7 @@ export class ProductsService {
 
     const totalItems = (await this.productModel.find(filter)).length;
     const totalPages = Math.ceil(totalItems / defaultLimit);
-
+    
 
     let result = await this.productModel.find(filter)
       .skip(offset)
@@ -60,7 +62,11 @@ export class ProductsService {
       .select([''])
       .populate(population)
       .exec();
-
+    let newResult = result.map(async(product) => {
+      const  tmp = await this.findOne(product.id)
+         return tmp
+    	});
+      const results = await Promise.all(newResult);
     return {
       meta: {
         current: currentPage, //trang hiện tại
@@ -68,7 +74,7 @@ export class ProductsService {
         pages: totalPages,  //tổng số trang với điều kiện query
         total: totalItems // tổng số phần tử (số bản ghi)
       },
-      result //kết quả query
+      result :results//kết quả query
     }
 
   }
@@ -83,7 +89,8 @@ export class ProductsService {
     const quantityComments = await this.reviewService.getQuantityComment(id as any)
     const productPurchased = await this.inventoryProductService.getProductPurchased(id as any) as any
     const { _id, reservations } = productPurchased
-    const newData = { ...data.toObject(), quantityComments: +quantityComments, quantityProductPurchased: reservations.length, quantity: productInventory.quantity }
+    const category =await this.categoriesService.findOne(data.category as any)
+    const newData = { ...data.toObject(), quantityComments: +quantityComments, quantityProductPurchased: reservations.length, quantity: productInventory.quantity ,category:category.name}
     return newData;
   }
   async findOneForUser(id: string, user: IUser) {

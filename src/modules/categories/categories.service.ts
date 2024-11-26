@@ -60,10 +60,12 @@ export class CategoriesService {
 
   }
 
-
-  // findOne(id: number) {
-  //   return `This action returns a #${id} category`;
-  // }
+  async findOne(id: string) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new BadRequestException(`not found product with id=${id}`);
+    }
+    return await this.categoryModel.findById(id);
+  }
 
 
   async update(updateProductDto: UpdateCategoryDto, user: IUser) {
