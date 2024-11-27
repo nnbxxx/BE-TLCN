@@ -53,7 +53,8 @@ This backend server serves as the core of the online groceries shop, facilitatin
 
 4. **Set up environment variables:**
 
-    Setup file env
+ ```bash
+   Setup file env
 
 
     PORT=8800
@@ -100,6 +101,7 @@ This backend server serves as the core of the online groceries shop, facilitatin
     #INIT SAMPLE DATA
     SHOULD_INIT = 
     INIT_PASSWORD = 
+   ```
 
 5. **Run the server:**
 
