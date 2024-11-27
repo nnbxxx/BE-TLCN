@@ -37,6 +37,12 @@ export class ProductsController {
     this.productsService.getProductsRecentViewByUser(user);
     return this.productsService.findOneForUser(id as any, user);
   }
+  @Get('/images/:id')
+  @ResponseMessage("Fetch Product by id for members")
+  findImages(@Param('id') id: string) {
+
+    return this.productsService.findImages(id as any);
+  }
   @Get('/product/recent')
   @ResponseMessage("Fetch Products Recent View for members")
   findProductsRecentViewForUser(@User() user: IUser) {

@@ -53,7 +53,7 @@ export class ProductsService {
 
     const totalItems = (await this.productModel.find(filter)).length;
     const totalPages = Math.ceil(totalItems / defaultLimit);
-    
+
 
     let result = await this.productModel.find(filter)
       .skip(offset)
@@ -62,11 +62,11 @@ export class ProductsService {
       .select([''])
       .populate(population)
       .exec();
-    let newResult = result.map(async(product) => {
-      const  tmp = await this.findOne(product.id)
-         return tmp
-    	});
-      const results = await Promise.all(newResult);
+    let newResult = result.map(async (product) => {
+      const tmp = await this.findOne(product.id)
+      return tmp
+    });
+    const results = await Promise.all(newResult);
     return {
       meta: {
         current: currentPage, //trang hiện tại
@@ -74,7 +74,7 @@ export class ProductsService {
         pages: totalPages,  //tổng số trang với điều kiện query
         total: totalItems // tổng số phần tử (số bản ghi)
       },
-      result :results//kết quả query
+      result: results//kết quả query
     }
 
   }
@@ -89,8 +89,8 @@ export class ProductsService {
     const quantityComments = await this.reviewService.getQuantityComment(id as any)
     const productPurchased = await this.inventoryProductService.getProductPurchased(id as any) as any
     const { _id, reservations } = productPurchased
-    const category =await this.categoriesService.findOne(data.category as any)
-    const newData = { ...data.toObject(), quantityComments: +quantityComments, quantityProductPurchased: reservations.length, quantity: productInventory.quantity ,category:category.name}
+    const category = await this.categoriesService.findOne(data.category as any)
+    const newData = { ...data.toObject(), quantityComments: +quantityComments, quantityProductPurchased: reservations.length, quantity: productInventory.quantity, category: category.name }
     return newData;
   }
   async findOneForUser(id: string, user: IUser) {
@@ -107,7 +107,13 @@ export class ProductsService {
     return newData;
 
   }
-
+  async findImages(id: string) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new BadRequestException(`not found product with id=${id}`);
+    }
+    const data = await this.productModel.findById(id);
+    return data.images;
+  }
   async update(updateProductDto: UpdateProductDto, user: IUser) {
 
     return await this.productModel.updateOne(

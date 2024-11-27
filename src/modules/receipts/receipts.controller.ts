@@ -74,6 +74,11 @@ export class ReceiptsController {
     // console.log("🚀 ~ ReceiptsController ~ autoUpdateConfirm ~ autoUpdateConfirm")
     return this.receiptsService.autoconfirm();
   }
+  @ResponseMessage("Dashboard receipts")
+  @Get('/dashboard/dashboard')
+  getDashboard() {
+    return this.receiptsService.getDashboard();
+  }
 
   @ResponseMessage("confirmPayment receipts")
   @Post('/confirmPayment')

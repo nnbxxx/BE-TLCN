@@ -187,6 +187,40 @@ export class ReceiptsService {
     }
     return receipt;
   }
+  async getDashboard() {
+    const result = await this.receiptModel.aggregate([
+      {
+        $group: {
+          _id: '$status',
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    // Định dạng lại dữ liệu để dễ sử dụng
+    const formattedResult = result.reduce((acc, item) => {
+      acc[item._id] = item.count;
+      return acc;
+    }, {});
+
+    // Đảm bảo trạng thái nào không có cũng được trả về 0
+    const statuses = [
+      'CONFIRMED',
+      'UNCONFIRMED',
+      'PREPARE',
+      'ON_DELIVERY',
+      'DELIVERED',
+      'CANCEL',
+    ];
+
+    const response = statuses.reduce((acc, status) => {
+      acc[status] = formattedResult[status] || 0;
+      return acc;
+    }, {});
+
+    return response;
+
+  }
 
   async updateForUser(updateReceiptDto: UpdateReceiptDto) {
     const receipt = await this.findOne(updateReceiptDto._id)
@@ -201,19 +235,23 @@ export class ReceiptsService {
   }
   async updateStatus(updateStatusDto: UpdateStatusDto) {
     const receipt = await this.findOne(updateStatusDto._id)
+    let data = {
+      ...updateStatusDto,
+      statusUser: updateStatusDto.statusSupplier
+    }
     // chưa phân role
     // if (receipt.statusUser === RECEIPT_STATUS.CONFIRMED) {
     //   throw new BadRequestException(`Đơn hàng đã xác nhận, vui lòng liên hệ nhà cung cấp để cập nhật đơn hàng`)
     // }
     if (receipt) {
       await this.receiptModel.updateOne({ _id: updateStatusDto._id }, {
-        ...updateStatusDto
+        ...data
       })
-      if(updateStatusDto.statusSupplier === RECEIPT_STATUS.DELIVERED){
-        const user  = {
+      if (updateStatusDto.statusSupplier === RECEIPT_STATUS.DELIVERED) {
+        const user = {
           _id: receipt.user
         }
-        this.confirmPayment(receipt._id as any,user as any );
+        this.confirmPayment(receipt._id as any, user as any);
       }
       return await this.calcTotal(receipt._id as any);
     }
@@ -257,7 +295,7 @@ export class ReceiptsService {
 
       return await this.receiptModel.findOneAndUpdate(
         { _id: receiptId },
-        { $set: { isCheckout:true,statusUser: RECEIPT_STATUS.CONFIRMED, statusSupplier: RECEIPT_STATUS.DELIVERED ,} },
+        { $set: { isCheckout: true, statusUser: RECEIPT_STATUS.CONFIRMED, statusSupplier: RECEIPT_STATUS.DELIVERED, } },
         { new: true }
       );
 
