@@ -1,3 +1,114 @@
+# Groceries Backend Nest.js
+
+This repository contains the backend server for an online groceries shop built with Nest.js.
+
+## Sinh viên thực hiện
+
+| Tên                | MSSV     |
+| ------------------ | -------- |
+| Lê Minh Quang      | 21110279 |
+| Ngô Nguyên Bảo     | 21119170 |
+
+
+## Description
+
+The Groceries Backend Nest.js is a server-side application developed with Nest.js to support the functionality of an online groceries shop. It utilizes Node.js along with Express for building the server and MongoDB for database management.
+
+## Technologies Used
+
+- Nest.js
+- Express
+- MongoDB
+
+## Features
+
+The backend server provides essential functionality for the online groceries shop, including:
+
+- Managing product inventory
+- Processing user orders
+- Handling user authentication and authorization
+- Generating reports and analytics for business insights
+
+This backend server serves as the core of the online groceries shop, facilitating communication between the frontend client applications and the database.
+
+## Installation
+
+1. **Clone the repository:**
+
+   ```bash
+   git clone https://github.com/nnbxxx/BE-TLCN.git
+   ```
+
+2. **Navigate to the project directory:**
+
+   ```bash
+   cd BE-TLCN
+   ```
+
+3. **Install dependencies:**
+
+   ```bash
+   npm install
+   ```
+
+4. **Set up environment variables:**
+
+ ```bash
+   Setup file env
+
+
+    PORT=8800
+
+
+    MONGODB_URI=
+    FE_URI = 
+
+
+    THROTTLE_TTL=
+    THROTTLE_LIMIT=
+
+    #Set up access  token
+    JWT_ACCESS_TOKEN_SECRET=
+    JWT_ACCESS_EXPIRE=
+
+    JWT_REFRESH_TOKEN_SECRET=
+    JWT_REFRESH_EXPIRE=
+
+    #CONFIG EMAIL
+    EMAIL_HOST=
+
+    EMAIL_AUTH_USER=
+    EMAIL_AUTH_PASS=
+    EMAIL_PREVIEW=
+
+
+    #CONFIG WEBSOCKET
+    PORT_SOCKET = 
+
+    #CONFIG CLOUDIARY
+    CLOUDINARY_NAME = 
+    CLOUDINARY_API_KEY = 
+    CLOUDINARY_API_SECRET = 
+
+
+    #CONFIG VNPAY
+    VNP_TMNCODE = 
+    VNP_HASHSECRET = 
+    VNP_URL = 
+    VNP_RETURNURL = 
+
+
+    #INIT SAMPLE DATA
+    SHOULD_INIT = 
+    INIT_PASSWORD = 
+   ```
+
+5. **Run the server:**
+
+   ```bash
+   npm start
+   ```
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
@@ -22,42 +133,6 @@
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
-
-```bash
-$ npm install
-```
-
-## Compile and run the project
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Run tests
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-
-```
 
 ## Resources
 
