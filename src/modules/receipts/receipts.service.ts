@@ -244,15 +244,16 @@ export class ReceiptsService {
     //   throw new BadRequestException(`Đơn hàng đã xác nhận, vui lòng liên hệ nhà cung cấp để cập nhật đơn hàng`)
     // }
     if (receipt) {
-      await this.receiptModel.updateOne({ _id: updateStatusDto._id }, {
-        ...data
-      })
       if (updateStatusDto.statusSupplier === RECEIPT_STATUS.DELIVERED) {
         const user = {
           _id: receipt.user
         }
         this.confirmPayment(receipt._id as any, user as any);
       }
+      await this.receiptModel.updateOne({ _id: updateStatusDto._id }, {
+        ...data
+      })
+
       return await this.calcTotal(receipt._id as any);
     }
     else {
