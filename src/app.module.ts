@@ -32,6 +32,9 @@ import { RolesModule } from './modules/roles/roles.module';
 import { DatabasesModule } from './databases/databases.module';
 import { MessageModule } from './modules/message/message.module';
 import { ChatRoomsModule } from './modules/chat-rooms/chat-rooms.module';
+import { ColorModule } from './color/color.module';
+import { BrandModule } from './brand/brand.module';
+import { BlogCategoryModule } from './blog-category/blog-category.module';
 
 
 @Module({
@@ -78,7 +81,10 @@ import { ChatRoomsModule } from './modules/chat-rooms/chat-rooms.module';
     RolesModule,
     DatabasesModule,
     ChatRoomsModule,
-    MessageModule
+    MessageModule,
+    ColorModule,
+    BrandModule,
+    BlogCategoryModule,
 
 
   ],

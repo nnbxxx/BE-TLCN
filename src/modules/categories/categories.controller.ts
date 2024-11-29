@@ -18,25 +18,26 @@ export class CategoriesController {
 
   @Public()
   @Get()
-  @ResponseMessage("Fetch Product with paginate")
+  @ResponseMessage("Fetch Category with paginate")
   findAll(@Query("current") currentPage: number,
     @Query("pageSize") limit: number,
     @Query() qs: string,) {
     return this.categoriesService.findAll(currentPage, limit, qs);
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.categoriesService.findOne(+id);
-  // }
+  @Get(':id')
+  @ResponseMessage("Fetch Category by id")
+  findOne(@Param('id') id: string) {
+    return this.categoriesService.findOne(id);
+  }
 
   @Patch()
-  update( @Body() updateCategoryDto: UpdateCategoryDto,@User() user: IUser) {
-    return this.categoriesService.update( updateCategoryDto,user);
+  update(@Body() updateCategoryDto: UpdateCategoryDto, @User() user: IUser) {
+    return this.categoriesService.update(updateCategoryDto, user);
   }
 
   @Delete(':id')
-  @ResponseMessage("Delete a Product")
+  @ResponseMessage("Delete a category")
   remove(@Param('id') id: string, @User() user: IUser) {
     return this.categoriesService.remove(id, user);
   }
