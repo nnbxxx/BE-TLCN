@@ -57,6 +57,18 @@ export class UsersController {
     let updatedUser = await this.usersService.updateUserProfile(user, updateUserDto);
     return updatedUser;
   }
+  @ResponseMessage("Update a User Role")
+  @Patch('/:id')
+  async updateRole(@Param('id') id: string, @Body() role: string) {
+    let updatedUser = await this.usersService.updateUserRole(id, role);
+    return updatedUser;
+  }
+  @ResponseMessage("Update a User Role")
+  @Patch('block/:id')
+  async blockUser(@Param('id') id: string,) {
+    let updatedUser = await this.usersService.blockUser(id);
+    return updatedUser;
+  }
 
   @Delete(':id')
   @ResponseMessage("Delete a User")

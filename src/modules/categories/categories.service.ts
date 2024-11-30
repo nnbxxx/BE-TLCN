@@ -62,9 +62,15 @@ export class CategoriesService {
 
   async findOne(id: string) {
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new BadRequestException(`not found product with id=${id}`);
+      throw new BadRequestException(`not found category with id=${id}`);
     }
     return await this.categoryModel.findById(id);
+  }
+  async findOneByName(id: string) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new BadRequestException(`not found category with name=${id}`);
+    }
+    return await this.categoryModel.findOne({ name: id });
   }
 
 

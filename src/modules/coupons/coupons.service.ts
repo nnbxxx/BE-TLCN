@@ -75,7 +75,7 @@ export class CouponsService {
 
   async findOne(id: string) {
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new BadRequestException(`not found product with id=${id}`);
+      throw new BadRequestException(`not found coupon with id=${id}`);
     }
     return await this.couponModel.findById(id);
   }
@@ -96,7 +96,7 @@ export class CouponsService {
 
   async remove(id: string, user: IUser) {
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new BadRequestException(`not found product with id=${id}`); // status: 200 => 400
+      throw new BadRequestException(`not found coupon with id=${id}`); // status: 200 => 400
     }
     await this.couponModel.updateOne(
       { _id: id },

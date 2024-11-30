@@ -17,6 +17,9 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
         if (user.isActive === false) {
             throw new BadRequestException("Tài khoản chưa được kích hoạt");
         }
+        if (user.isBlocked) {
+            throw new BadRequestException("Tài khoản bị khóa");
+        }
         return user; // req.user
     }
 }

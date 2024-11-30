@@ -35,7 +35,7 @@ export class ReviewsService {
 
   async getQuantityComment(productId: string) {
     if (!mongoose.Types.ObjectId.isValid(productId)) {
-      throw new NotFoundException(`not found product with id=${productId}`);
+      throw new NotFoundException(`not found review with id=${productId}`);
     }
     return this.reviewModel.countDocuments({ productId }).exec();
   }

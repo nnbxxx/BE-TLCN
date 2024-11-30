@@ -12,8 +12,6 @@ export class UpdateUserDto extends OmitType(CreateUserDto, [
 export class ProfileUserDto extends OmitType(CreateUserDto, [
     'email',
     'password',
-    'role',
-    'address'
 ] as const) {
     @ApiProperty({ example: 'avt.com.vn', description: 'avatar' })
     @IsString({ message: 'avatar phải là string' })

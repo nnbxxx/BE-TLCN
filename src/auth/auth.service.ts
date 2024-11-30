@@ -152,12 +152,12 @@ export class AuthService {
         }
     }
     logout = async (response: Response, user: IUser) => {
-        if(user.role.name === 'admin'){
-        await this.usersService.updateUserToken("", user._id,false);
-            
+        if (user.role.name === 'admin') {
+            await this.usersService.updateUserToken("", user._id, false);
+
         }
         else {
-        await this.usersService.updateUserToken("", user._id);
+            await this.usersService.updateUserToken("", user._id);
 
         }
         response.clearCookie("refresh_token");

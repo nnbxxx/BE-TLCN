@@ -34,7 +34,7 @@ export class CartsService {
   }
   async removeProductToCart(idProduct: string, user: IUser) {
     if (!mongoose.Types.ObjectId.isValid(idProduct)) {
-      throw new BadRequestException(`not found product with id=${idProduct}`);
+      throw new BadRequestException(`not found cart with id=${idProduct}`);
     }
     const foundCart = await this.findByUser(user)
 
@@ -64,7 +64,7 @@ export class CartsService {
   }
   async addProductToCart(cartItem: CartItem, user: IUser) {
     if (!mongoose.Types.ObjectId.isValid(cartItem.product._id)) {
-      throw new BadRequestException(`not found product with id=${cartItem.product._id}`);
+      throw new BadRequestException(`not found cart with id=${cartItem.product._id}`);
     }
 
     const isStock = await this.checkIsProductStock(cartItem.product._id as any, cartItem)

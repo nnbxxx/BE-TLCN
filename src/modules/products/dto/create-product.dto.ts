@@ -7,10 +7,9 @@ export class CreateProductDto {
     @IsNotEmpty({ message: 'Tên sản phẩm không được để trống', })
     name: string;
 
-    @ApiProperty({ example: '66f3d4c7d14a5fc30aaab4e1', description: 'mã category' })
-    @IsMongoId({ message: "Category phải là mongo id" })
+    @ApiProperty({ example: 'aaaaa', description: 'mã category' })
     @IsNotEmpty({ message: 'Category sản phẩm không được để trống', })
-    category: mongoose.Schema.Types.ObjectId;
+    category: string;
 
     @ApiProperty({ example: 'dior', description: 'tên thương hiệu' })
     @IsNotEmpty({ message: 'Brand không được để trống', })
@@ -22,21 +21,28 @@ export class CreateProductDto {
     @IsNotEmpty({ message: 'Giá không được để trống', })
     price: number;
 
+
+    @ApiProperty({ example: 'featured', description: 'tên thương hiệu' })
+    @IsNotEmpty({ message: 'Tags không được để trống', })
+    tags: string;
+
+
     @ApiProperty({ example: 'mô tả sản phẩm', description: 'mô tả sản phẩm' })
     @IsNotEmpty({ message: 'Description không được để trống', })
     description: string;
 
-    @ApiProperty({ example: 'shop abc xyz', description: 'tên shop' })
-    @IsNotEmpty({ message: 'Tên shop sản phẩm không được để trống', })
-    shopName: string;
-
-
     @IsOptional()
-    @ApiProperty({ example: '[abc.xyz.com.vn]', description: 'ảnh' })
+    @ApiProperty({ example: ['abc.xyz.com.vn'], description: 'ảnh' })
     // @IsNotEmpty({ message: 'Images không được để trống', })
     @IsArray({ message: 'Images phải là array' })
     @IsString({ each: true, message: "Image phải là string" })
     images: string[];
+    @IsOptional()
+    @ApiProperty({ example: ['abc.xyz.com.vn'], description: 'ảnh' })
+    // @IsNotEmpty({ message: 'Images không được để trống', })
+    @IsArray({ message: 'Images phải là array' })
+    @IsString({ each: true, message: "Image phải là string" })
+    colors: string[];
 
 
     @ApiProperty({ example: 1000, description: 'số lượng trong kho' })
@@ -44,10 +50,10 @@ export class CreateProductDto {
     @IsNumber({}, { message: 'quantity phải là số nguyên', })
     @IsNotEmpty({ message: 'quantity không được để trống', })
     quantity: number;
-    @ApiProperty({ example: 100, description: 'giảm giá' })
-    @Min(1, { message: 'discount phải là số dương' })
-    @Max(100, { message: 'discount tối đa là 100' })
-    @IsNumber({}, { message: 'discount phải là số nguyên', })
-    @IsNotEmpty({ message: 'discount không được để trống', })
-    discount: number;
+    // @ApiProperty({ example: 100, description: 'giảm giá' })
+    // @Min(1, { message: 'discount phải là số dương' })
+    // @Max(100, { message: 'discount tối đa là 100' })
+    // @IsNumber({}, { message: 'discount phải là số nguyên', })
+    // @IsNotEmpty({ message: 'discount không được để trống', })
+    // discount: number;
 }

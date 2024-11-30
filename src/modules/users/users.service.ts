@@ -16,16 +16,16 @@ import { ChangePasswordAuthDto, CodeAuthDto } from 'src/auth/dto/create-auth.dto
 import * as crypto from 'crypto';
 import { ReceiptsService } from '../receipts/receipts.service';
 import { RECEIPT_STATUS } from 'src/constants/schema.enum';
-import { Role, RoleDocument } from '../roles/schemas/role.schemas';
-import { USER_ROLE } from 'src/databases/sample';
+// import { Role, RoleDocument } from '../roles/schemas/role.schemas';
+// import { USER_ROLE } from 'src/databases/sample';
 @Injectable()
 export class UsersService {
 
   constructor(
     @InjectModel(UserM.name)
     private userModel: SoftDeleteModel<UserDocument>,
-    @InjectModel(Role.name)
-    private roleModel: SoftDeleteModel<RoleDocument>,
+    // @InjectModel(Role.name)
+    // private roleModel: SoftDeleteModel<RoleDocument>,
 
     private readonly mailerService: MailerService,
 
@@ -40,8 +40,9 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto, @User() user: IUser) {
     const {
-      name, email, password, age,
-      gender, address
+      name, email, password,
+      gender,
+      //address,age,
     }
       = createUserDto;
 
@@ -51,16 +52,16 @@ export class UsersService {
       throw new BadRequestException(`Email: ${email} đã tồn tại trên hệ thống. Vui lòng sử dụng email khác.`)
     }
     //fetch user role
-    const userRole = await this.roleModel.findOne({ name: USER_ROLE });
+    // const userRole = await this.roleModel.findOne({ name: USER_ROLE });
 
     const hashPassword = this.getHashPassword(password);
 
     let newUser = await this.userModel.create({
       name, email,
       password: hashPassword,
-      age,
-      gender, address,
-      role: userRole?._id,
+      // age,
+      // gender, address,
+      // role: userRole?._id,
       createdBy: {
         _id: user._id,
         email: user.email
@@ -78,7 +79,7 @@ export class UsersService {
       throw new BadRequestException(`Email: ${email} đã tồn tại trên hệ thống. Vui lòng sử dụng email khác.`)
     }
     //fetch user role
-    const userRole = await this.roleModel.findOne({ name: USER_ROLE });
+    // const userRole = await this.roleModel.findOne({ name: USER_ROLE });
 
     const hashPassword = this.getHashPassword(password);
     const codeId = crypto.randomInt(100000, 999999);
@@ -88,7 +89,7 @@ export class UsersService {
       // age,
       // gender,
       // address,
-      role: userRole?._id,
+      // role: userRole?._id,
       isActive: false,
       codeId: codeId,
       codeExpired: dayjs().add(5, 'minutes')
@@ -206,11 +207,11 @@ export class UsersService {
     })
   }
 
-  updateUserToken = async (refreshToken: string, _id: string,isActive = true) => {
+  updateUserToken = async (refreshToken: string, _id: string, isActive = true) => {
     return await this.userModel.updateOne(
       { _id },
       { refreshToken },
-      {isActive}
+      { isActive }
     )
   }
 
@@ -448,6 +449,18 @@ export class UsersService {
         }
       });
     return updated;
+  }
+  async updateUserRole(id: string, role: any) {
+    const user = await this.userModel.findById(id);
+    user.role = role.role;
+    await user.save();
+    return user;
+  }
+  async blockUser(id: string) {
+    const user = await this.userModel.findById(id);
+    user.isBlocked = !user.isBlocked;
+    await user.save();
+    return user;
   }
 
 }

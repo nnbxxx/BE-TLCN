@@ -35,6 +35,7 @@ import { ChatRoomsModule } from './modules/chat-rooms/chat-rooms.module';
 import { ColorModule } from './color/color.module';
 import { BrandModule } from './brand/brand.module';
 import { BlogCategoryModule } from './blog-category/blog-category.module';
+import { BlogModule } from './modules/blog/blog.module';
 
 
 @Module({
@@ -78,14 +79,14 @@ import { BlogCategoryModule } from './blog-category/blog-category.module';
     InventoryProductModule,
     AddressUserModule,
     PermissionsModule,
-    RolesModule,
+    // RolesModule,
     DatabasesModule,
     ChatRoomsModule,
     MessageModule,
     ColorModule,
     BrandModule,
     BlogCategoryModule,
-
+    BlogModule,
 
   ],
   controllers: [AppController],

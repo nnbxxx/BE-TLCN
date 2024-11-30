@@ -60,7 +60,7 @@ export class BlogCategoryService {
 
   async findOne(id: string) {
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new BadRequestException(`not found product with id=${id}`);
+      throw new BadRequestException(`not found blog category with id=${id}`);
     }
     return await this.blogCategoryModel.findById(id);
   }
@@ -82,7 +82,7 @@ export class BlogCategoryService {
 
   async remove(id: string, user: IUser) {
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new BadRequestException(`not found category with id=${id}`); // status: 200 => 400
+      throw new BadRequestException(`not found blog category with id=${id}`); // status: 200 => 400
     }
     await this.blogCategoryModel.updateOne(
       { _id: id },

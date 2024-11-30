@@ -31,7 +31,7 @@ export class CouponsController {
     return this.couponsService.findOne(id as any);
   }
   @ResponseMessage("Update a Coupons")
-  @Patch(':id')
+  @Patch()
   update(@Body() updateCouponDto: UpdateCouponDto, @User() user: IUser) {
     return this.couponsService.update(updateCouponDto, user);
   }

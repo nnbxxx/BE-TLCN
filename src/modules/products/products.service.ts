@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product, ProductDocument } from './schemas/product.schemas';
@@ -25,9 +25,9 @@ export class ProductsService {
   ) { }
 
   async create(createProductDto: CreateProductDto, user: IUser) {
-    const { brand, category, description, images, name, price, shopName, quantity } = createProductDto
+    const { brand, category, description, images, name, price, tags, quantity, colors } = createProductDto
     const product = await this.productModel.create({
-      brand, category, description, images, name, price, shopName,
+      brand, category, description, images, name, price, tags, colors,
       createdBy: {
         _id: user._id,
         email: user.email
@@ -82,17 +82,41 @@ export class ProductsService {
 
   async findOne(id: string) {
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new BadRequestException(`not found product with id=${id}`);
+      throw new BadRequestException(`Invalid product ID: ${id}`);
     }
-    const data = await this.productModel.findById(id);
+
+    // Tìm sản phẩm và populate màu
+    const product = await this.productModel
+      .findById(id)
+      .populate({
+        path: 'colors', // Trường colors tham chiếu đến bảng Color
+        select: 'color', // Chỉ lấy mã màu từ bảng Color
+      })
+      .exec();
+    if (!product) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
+    }
+
+    // Lấy thông tin từ các service khác
     const productInventory = await this.inventoryProductService.findByProductId(id);
-    const quantityComments = await this.reviewService.getQuantityComment(id as any)
-    const productPurchased = await this.inventoryProductService.getProductPurchased(id as any) as any
-    const { _id, reservations } = productPurchased
-    const category = await this.categoriesService.findOne(data.category as any)
-    const newData = { ...data.toObject(), quantityComments: +quantityComments, quantityProductPurchased: reservations.length, quantity: productInventory.quantity, category: category.name }
+    const quantityComments = await this.reviewService.getQuantityComment(id);
+    const productPurchased = await this.inventoryProductService.getProductPurchased(id) as any;
+
+    const { reservations = [] } = productPurchased || {};
+    const quantityProductPurchased = Array.isArray(reservations) ? reservations.length : 0;
+
+    // Chuẩn bị dữ liệu trả về
+    const newData = {
+      ...product.toObject(),
+      colors: product.colors, // Thay thế ID của màu bằng thông tin chi tiết (mã màu hoặc tên)
+      quantityComments: +quantityComments,
+      quantityProductPurchased,
+      quantity: productInventory?.quantity || 0,
+    };
+
     return newData;
   }
+
   async findOneForUser(id: string, user: IUser) {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new BadRequestException(`not found product with id=${id}`);

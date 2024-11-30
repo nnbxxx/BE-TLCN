@@ -67,9 +67,10 @@ export class User {
     @Prop()
     image: string;
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Role.name })
-    role: mongoose.Schema.Types.ObjectId;
-
+    // @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Role.name })
+    // role: mongoose.Schema.Types.ObjectId;
+    @Prop({ type: String, default: 'user' })
+    role: string
     @Prop({ default: 0 })
     point: number;
 
@@ -78,6 +79,8 @@ export class User {
 
     @Prop({ default: false })
     isActive: boolean;
+    @Prop({ default: false })
+    isBlocked: boolean;
 
     @Prop()
     codeId: string;

@@ -1,42 +1,56 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateProductDto } from './create-product.dto';
-import { IsMongoId, IsNotEmpty } from 'class-validator';
 import { ApiProperty, OmitType } from '@nestjs/swagger';
-import mongoose from 'mongoose';
 
-export class UpdateProductDto extends OmitType(CreateProductDto, [
-] as const) {
+import { IsArray, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from "class-validator";
+import mongoose from "mongoose";
+export class UpdateProductDto
+// extends OmitType(CreateProductDto, [
+// ] as const)
+{
     @IsMongoId({ message: '_id có dạng mongodb id' })
     @IsNotEmpty({ message: '_id không được để trống' })
     _id: string;
-}
-export class ProductUpdateDtoSw {
-    @ApiProperty({ example: 'Dior 333', description: 'Tên sản phẩm' })
-    @IsNotEmpty({ message: 'Name không được để trống' })
+
+    @ApiProperty({ example: 'dior 0001', description: 'Tên product' })
+    @IsNotEmpty({ message: 'Tên sản phẩm không được để trống', })
     name: string;
 
-    @ApiProperty({ example: `WONMAN'S FASHION`, description: 'Tên loại sp' })
-    @IsMongoId({ message: "Category phải là mongo id" })
+    @ApiProperty({ example: 'aaaaaaaaaa', description: 'mã category' })
     @IsNotEmpty({ message: 'Category sản phẩm không được để trống', })
-    category: mongoose.Schema.Types.ObjectId;
-    @ApiProperty({ example: `Dior`, description: 'Tên loại sản phẩm' })
-    @IsNotEmpty({ message: 'Category không được để trống' })
+    category: string;
+
+    @ApiProperty({ example: 'dior', description: 'tên thương hiệu' })
+    @IsNotEmpty({ message: 'Brand không được để trống', })
     brand: string;
 
-    @ApiProperty({ example: 123456, description: 'Giá sản phẩm' })
-    @IsNotEmpty({ message: 'Giá không được để trống' })
+    @ApiProperty({ example: 12345, description: 'giá sản phẩm' })
+    @Min(1, { message: 'Price phải là số dương' })
+    @IsNumber({}, { message: 'Price phải là số nguyên', })
+    @IsNotEmpty({ message: 'Giá không được để trống', })
     price: number;
 
-    @ApiProperty({ example: 'Dior nè', description: 'Description sản phẩm' })
+
+    @ApiProperty({ example: 'featured', description: 'tên thương hiệu' })
+    @IsNotEmpty({ message: 'Tags không được để trống', })
+    tags: string;
+
+
+    @ApiProperty({ example: 'mô tả sản phẩm', description: 'mô tả sản phẩm' })
     @IsNotEmpty({ message: 'Description không được để trống', })
     description: string;
 
-    @ApiProperty({ example: 'Easy shop', description: 'Tên shop bán sản phẩm' })
-    @IsNotEmpty({ message: 'Tên shop bán sản phẩm không được để trống' })
-    shopName: string;
+    @IsOptional()
+    @ApiProperty({ example: ['abc.xyz.com.vn'], description: 'ảnh' })
+    // @IsNotEmpty({ message: 'Images không được để trống', })
+    @IsArray({ message: 'Images phải là array' })
+    @IsString({ each: true, message: "Image phải là string" })
+    images: string[];
 
-    @ApiProperty({ example: '123.com.vn', description: 'Ảnh sản phẩm' })
-    @IsNotEmpty({ message: 'Image không được để trống', })
-    image: string;
 
+    @ApiProperty({ example: 1000, description: 'số lượng trong kho' })
+    @Min(1, { message: 'quantity phải là số dương' })
+    @IsNumber({}, { message: 'quantity phải là số nguyên', })
+    @IsNotEmpty({ message: 'quantity không được để trống', })
+    quantity: number;
 }

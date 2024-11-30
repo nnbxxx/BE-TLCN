@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { HydratedDocument } from "mongoose";
+import { Color } from "src/color/schemas/color.schemas";
 import { Category } from "src/modules/categories/schemas/category.Schemas";
 
 export type ProductDocument = HydratedDocument<Product>;
@@ -8,9 +9,8 @@ export type ProductDocument = HydratedDocument<Product>;
 export class Product {
     @Prop({ required: true })
     name: string;
-
-    @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: Category.name })
-    category: mongoose.Schema.Types.ObjectId;
+    @Prop({ required: true })
+    category: string;
 
     @Prop({ required: true })
     brand: string;
@@ -20,20 +20,25 @@ export class Product {
 
     @Prop({ required: true })
     description: string;
-
     @Prop({ required: true })
-    shopName: string;
+    tags: string;
 
     @Prop({
         default: [],
         type: [String]
     })
     images: string[];
+    @Prop({
+        default: [],
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: Color.name
+    })
+    colors: mongoose.Schema.Types.ObjectId[];
 
     @Prop({ default: 0 })
     rating: number;
-    @Prop({ default: 0 })
-    discount: number;
+    // @Prop({ default: 0 })
+    // discount: number;
 
     @Prop({ type: Object })
     createdBy: {
@@ -69,36 +74,36 @@ export class Product {
 export const ProductSchema = SchemaFactory.createForClass(Product);
 
 
-export class DescriptionProduct {
-    key: string;
-    value: [];
-}
-const x = {
-    decription: [
-        {
-            k: 'color',
-            v: [{
-                color: 'red',
-                img: 'abc xyz',
-            }, {
-                color: 'blue',
-                img: 'abc xyz',
-            }]
-        }, {
-            k: 'size',
-            v: [{
-                size: 'x',
-                decs: "cho x đến y kg"
+// export class DescriptionProduct {
+//     key: string;
+//     value: [];
+// }
+// const x = {
+//     decription: [
+//         {
+//             k: 'color',
+//             v: [{
+//                 color: 'red',
+//                 img: 'abc xyz',
+//             }, {
+//                 color: 'blue',
+//                 img: 'abc xyz',
+//             }]
+//         }, {
+//             k: 'size',
+//             v: [{
+//                 size: 'x',
+//                 decs: "cho x đến y kg"
 
-            }, {
-                size: 'xl',
-                decs: "cho x đến y kg"
+//             }, {
+//                 size: 'xl',
+//                 decs: "cho x đến y kg"
 
-            }, {
-                size: 'xxl',
-                decs: "cho x đến y kg"
+//             }, {
+//                 size: 'xxl',
+//                 decs: "cho x đến y kg"
 
-            }]
-        }
-    ]
-}
+//             }]
+//         }
+//     ]
+// }
