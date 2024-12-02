@@ -5,6 +5,7 @@ import mongoose, { HydratedDocument, Types } from "mongoose";
 import { Product } from "src/modules/products/schemas/product.schemas";
 import { CartItem } from "../dto/update-cart.dto";
 import { User } from "src/modules/users/schemas/user.schema";
+import { Color } from "src/color/schemas/color.schemas";
 
 export type CartDocument = HydratedDocument<Cart>;
 @Schema({ timestamps: true })
@@ -16,7 +17,7 @@ export class Cart {
         require: true,
         type: [{
             product: { type: mongoose.Schema.Types.ObjectId, ref: Product.name, require: true, },
-            name: { type: String, require: true, },
+            color: { type: mongoose.Schema.Types.ObjectId, ref: Color.name, require: true, },
             quantity: { type: Number, require: true, },
             price: { type: Number, require: true, },
         }]

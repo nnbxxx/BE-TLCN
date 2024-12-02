@@ -9,6 +9,8 @@ import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { ProductsService } from '../products/products.service';
 import mongoose, { Types } from 'mongoose';
 import { InventoryProductService } from '../inventory-product/inventory-product.service';
+import { Product } from '../products/schemas/product.schemas';
+import { Color } from 'src/color/schemas/color.schemas';
 
 @Injectable()
 export class CartsService {
@@ -28,25 +30,31 @@ export class CartsService {
     });
   }
   async findByUser(user: IUser) {
-    return await this.cartModel
+    const pop = [{
+      path: "items.product",
+      model: Product.name,
+      select: "_id name price images "  // Lựa chọn chỉ lấy _id và tên sản phẩm
+    }, {
+      path: "items.color",
+      model: Color.name,
+      select: "_id color "
+    }
+    ]
+    const re = await this.cartModel
       .findOne({ user: user._id })
-      .select("-__v -updatedAt -createdAt");
+      .select("-__v -updatedAt -createdAt -isDeleted -deletedAt")
+      .populate(pop);
+    return re;
   }
   async removeProductToCart(idProduct: string, user: IUser) {
     if (!mongoose.Types.ObjectId.isValid(idProduct)) {
       throw new BadRequestException(`not found cart with id=${idProduct}`);
     }
     const foundCart = await this.findByUser(user)
+    let newitem = foundCart.items.filter((id: any) => !id.equals(idProduct));
+    foundCart.items = newitem;
+    await foundCart.save();
 
-    await this.checkedItemInCart(user._id as any, idProduct as any);
-    await this.cartModel.findOneAndUpdate(
-      { user: user._id },
-      {
-        $pull: { items: { product: idProduct } }
-      },
-      { new: true }
-
-    );
     return await this.calcTotal(foundCart?._id as any);
   }
   async removeAllCartItem(user: IUser) {
@@ -84,7 +92,7 @@ export class CartsService {
           $set: {
             "items.$": {
               product: cartItem.product._id,
-              name: cartItem.product.name,
+              color: cartItem.product.color,
               quantity: cartItem.product.quantity,
               price: cartItem.product.price,
             }
@@ -100,7 +108,7 @@ export class CartsService {
           $push: {
             items: {
               product: cartItem.product._id,
-              name: cartItem.product.name,
+              color: cartItem.product.color,
               quantity: cartItem.product.quantity,
               price: cartItem.product.price,
             }
@@ -143,13 +151,7 @@ export class CartsService {
     return await this.cartModel.
       findByIdAndUpdate(cartId, { $set: { total: total } }, { new: true });
   }
-  async checkedItemInCart(userId: Types.ObjectId, proId: Types.ObjectId) {
-    const isItemExist = await this.cartModel.findOne({
-      user: userId,
-      "items.product": proId,
-    })
-    if (!isItemExist) throw new BadRequestException("Product does not exist in the cart.");
-  }
+
   // findAll() {
   //   return `This action returns all carts`;
   // }
