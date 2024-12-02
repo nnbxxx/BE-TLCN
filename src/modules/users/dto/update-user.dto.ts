@@ -9,15 +9,23 @@ export class UpdateUserDto extends OmitType(CreateUserDto, [
     @IsNotEmpty({ message: '_id không được để trống' })
     _id: string;
 }
-export class ProfileUserDto extends OmitType(CreateUserDto, [
-    'email',
-    'password',
-] as const) {
+export class ProfileUserDto
+// extends OmitType(CreateUserDto, [
+//     'email',
+//     'password',
+// ] as const) 
+{
     @ApiProperty({ example: 'avt.com.vn', description: 'avatar' })
     @IsString({ message: 'avatar phải là string' })
     @IsOptional()
     // @IsNotEmpty({ message: 'avatar không được để trống' })
     avatar: string;
+    @IsNotEmpty({ message: 'Name không được để trống' })
+    name: string;
+    @IsNotEmpty({ message: 'Gender không được để trống' })
+    gender: string;
+    @IsNotEmpty({ message: 'Gender không được để trống' })
+    age: number;
 }
 
 export class ProfileUserDtoSw {
@@ -30,9 +38,6 @@ export class ProfileUserDtoSw {
     @ApiProperty({ example: 'Female', description: 'Gender' })
     @IsNotEmpty({ message: 'Gender không được để trống' })
     gender: string;
-    @ApiProperty({ example: '1vvn', description: 'Address' })
-    @IsNotEmpty({ message: 'Address không được để trống' })
-    address: string;
 
 }
 export class ProfileUserDtoSwWeb {

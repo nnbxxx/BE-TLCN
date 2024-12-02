@@ -6,6 +6,7 @@ export interface IUser {
   age: string;
   avatar: string,
   address: string;
+  point: number;
   role: {
     _id: string;
     name: string;
