@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateLikeProductDto } from './dto/create-like-product.dto';
-import { ProductLikeItem, UpdateLikeProductDto } from './dto/update-like-product.dto';
+import { AddLikeProductDto, UpdateLikeProductDto } from './dto/update-like-product.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { LikeProduct, LikeProductDocument } from './schemas/like-product.schemas';
 import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
@@ -28,48 +28,46 @@ export class LikeProductsService {
     });
   }
   async findByUser(user: IUser) {
-
     const re = await this.likeProductModel
       .findOne({ user: user._id })
-      .select("-__v -updatedAt -createdAt -isDeleted -deletedAt").populate({
-        path: "items.product",
+      .select("-__v -updatedAt -createdAt -isDeleted -deletedAt")
+      .populate({
+        path: "items",
         model: Product.name,
-        select: "_id name price rating images discount"  // Lựa chọn chỉ lấy _id và tên sản phẩm
+        select: "_id name price images "  // Lựa chọn chỉ lấy _id và tên sản phẩm
       });
 
-    const handleRe = await Promise.all(re?.items.map(async (item: any) => {
-      const productPurchased = await this.inventoryProductService.getProductPurchased(item.product as any) as any
-      const { _id, reservations } = productPurchased
-      return {
-        ...item.toObject(),
-        quantityProductPurchased: +reservations.length
-      };
-    })
-    );
+    return re;
+  }
 
-    return { ...re.toObject(), items: handleRe };
-  }
-  async checkedItemLikeProducts(userId: Types.ObjectId, proId: Types.ObjectId) {
-    const isItemExist = await this.likeProductModel.findOne({
-      user: userId,
-      "items.product": proId,
-    })
-    if (!isItemExist) throw new BadRequestException("Product does not exist in the Like Products.");
-  }
   async removeProduct(idProduct: string, user: IUser) {
     if (!mongoose.Types.ObjectId.isValid(idProduct)) {
-      throw new BadRequestException(`not found product with id=${idProduct}`);
+      throw new BadRequestException(`Not found product with id=${idProduct}`);
     }
-    await this.checkedItemLikeProducts(user._id as any, idProduct as any);
-    return await this.likeProductModel.findOneAndUpdate(
-      { user: user._id },
-      {
-        $pull: { items: { product: idProduct } }
-      },
-      { new: true }
 
+    // Tìm giỏ hàng của người dùng
+    const foundCart = await this.likeProductModel.findOne({ user: user._id });
+    if (!foundCart) {
+      throw new BadRequestException(`Like Product not found for user with id=${user._id}`);
+    }
+
+    // Kiểm tra nếu sản phẩm có trong danh sách
+    const productIndex = foundCart.items.findIndex((item: any) => {
+      return item.equals(new mongoose.Types.ObjectId(idProduct))
+    }
     );
 
+    if (productIndex === -1) {
+      throw new BadRequestException(`Like Product with id=${idProduct} not found`);
+    }
+
+    // Loại bỏ sản phẩm khỏi danh sách
+    foundCart.items.splice(productIndex, 1);
+
+    // Lưu lại giỏ hàng sau khi loại bỏ sản phẩm
+    await foundCart.save();
+
+    return foundCart;
   }
   async removeAll(user: IUser) {
     const foundCart = await this.likeProductModel.findOneAndUpdate(
@@ -77,91 +75,54 @@ export class LikeProductsService {
         user: user._id,
       },
       {
-        $set: { items: [], total: 0 }
+        $set: { items: [] }
       },
       { new: true },
     )
 
     return foundCart;
   }
-  async addProduct(productLikeItem: ProductLikeItem, user: IUser) {
+  async addProduct(productLikeItem: AddLikeProductDto, user: IUser) {
 
-    if (!mongoose.Types.ObjectId.isValid(productLikeItem.product._id)) {
-      throw new BadRequestException(`not found product with id=${productLikeItem.product._id}`);
+    if (!mongoose.Types.ObjectId.isValid(productLikeItem._id)) {
+      throw new BadRequestException(`not found product with id=${productLikeItem._id}`);
     }
     const foundProducts = await this.likeProductModel
       .findOne({ user: user._id })
       .select("-__v -updatedAt -createdAt");
-    const isItemExist = await this.checkIsItemExit(productLikeItem.product._id as any, foundProducts.items)
-    if (!isItemExist) {
-      return await this.likeProductModel.findOneAndUpdate(
-        {
-          user: user._id,
-          items: { $elemMatch: { product: productLikeItem.product._id } },
-        },
-        {
-          $set: {
-            "items.$": {
-              product: productLikeItem.product._id,
-              name: productLikeItem.product.name,
-            }
-          },
-        },
-        { new: true },
-      )
+    const isItemExist = await this.checkIsItemExit(productLikeItem._id as any, foundProducts.items as any)
+    const { items } = foundProducts;
+    if (isItemExist) {
+      foundProducts.items = [...items, new mongoose.Types.ObjectId(productLikeItem._id)] as any;
+      await foundProducts.save();
     }
-    else {
-      return await this.likeProductModel.findByIdAndUpdate(
-        foundProducts._id,
-        {
-          $push: {
-            items: {
-              product: productLikeItem.product._id,
-              name: productLikeItem.product.name,
 
-            }
-          },
-        },
-        { new: true },
-      )
-    }
+    return foundProducts;
   }
-  async checkIsItemExit(productId: mongoose.Types.ObjectId, userProductList: any) {
-
-    const itemExist = userProductList.filter(item => {
-      if (item.product) {
-        return item.product.equals(productId)
-      }
-      return false
-    });
-    return (itemExist.length === 0)
+  async checkIsItemExit(productId: mongoose.Types.ObjectId, userProductList: mongoose.Types.ObjectId[]) {
+    // Sử dụng phương thức some để kiểm tra sự tồn tại của item trong danh sách
+    return !userProductList.some(item => item.equals(productId));
   }
   async checkProductFavorite(productId: string, user: IUser) {
+    // Kiểm tra tính hợp lệ của ID sản phẩm
     if (!mongoose.Types.ObjectId.isValid(productId)) {
-      throw new BadRequestException(`not found product with id=${productId}`);
+      throw new BadRequestException(`Not found product with id=${productId}`);
     }
-    const foundProducts = await this.findByUser(user)
-    const item = foundProducts.items.find((item: any) => {
-      return (new mongoose.Types.ObjectId(item.product.toString())).equals(productId);
-    })
 
-    return {
-      checkProduct: item ? true : false
+    // Tìm giỏ hàng của người dùng
+    const foundCart = await this.likeProductModel.findOne({ user: user._id });
+
+    // Nếu không tìm thấy giỏ hàng, trả về false
+    if (!foundCart) {
+      return { checkProduct: false };
     }
+
+    // Kiểm tra sản phẩm có trong danh sách yêu thích không
+    const isProductFavorite = foundCart.items.some((item: any) =>
+      item.equals(new mongoose.Types.ObjectId(productId))
+    );
+
+    // Trả về kết quả kiểm tra
+    return { checkProduct: isProductFavorite };
   }
-  // findAll() {
-  //   return `This action returns all likeProducts`;
-  // }
-
-  // findOne(id: number) {
-  //   return `This action returns a #${id} likeProduct`;
-  // }
-
-  // update(id: number, updateLikeProductDto: UpdateLikeProductDto) {
-  //   return `This action updates a #${id} likeProduct`;
-  // }
-
-  // remove(id: number) {
-  //   return `This action removes a #${id} likeProduct`;
-  // }
 }

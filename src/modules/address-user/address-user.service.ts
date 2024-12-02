@@ -90,7 +90,7 @@ export class AddressUserService {
   //   return `This action returns a #${id} addressUser`;
   // }
 
-  async update(updateAddressUserDto: UpdateAddressUserDto, user: IUser) {
+  async update(updateAddressUserDto: UpdateAddressUserDto) {
     return await this.addressUserModel.updateOne(
       { _id: updateAddressUserDto._id },
       {

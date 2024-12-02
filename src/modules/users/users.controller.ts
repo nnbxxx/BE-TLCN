@@ -63,7 +63,7 @@ export class UsersController {
     let updatedUser = await this.usersService.updateUserRole(id, role);
     return updatedUser;
   }
-  @ResponseMessage("Update a User Role")
+  @ResponseMessage("Block a User")
   @Patch('block/:id')
   async blockUser(@Param('id') id: string,) {
     let updatedUser = await this.usersService.blockUser(id);

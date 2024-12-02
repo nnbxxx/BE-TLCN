@@ -41,17 +41,17 @@ export class AddressUserController {
     return this.addressUserService.findUserAddress(user, id);
   }
 
-  @Patch('')
+  @Patch()
   @ApiBody({ type: UpdateAddressUserDtoSWG })
   @ResponseMessage("Update address user ")
   update(@Body() updateAddressUserDto: UpdateAddressUserDto, @User() user: IUser) {
-    return this.addressUserService.update(updateAddressUserDto, user);
+    return this.addressUserService.update(updateAddressUserDto);
   }
   @Patch('/user')
   @ApiBody({ type: UpdateAddressUserDtoSWG })
   @ResponseMessage("Update address user ")
   updateAddressUser(@Body() updateAddressUserDto: UpdateAddressUserDto, @User() user: IUser) {
-    return this.addressUserService.update(updateAddressUserDto, user);
+    return this.addressUserService.updateUser(updateAddressUserDto, user);
   }
   @Patch('/user/default/:id')
   @ResponseMessage("Update address user ")

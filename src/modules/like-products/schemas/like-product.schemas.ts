@@ -2,7 +2,6 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { HydratedDocument } from "mongoose";
 import { Product } from "src/modules/products/schemas/product.schemas";
 import { User } from "src/modules/users/schemas/user.schema";
-import { ProductLikeItem } from "../dto/update-like-product.dto";
 
 export type LikeProductDocument = HydratedDocument<LikeProduct>;
 
@@ -12,13 +11,10 @@ export class LikeProduct {
     user: mongoose.Schema.Types.ObjectId;
 
     @Prop({
-        require: true,
-        type: [{
-            product: { type: mongoose.Schema.Types.ObjectId, ref: Product.name, require: true, },
-            name: { type: String, require: true, },
-        }]
+        required: true,
+        type: [{ type: mongoose.Schema.Types.ObjectId, ref: Product.name, required: true }],
     })
-    items: ProductLikeItem[];
+    items: mongoose.Schema.Types.ObjectId[];
 
     @Prop({ type: Object })
     createdBy: {

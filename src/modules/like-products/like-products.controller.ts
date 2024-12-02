@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { LikeProductsService } from './like-products.service';
 import { CreateLikeProductDto } from './dto/create-like-product.dto';
-import { ProductLikeItem, UpdateLikeProductDto } from './dto/update-like-product.dto';
+import { AddLikeProductDto, UpdateLikeProductDto } from './dto/update-like-product.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { ResponseMessage, User } from 'src/decorator/customize';
 import { IUser } from '../users/users.interface';
@@ -21,17 +21,16 @@ export class LikeProductsController {
   }
   @ResponseMessage("Add product to Cart User")
   @Post('/add')
-  addItem(@User() user: IUser, @Body() productLikeItem: ProductLikeItem) {
+  addItem(@User() user: IUser, @Body() productLikeItem: AddLikeProductDto) {
     return this.likeProductsService.addProduct(productLikeItem, user);
   }
-
 
   @ResponseMessage("Delete product to Cart User")
   @Delete(':id')
   removeCartItem(@Param('id') id: string, @User() user: IUser) {
     return this.likeProductsService.removeProduct(id, user);
   }
-  @ResponseMessage("Check product to is like")
+  @ResponseMessage("Check product  is like")
   @Get('/user/:id')
   checkCartItem(@Param('id') id: string, @User() user: IUser) {
     return this.likeProductsService.checkProductFavorite(id, user);
