@@ -5,18 +5,16 @@ import { AddressReceipt } from "./update-receipt.dto";
 import { PAYMENT_METHOD } from "src/constants/schema.enum";
 import { ApiProperty } from "@nestjs/swagger";
 
-export interface IReceipt {
-
-}
 
 export class ReceiptDetailDTo {
     @IsMongoId({ message: 'productId phải là mongid' })
     @IsNotEmpty({ message: 'productId không được để trống' })
     @IsString({ message: "productId phải là string" })
     product: string
-    @IsNotEmpty({ message: 'name không được để trống' })
-    @IsString({ message: "name phải là string" }) // To make a field optional you can add @IsOptional
-    name: string;
+    @IsMongoId({ message: 'productId phải là mongid' })
+    @IsNotEmpty({ message: 'productId không được để trống' })
+    @IsString({ message: "productId phải là string" })
+    color: string
     @Min(1, { message: 'Price phải là số dương' })
     @IsNumber({}, { message: 'Price phải là số nguyên', })
     @IsNotEmpty({ message: 'Price không được để trống', })
@@ -46,18 +44,13 @@ export class CreateReceiptDto {
     @IsString({ message: "name phải là string" })
     notes: string;
 
-    @ValidateNested()
-    @Type(() => AddressReceipt)
-    @IsNotEmpty()
-    address: {
-        province: string,
-        district: string,
-        ward: string,
-        detail: string
-    }
+    @IsMongoId({ message: 'Address phải là mongid' })
+    @IsNotEmpty({ message: 'Address không được để trống' })
+    @IsString({ message: "Address phải là string" })
+    address: string
+
     @IsNotEmpty({ message: 'paymentMethod không được để trống' })
     @IsEnum(PAYMENT_METHOD, { message: 'paymentMethod phải là enum ' })
     @ApiProperty({ example: PAYMENT_METHOD.COD, description: 'phương thức thanh toán' })
-
     paymentMethod: PAYMENT_METHOD
 }

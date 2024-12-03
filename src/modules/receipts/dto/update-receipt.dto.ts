@@ -4,6 +4,7 @@ import { IsEnum, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, Min, Val
 import { Type } from 'class-transformer';
 import { RECEIPT_STATUS } from 'src/constants/schema.enum';
 import { ApiProperty } from '@nestjs/swagger';
+import mongoose from 'mongoose';
 
 export class UpdateStatusDto {
     @IsMongoId({ message: '_id phải là mongo id' })
@@ -80,6 +81,7 @@ export class ReceiptItem {
         name: string,
         price: number,
         quantity: number
+        color: mongoose.Schema.Types.ObjectId,
     }
 }
 export class AddressReceipt {

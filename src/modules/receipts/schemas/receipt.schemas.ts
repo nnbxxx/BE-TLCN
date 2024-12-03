@@ -5,6 +5,8 @@ import { PAYMENT_METHOD, RECEIPT_STATUS } from "src/constants/schema.enum";
 import { Product } from "src/modules/products/schemas/product.schemas";
 import { User } from "src/modules/users/schemas/user.schema";
 import { AddressReceipt, ReceiptItem } from "../dto/update-receipt.dto";
+import { Color } from "src/color/schemas/color.schemas";
+import { AddressUser } from "src/modules/address-user/schemas/address-user.schemas";
 
 export type ReceiptDocument = HydratedDocument<Receipt>;
 @Schema({ timestamps: true })
@@ -12,16 +14,16 @@ export class Receipt {
   @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: User.name })
   user: mongoose.Schema.Types.ObjectId;
 
-  @Prop({ required: true, type: Object })
-  address: AddressReceipt
+  @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: AddressUser.name })
+  address: mongoose.Schema.Types.ObjectId;
 
   @Prop({
     require: true,
     type: [{
       product: { type: mongoose.Schema.Types.ObjectId, ref: Product.name, require: true, },
-      name: { type: String, require: true, },
       quantity: { type: Number, require: true, },
       price: { type: Number, require: true, },
+      color: { type: mongoose.Schema.Types.ObjectId, ref: Color.name, require: true, },
     }]
   })
   items: ReceiptItem[];

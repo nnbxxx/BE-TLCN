@@ -154,12 +154,24 @@ export class UsersService {
 
   }
   async findOneCoupon(id: string) {
-    if (!mongoose.Types.ObjectId.isValid(id))
-      return `not found user`;
 
-    return await this.userModel.findOne({
-      _id: id
-    }).select(["couponsUser", "name", "email"])
+    // Tìm người dùng và lọc danh sách couponsUser có isActive: false
+    const user = await this.userModel
+      .findOne({ _id: id, isActive: true })
+      .select(["couponsUser", "name", "email"]);
+
+
+    if (!user) {
+      throw new NotFoundException('User not found or inactive');
+    }
+
+    // Lọc danh sách couponsUser
+    const inactiveCoupons = user.couponsUser.filter(coupon => coupon.isActive === false);
+
+    return {
+      ...user.toObject(),
+      couponsUser: inactiveCoupons
+    };
   }
 
   findOneByUsername(username: string) {

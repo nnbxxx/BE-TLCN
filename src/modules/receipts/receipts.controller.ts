@@ -112,7 +112,7 @@ export class ReceiptsController {
   async generatePaymentUrl(@Query() paymentUrlDto: PaymentUrlDto) {
     const result = await this.receiptsService.generatePaymentUrl(paymentUrlDto);
 
-    return result
+    return { vnpUrl: result }
   }
 
   @Redirect()

@@ -131,10 +131,7 @@ export class ReceiptsService {
 
     let offset = (+currentPage - 1) * (+limit);
     let defaultLimit = +limit ? +limit : 10;
-    const populateProduct = {
-      path: 'items',
-      populate: { path: 'product', select: 'images' }
-    }
+
     if (user) {
       const totalItems = (await this.receiptModel.find({ ...filter, user: user._id })).length;
       const totalPages = Math.ceil(totalItems / defaultLimit);
@@ -144,7 +141,18 @@ export class ReceiptsService {
         .limit(defaultLimit)
         .sort(sort as any)
         .select([])
-        .populate(population)
+        .populate({
+          path: 'items.product',
+          select: 'name images price', // Chỉ chọn các trường name và images từ product
+        })
+        .populate({
+          path: 'items.color',
+          select: 'color', // Chỉ chọn trường name từ color
+        })
+        .populate({
+          path: 'address',
+          select: 'receiver phone province districts wards specific', // Chỉ chọn trường name từ color
+        })
         .exec();
       return {
         meta: {
@@ -163,7 +171,14 @@ export class ReceiptsService {
       .limit(defaultLimit)
       .sort(sort as any)
       .select([])
-      .populate(populateProduct ? populateProduct : population)
+      .populate({
+        path: 'items.product',
+        select: 'name images', // Chỉ chọn các trường name và images từ product
+      })
+      .populate({
+        path: 'items.color',
+        select: 'name', // Chỉ chọn trường name từ color
+      })
       .exec();
 
 
