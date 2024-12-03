@@ -26,7 +26,7 @@ export class CloudinaryService {
                 {
                     folder: folder, resource_type: resourceType as any,
                     transformation: [
-                        { width: 500, height: 500, crop: 'pad', background: 'auto' } // Tăng kích thước ảnh và thêm nền nếu cần
+                        { width: 736, height: 1104, crop: 'pad', background: 'auto' } // Tăng kích thước ảnh và thêm nền nếu cần
                     ]
                 },
                 (error, result) => {

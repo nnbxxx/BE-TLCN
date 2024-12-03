@@ -118,18 +118,18 @@ export class CouponsService {
         quantity: { $gte: 1 },
         couponExpired: { $gte: dayjs().toDate() },
       })
-      .select({ _id: 1, code: 1, description: 1, name: 1 })
+      .select({ _id: 1, code: 1, description: 1, name: 1, couponExpired: 1 })
       .exec();
 
 
     coupons.forEach(async (coupon) => {
       const { pointAccept } = coupon.description as any
-      const { _id, code, name } = coupon
+      const { _id, code, name, couponExpired } = coupon
       // danh sách user chưa có coupon có _id và đủ điều kiện 
       const listUser = await this.userService.getAllUserAcceptPoint(pointAccept, _id as any)
       listUser.forEach(async (user) => {
 
-        this.userService.updateUserNewCoupons(user._id as any, { _id, code, name } as any)
+        this.userService.updateUserNewCoupons(user._id as any, { _id, code, name, couponExpired } as any)
         this.notificationsService.create({
           message: `${name}`,
           title: `Bạn vừa nhận được mã khuyến mãi mới: ${code}`,

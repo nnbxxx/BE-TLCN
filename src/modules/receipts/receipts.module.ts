@@ -9,9 +9,10 @@ import { UsersModule } from '../users/users.module';
 import { InventoryProductModule } from '../inventory-product/inventory-product.module';
 import { CouponsService } from '../coupons/coupons.service';
 import { CouponsModule } from '../coupons/coupons.module';
+import { AddressUserModule } from '../address-user/address-user.module';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: Receipt.name, schema: ReceiptSchema }]), ProductsModule, CartsModule, UsersModule, InventoryProductModule, CouponsModule],
+  imports: [MongooseModule.forFeature([{ name: Receipt.name, schema: ReceiptSchema }]), ProductsModule, CartsModule, UsersModule, InventoryProductModule, CouponsModule, AddressUserModule],
   controllers: [ReceiptsController],
   providers: [ReceiptsService],
   exports: [ReceiptsService]

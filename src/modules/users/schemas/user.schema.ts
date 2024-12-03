@@ -44,6 +44,7 @@ export class User {
             isActive: { type: Boolean, required: true, default: false },
             name: { type: String, required: true },
             code: { type: String, required: true },
+            couponExpired: { type: Date, required: true },
         }],
         required: true, default: []
     })
@@ -52,7 +53,8 @@ export class User {
             _id: mongoose.Schema.Types.ObjectId,
             isActive: boolean,
             name: string,
-            code: string
+            code: string,
+            couponExpired: Date
         }
     ];
 

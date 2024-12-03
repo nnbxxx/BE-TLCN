@@ -395,15 +395,15 @@ export class UsersService {
       .exec();
   }
   async updateUserNewCoupons(userId: string, coupon: {
-    _id: string, name: string, code: string
+    _id: string, name: string, code: string, couponExpired: Date
   }) {
     if (!mongoose.Types.ObjectId.isValid(userId))
       throw new NotFoundException(`Not found coupon`);
-    const { _id, name, code } = coupon
+    const { _id, name, code, couponExpired } = coupon
     await this.userModel.findByIdAndUpdate(userId, {
       $addToSet: {
         couponsUser: {
-          _id, name, code,
+          _id, name, code, couponExpired,
           isActive: false,
         }
       },

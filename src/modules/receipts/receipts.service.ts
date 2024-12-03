@@ -19,6 +19,7 @@ import { CheckValidCoupon } from '../coupons/dto/create-coupon.dto';
 import { ProductCode, VNPay, VnpLocale } from 'vnpay';
 import { PaymentUrlDto } from './dto/payment-url.dto';
 import path from 'path';
+import { AddressUserService } from '../address-user/address-user.service';
 
 @Injectable()
 export class ReceiptsService {
@@ -30,7 +31,8 @@ export class ReceiptsService {
     private cartService: CartsService,
     private userService: UsersService,
     private inventoryProductService: InventoryProductService,
-    private couponService: CouponsService
+    private couponService: CouponsService,
+    private addressUserService: AddressUserService,
 
   ) {
     this.vnpay = new VNPay({
@@ -384,6 +386,7 @@ export class ReceiptsService {
     }
 
   }
+
   // ===== VNPAY =====
   async generatePaymentUrl(paymentUrlDto: PaymentUrlDto) {
     const params = {
