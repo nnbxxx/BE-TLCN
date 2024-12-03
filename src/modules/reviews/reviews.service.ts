@@ -30,6 +30,8 @@ export class ReviewsService {
 
       }
     })
+    //UPDATE RATING PRODUCT
+    
     return newReview;
   }
 

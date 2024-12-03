@@ -360,8 +360,8 @@ export class UsersService {
 
     return updateUser;
   }
-  async updatePurchasedProducts(user: IUser, productIds: string[], point: number) {
-    await this.userModel.findByIdAndUpdate(user._id, {
+  async updatePurchasedProducts(userId: string, productIds: string[], point: number) {
+    await this.userModel.findByIdAndUpdate(userId, {
       $addToSet: { purchasedProducts: { $each: productIds } },
       $inc: { point: point }
     }, {
