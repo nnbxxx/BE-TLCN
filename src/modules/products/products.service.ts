@@ -20,7 +20,7 @@ export class ProductsService {
     private productModel: SoftDeleteModel<ProductDocument>,
     private userService: UsersService,
     private inventoryProductService: InventoryProductService,
-    @Inject(forwardRef(() => ReviewsService)) 
+    @Inject(forwardRef(() => ReviewsService))
     private reviewService: ReviewsService,
     private categoriesService: CategoriesService
   ) { }
@@ -50,7 +50,7 @@ export class ProductsService {
     delete filter.current;
     delete filter.pageSize;
     let offset = (+currentPage - 1) * (+limit);
-    let defaultLimit = +limit ? +limit : 10;
+    let defaultLimit = +limit ? +limit : 1000;
 
     const totalItems = (await this.productModel.find(filter)).length;
     const totalPages = Math.ceil(totalItems / defaultLimit);

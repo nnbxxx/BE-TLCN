@@ -31,7 +31,7 @@ export class InventoryProductService {
     delete filter.pageSize;
 
     let offset = (+currentPage - 1) * (+limit);
-    let defaultLimit = +limit ? +limit : 10;
+    let defaultLimit = +limit ? +limit : 1000;
 
     const totalItems = (await this.inventoryProductModel.find(filter)).length;
     const totalPages = Math.ceil(totalItems / defaultLimit);

@@ -45,7 +45,7 @@ export class RolesService {
     delete filter.pageSize;
 
     let offset = (+currentPage - 1) * (+limit);
-    let defaultLimit = +limit ? +limit : 10;
+    let defaultLimit = +limit ? +limit : 1000;
 
     const totalItems = (await this.roleModel.find(filter)).length;
     const totalPages = Math.ceil(totalItems / defaultLimit);

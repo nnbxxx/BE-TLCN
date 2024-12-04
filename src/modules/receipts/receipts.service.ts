@@ -131,7 +131,7 @@ export class ReceiptsService {
     delete filter.pageSize;
 
     let offset = (+currentPage - 1) * (+limit);
-    let defaultLimit = +limit ? +limit : 10;
+    let defaultLimit = +limit ? +limit : 1000;
 
     if (user) {
       const totalItems = (await this.receiptModel.find({ ...filter, user: user._id })).length;

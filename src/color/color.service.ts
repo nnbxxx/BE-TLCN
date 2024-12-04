@@ -32,7 +32,7 @@ export class ColorService {
 
 
     let offset = (+currentPage - 1) * (+limit);
-    let defaultLimit = +limit ? +limit : 10;
+    let defaultLimit = +limit ? +limit : 1000;
 
     const totalItems = (await this.colorModel.find(filter)).length;
     const totalPages = Math.ceil(totalItems / defaultLimit);
