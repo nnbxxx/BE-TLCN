@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product, ProductDocument } from './schemas/product.schemas';
@@ -20,6 +20,7 @@ export class ProductsService {
     private productModel: SoftDeleteModel<ProductDocument>,
     private userService: UsersService,
     private inventoryProductService: InventoryProductService,
+    @Inject(forwardRef(() => ReviewsService)) 
     private reviewService: ReviewsService,
     private categoriesService: CategoriesService
   ) { }

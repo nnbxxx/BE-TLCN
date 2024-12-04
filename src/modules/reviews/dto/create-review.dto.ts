@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Type } from "class-transformer";
-import { IsArray, IsMongoId, IsNotEmpty, IsOptional, IsString, ValidateNested } from "class-validator";
+import { IsArray, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min, ValidateNested } from "class-validator";
 import mongoose from "mongoose";
 
 export class CreateReviewDto {
@@ -21,9 +21,11 @@ export class CreateReviewDto {
     fileUrl?: string[];
 
     @IsNotEmpty({ message: 'rating sản phẩm không được để trống', })
-    @IsString({ message: "rating phải là string" })
-    @ApiProperty({ example: `5`, description: 'rating' })
-    rating: string;
+    @Min(0, { message: 'rating phải >= 0' })
+    @Max(5, { message: 'rating tối đa là 5' })
+    @IsNumber({}, { message: 'rating phải là số nguyên', })
+    @ApiProperty({ example: 5, description: 'rating' })
+    rating: number;
 
     @ApiProperty({ example: `good products`, description: 'comment' })
     @IsNotEmpty({ message: 'comment sản phẩm không được để trống', })

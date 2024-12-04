@@ -15,8 +15,8 @@ export class Review {
     @Prop({ required: true, default: [] })
     fileUrl?: [string];
 
-    @Prop({ default: '0' })
-    rating: string;
+    @Prop({ default: 0 })
+    rating: number;
     @Prop({ required: true, type: String })
     comment: string;
 

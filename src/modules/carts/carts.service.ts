@@ -17,7 +17,6 @@ export class CartsService {
   constructor(
     @InjectModel(Cart.name)
     private cartModel: SoftDeleteModel<CartDocument>,
-    private productService: ProductsService,
     private inventoryProductService: InventoryProductService
   ) { }
   create(user: IUser) {

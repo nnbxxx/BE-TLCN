@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -7,14 +7,27 @@ import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import { UserDocument } from '../users/schemas/user.schema';
 import { UsersService } from '../users/users.service';
 import { IUser } from '../users/users.interface';
-import mongoose from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import aqp from 'api-query-params';
+import { Product, ProductDocument } from '../products/schemas/product.schemas';
+import { ProductsService } from '../products/products.service';
+import { ReceiptsService } from '../receipts/receipts.service';
+import { Receipt, ReceiptDocument } from '../receipts/schemas/receipt.schemas';
+import { RECEIPT_STATUS } from 'src/constants/schema.enum';
 
 @Injectable()
 export class ReviewsService {
   constructor(
     @InjectModel(Review.name)
-    private reviewModel: SoftDeleteModel<ReviewDocument>, private userService: UsersService
+    private reviewModel: SoftDeleteModel<ReviewDocument>,
+    // @Inject(forwardRef(() => ProductsService))
+    @InjectModel(Product.name)
+    private productModel: SoftDeleteModel<ProductDocument>,
+    // @Inject(forwardRef(() => ReceiptsService))
+    @InjectModel(Receipt.name)
+    private receiptModel: SoftDeleteModel<ReceiptDocument>,
+
+    private userService: UsersService
   ) { }
   async create(user: IUser, createReviewDto: CreateReviewDto) {
     const { comment, productId, rating, userId, fileUrl } = createReviewDto
@@ -22,6 +35,7 @@ export class ReviewsService {
     if (!checkProduct) {
       throw new BadRequestException('User has not purchased this product');
     }
+    await this.validateReview(user._id, createReviewDto.productId as any);
     let newReview = await this.reviewModel.create({
       comment, productId, rating, userId, fileUrl,
       createdBy: {
@@ -31,8 +45,45 @@ export class ReviewsService {
       }
     })
     //UPDATE RATING PRODUCT
-    
+    await this.updateProductRating(productId as any);
     return newReview;
+  }
+  async updateProductRating(productId: string) {
+    const ratings = await this.reviewModel.aggregate([
+      { $match: { productId: new mongoose.Types.ObjectId(productId) } },
+      { $group: { _id: null, avgRating: { $avg: { $toInt: '$rating' } } } },
+    ]);
+
+    const avgRating = ratings.length > 0 ? ratings[0].avgRating : 0;
+
+    // Cập nhật lại sản phẩm
+    await this.productModel.findByIdAndUpdate(productId, { rating: avgRating });
+  }
+  async validateReview(userId: string, productId: string) {
+
+
+    // 1. Đếm số lần user đã review sản phẩm này
+    const existingReviewsCount = await this.reviewModel.countDocuments({
+      userId,
+      productId,
+      isDeleted: false,
+    });
+
+    // 2. Đếm số lượng đơn hàng "completed" chứa sản phẩm này
+    const completedOrdersCount = await this.receiptModel.countDocuments({
+      user: userId,
+      'items.product': productId,
+      statusUser: RECEIPT_STATUS.DELIVERED,
+      isCheckout: true
+    });
+
+    // 3. Cho phép review nếu số lần review nhỏ hơn số đơn "completed"
+    if (existingReviewsCount >= completedOrdersCount) {
+      throw new BadRequestException(
+        `Bạn đã review đủ số lần tương ứng với các đơn hàng đã hoàn thành. Vui long mua lại sản phẩm để reviews`,
+      );
+    }
+    //    return newReview;
   }
 
   async getQuantityComment(productId: string) {

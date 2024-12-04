@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateReceiptDto } from './dto/create-receipt.dto';
 import { UpdateReceiptDto, UpdateStatusDto } from './dto/update-receipt.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -27,6 +27,7 @@ export class ReceiptsService {
   constructor(
     @InjectModel(Receipt.name)
     private receiptModel: SoftDeleteModel<ReceiptDocument>,
+    @Inject(forwardRef(() => ProductsService))
     private productService: ProductsService,
     private cartService: CartsService,
     private userService: UsersService,
