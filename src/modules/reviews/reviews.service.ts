@@ -110,7 +110,11 @@ export class ReviewsService {
       .limit(defaultLimit)
       .sort(sort as any)
       .select([''])
-      .populate(population)
+      // .populate(population)
+      .populate({
+        path: 'userId',
+        select: 'name avatar', // Chỉ chọn các trường name và images từ product
+      })
       .exec();
 
 
