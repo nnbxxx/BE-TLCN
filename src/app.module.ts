@@ -36,6 +36,7 @@ import { ColorModule } from './color/color.module';
 import { BrandModule } from './brand/brand.module';
 import { BlogCategoryModule } from './blog-category/blog-category.module';
 import { BlogModule } from './modules/blog/blog.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 
 @Module({
@@ -87,6 +88,7 @@ import { BlogModule } from './modules/blog/blog.module';
     BrandModule,
     BlogCategoryModule,
     BlogModule,
+    DashboardModule,
 
   ],
   controllers: [AppController],

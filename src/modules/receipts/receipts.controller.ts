@@ -43,6 +43,7 @@ export class ReceiptsController {
   }
   @ResponseMessage("View all receipt")
   @Get('/admin')
+  @Public()
   findAll(@Query("current") currentPage: number,
     @Query("pageSize") limit: number,
     @Query() qs: string) {
@@ -115,18 +116,32 @@ export class ReceiptsController {
     return { vnpUrl: result }
   }
 
-  @Redirect()
-  @Public()
+  // @Redirect()
+  // @Public()
+  // @Get("/vnpay/callback")
+  // async callbackVNPay(@Query() query, @Res() res) {
+  //   const result = this.receiptsService.validatePaymentCallback(query);
+
+  //   if (!result.isSuccess) {
+  //     const failUrl = `http://localhost:3000/orderFail/${result.vnp_TxnRef}?error=${result.message}`;
+  //     return { statusCode: HttpStatus.FOUND, url: failUrl };
+  //   }
+  //   await this.receiptsService.confirmPaid(result.vnp_TxnRef);
+  //   const succeedUrl = `http://localhost:3000/dashboard/my-orders`;
+  //   return { statusCode: HttpStatus.FOUND, url: succeedUrl };
+  // }
   @Get("vnpay/callback")
+  @Public()
   async callbackVNPay(@Query() query, @Res() res) {
     const result = this.receiptsService.validatePaymentCallback(query);
 
     if (!result.isSuccess) {
-      const failUrl = `http://localhost:3000/orderFail/${result.vnp_TxnRef}?error=${result.message}`;
-      return { statusCode: HttpStatus.FOUND, url: failUrl };
+      const failUrl = `http://localhost:3000/dashboard/my-orders`;
+      return res.redirect(failUrl); // Chuyển hướng người dùng về trang thất bại
     }
-    const d = await this.receiptsService.confirmPaid(result.vnp_TxnRef);
-    const succeedUrl = `http://localhost:3000/orderSuccess/${result.vnp_TxnRef}`;
-    return { statusCode: HttpStatus.FOUND, url: succeedUrl };
+
+    await this.receiptsService.confirmPaid(result.vnp_TxnRef);
+    const succeedUrl = `http://localhost:3000/dashboard/my-orders`;
+    return res.redirect(succeedUrl); // Chuyển hướng người dùng về trang thành công
   }
 }
