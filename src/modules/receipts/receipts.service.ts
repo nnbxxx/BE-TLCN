@@ -200,6 +200,19 @@ export class ReceiptsService {
       throw new NotFoundException(`not found receipt with id=${receiptId}`);
     }
     const receipt = await this.receiptModel.findById(receiptId)
+      .populate({
+        path: 'items.product',
+        select: 'name images brand', // Chỉ chọn các trường name và images từ product
+      })
+      .populate({
+        path: 'items.color',
+        select: 'color', // Chỉ chọn trường name từ color
+      })
+      .populate({
+        path: 'address',
+        select: 'receiver phone province districts wards specific',
+      })
+      .exec();
     if (!receipt) {
       throw new NotFoundException(`not found receipt with id=${receiptId}`);
     }
