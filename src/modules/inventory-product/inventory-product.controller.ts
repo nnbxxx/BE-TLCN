@@ -3,7 +3,7 @@ import { InventoryProductService } from './inventory-product.service';
 import { CreateInventoryProductDto } from './dto/create-inventory-product.dto';
 import { UpdateInventoryProductDto } from './dto/update-inventory-product.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { ResponseMessage, User } from 'src/decorator/customize';
+import { Public, ResponseMessage, User } from 'src/decorator/customize';
 import { IUser } from '../users/users.interface';
 
 @ApiTags('inventory-product')
@@ -15,7 +15,7 @@ export class InventoryProductController {
   create(@Body() createInventoryProductDto: CreateInventoryProductDto, @User() user: IUser) {
     return this.inventoryProductService.create(createInventoryProductDto, user);
   }
-
+  @Public()
   @Get()
   @ResponseMessage("Fetch InventoryProduct with paginate")
   findAll(@Query("current") currentPage: number,

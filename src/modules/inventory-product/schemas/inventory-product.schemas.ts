@@ -3,6 +3,7 @@ import mongoose, { HydratedDocument } from "mongoose";
 import { Product } from "src/modules/products/schemas/product.schemas";
 import { ReservationProduct } from "../dto/create-inventory-product.dto";
 import { User } from "src/modules/users/schemas/user.schema";
+import { Color } from "src/color/schemas/color.schemas";
 
 export type InventoryProductDocument = HydratedDocument<InventoryProduct>;
 
@@ -17,6 +18,7 @@ export class InventoryProduct {
     @Prop({
         type: [{
             userId: { type: mongoose.Schema.Types.ObjectId, ref: User.name, require: true, },
+            color: { type: mongoose.Schema.Types.ObjectId, ref: Color.name, require: true, },
             quantity: { type: Number, require: true, },
             price: { type: Number, require: true, },
         }], default: []

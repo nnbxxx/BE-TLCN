@@ -1,8 +1,9 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { DashboardService } from './dashboard.service';
-import { CreateDashboardDto } from './dto/create-dashboard.dto';
+import { CreateDashboardDto, DataRevenueDto } from './dto/create-dashboard.dto';
 import { UpdateDashboardDto } from './dto/update-dashboard.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { Public } from 'src/decorator/customize';
 
 @ApiTags('dashboard')
 @Controller('dashboard')
@@ -20,8 +21,14 @@ export class DashboardController {
   // }
 
   @Get('/info')
+  @Public()
   findOne() {
     return this.dashboardService.getDashboardCardInfo();
+  }
+  @Post('/revenue')
+  @Public()
+  getDataRevenue(@Body() dataRevenueDto: DataRevenueDto) {
+    return this.dashboardService.getMonthlyTotal(dataRevenueDto.year);
   }
 
   // @Patch(':id')

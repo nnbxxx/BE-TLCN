@@ -57,6 +57,9 @@ export class ReceiptAdd {
     @IsMongoId({ message: '_id phải là mongo id' })
     @IsNotEmpty({ message: '_id không được để trống' })
     _id: string;
+    @IsMongoId({ message: '_id phải là mongo id' })
+    @IsNotEmpty({ message: '_id không được để trống' })
+    color: string;
 
     @IsNotEmpty({ message: 'name không được để trống' })
     @IsString({ message: "name phải là string" }) // To make a field optional you can add @IsOptional

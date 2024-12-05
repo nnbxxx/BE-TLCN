@@ -20,6 +20,9 @@ export class ReservationProduct {
     @IsMongoId({ message: 'userId có dạng mongodb id' })
     @IsNotEmpty({ message: 'userId không được để trống' })
     userId: string;
+    @IsMongoId({ message: 'color có dạng mongodb id' })
+    @IsNotEmpty({ message: 'color không được để trống' })
+    color: string;
 
     @Min(1, { message: 'Quantity phải là số dương' })
     @IsNumber({}, { message: 'Quantity phải là số nguyên', })

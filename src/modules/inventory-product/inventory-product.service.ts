@@ -77,22 +77,49 @@ export class InventoryProductService {
     return this.inventoryProductModel.findOne({ productId }).select(['reservations']);
   }
   async updateReceiptUser(receiptItems: ReceiptItem[], user: IUser) {
-    receiptItems.map(async (item) => {
-      const { product, price, quantity } = item as any
+    receiptItems.map(async (item: any) => {
+      const { product, price, quantity, color } = item
       const productInventory = await this.findByProductId(product);
+      productInventory.quantity -= quantity;
       if (!productInventory) {
         throw new NotFoundException('Product not found');
       }
       const reservationData = {
         userId: user._id,
         quantity: quantity,
-        price: price
+        price: price,
+        color: color,
       }
       productInventory.reservations.push(reservationData);
       await productInventory.save();
 
     })
   }
+  async getTopProductsWithReservations(): Promise<any[]> {
+    const results = await this.inventoryProductModel
+      .aggregate([
+        {
+          $addFields: {
+            totalQuantityBought: {
+              $sum: '$reservations.quantity', // Tính tổng quantity trong reservations
+            },
+          },
+        },
+        { $sort: { totalQuantityBought: -1 } }, // Sắp xếp giảm dần theo tổng quantity
+        { $limit: 10 }, // Giới hạn top 10
+      ])
+      .exec()
+      .then((data) =>
+        this.inventoryProductModel.populate(data, { path: 'productId', select: 'name' })
+      );
+
+    // Lấy mảng chỉ gồm {name, totalQuantityBought}
+    return results.map((item: any) => ({
+      name: item.productId.name,
+      totalQuantityBought: item.totalQuantityBought,
+    }));
+  }
+
   // update(id: number, updateInventoryProductDto: UpdateInventoryProductDto) {
   //   return `This action updates a #${id} inventoryProduct`;
   // }
