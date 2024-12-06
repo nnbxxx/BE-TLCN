@@ -41,7 +41,6 @@ export class FilesController {
       }),
   ) file: Express.Multer.File) {
     const imgUrl = (await this.cloudinaryService.uploadFile(file, 'new-img')).url
-    //console.log("🚀 ~ FilesController ~ imgUrl:", imgUrl)
     return imgUrl;
   }
   @ResponseMessage("Upload multiple new file")
@@ -106,7 +105,6 @@ export class FilesController {
   // @ResponseMessage("Delete a file")
   // @Delete()
   // remove(@Body() url: string) {
-  //   console.log("🚀 ~ FilesController ~ remove ~ url:", url)
   //   return this.cloudinaryService.deleteImageOnCloud(url);
   // }
 }

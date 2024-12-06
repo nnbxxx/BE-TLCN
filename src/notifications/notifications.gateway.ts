@@ -17,7 +17,6 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 
   ) { }
   async handleDisconnect(client: Socket) {
-    // console.log("🚀 ~ NotificationsGateway ~ handleDisconnect ~ client:", client.id)
     const { _id } = client.handshake.headers
     if (_id) {
       this.usersService.updateSocketId(_id as any)
@@ -27,7 +26,6 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 
   }
   handleConnection(client: Socket) {
-    // console.log("🚀 ~ NotificationsGateway ~ handleConnection ~ client:", client.handshake.headers)
     const { _id } = client.handshake.headers
     if (_id) {
       this.usersService.updateSocketId(_id as any, client.id)

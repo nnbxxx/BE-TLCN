@@ -174,7 +174,6 @@ export class ProductsService {
   }
   async getProductsRecentViewByUser(user: IUser) {
     const userDB = await this.userService.findOne(user._id) as any;
-    // console.log("🚀 ~ ProductsService ~ getProductsRecentViewByUser ~ userDB:", userDB)
     return this.productModel.find({ _id: { $in: userDB.recentViewProducts } }).select(['_id', 'name', 'price', 'images']).exec();
   }
   async getProductsPurchasedByUser(user: IUser) {

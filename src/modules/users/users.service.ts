@@ -381,7 +381,6 @@ export class UsersService {
     return re.purchasedProducts.includes(productId as any);
   }
   async updateSocketId(userId: string, socketId: string = null) {
-    console.log("🚀 ~ UsersService ~ updateSocketId ~ userId:", userId)
     // if (userId) {
     //   throw new BadRequestException(`Không có user id`)
     // }

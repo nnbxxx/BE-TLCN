@@ -75,7 +75,6 @@ export class ReceiptsController {
   @Public()
   @Cron(CronExpression.EVERY_MINUTE)
   autoUpdateConfirm() {
-    // console.log("🚀 ~ ReceiptsController ~ autoUpdateConfirm ~ autoUpdateConfirm")
     return this.receiptsService.autoconfirm();
   }
   @ResponseMessage("Dashboard receipts")
@@ -88,7 +87,6 @@ export class ReceiptsController {
   @Post('/confirmPayment')
   @ApiBody({ type: IdSW })
   confirmPayment(@Body("id") id: string, @User() user: IUser) {
-    // console.log("🚀 ~ ReceiptsController ~ autoUpdateConfirm ~ autoUpdateConfirm")
     return this.receiptsService.confirmPayment(id, user);
   }
   @ResponseMessage("return receipts")

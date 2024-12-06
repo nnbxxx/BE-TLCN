@@ -59,8 +59,6 @@ export class DashboardService {
       },
     ]);
     const dataTopSellingProducts = await this.inventoryProductService.getTopProductsWithReservations();
-    const re = await this.getMonthlyTotal(2024);
-    console.log("🚀 ~ DashboardService ~ getDashboardCardInfo ~ re:", re)
 
     return {
       quantityBlog, quantityUser, quantityBrand, totalRevenue: totalReceipt[0].totalSum, totalProductPruchased: totalProductPurchased[0].totalQuantity,
