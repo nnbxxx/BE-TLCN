@@ -59,7 +59,7 @@ export class ProductsService {
         message: `Có sản phẩm mới: ${product.name}`,
         title: `Có sản phẩm mới: ${product.name}`,
         userId: user as any,
-        navigate: 'https://www.google.com/'
+        navigate: `${process.env.FE_URI}product/67592404351e7c224786745d`
       })
       const connectSocketId = await this.userService.checkConnectSocketIo(user as any);
       if (connectSocketId !== null) {
