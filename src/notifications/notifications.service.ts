@@ -25,8 +25,8 @@ export class NotificationsService {
     });;
   }
   async getNotificationsByUser(userId: string) {
-    return await this.notificationModel.find({}).exec();
-    // return await this.notificationModel.find({ userId }).sort({ createdAt: -1 });
+
+    return await this.notificationModel.find({ userId }).sort({ createdAt: -1 });
   }
   async markAsRead(notificationId: string, user: IUser) {
     if (!mongoose.Types.ObjectId.isValid(notificationId)) {

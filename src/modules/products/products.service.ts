@@ -12,6 +12,9 @@ import { InventoryProductService } from '../inventory-product/inventory-product.
 import { CreateInventoryProductDto } from '../inventory-product/dto/create-inventory-product.dto';
 import { ReviewsService } from '../reviews/reviews.service';
 import { CategoriesService } from '../categories/categories.service';
+import { User, UserDocument } from '../users/schemas/user.schema';
+import { NotificationsService } from 'src/notifications/notifications.service';
+import { NotificationsGateway } from 'src/notifications/notifications.gateway';
 
 @Injectable()
 export class ProductsService {
@@ -19,10 +22,14 @@ export class ProductsService {
     @InjectModel(Product.name)
     private productModel: SoftDeleteModel<ProductDocument>,
     private userService: UsersService,
+    @InjectModel(User.name)
+    private userModel: SoftDeleteModel<UserDocument>,
     private inventoryProductService: InventoryProductService,
     @Inject(forwardRef(() => ReviewsService))
     private reviewService: ReviewsService,
-    private categoriesService: CategoriesService
+    private categoriesService: CategoriesService,
+    private notificationsGateway: NotificationsGateway,
+    private notificationsService: NotificationsService
   ) { }
 
   async create(createProductDto: CreateProductDto, user: IUser) {
@@ -40,9 +47,32 @@ export class ProductsService {
       reservations: []
     }
     await this.inventoryProductService.create(inventoryProductDto, user)
+    await this.sendNewProductNotification(product);
     return product;
 
   }
+  async sendNewProductNotification(product) {
+    const listUser = await this.userModel.find({}, '_id').exec();
+    listUser.forEach(async (user) => {
+
+      this.notificationsService.create({
+        message: `Có sản phẩm mới: ${product.name}`,
+        title: `Có sản phẩm mới: ${product.name}`,
+        userId: user as any,
+        navigate: 'https://www.google.com/'
+      })
+      const connectSocketId = await this.userService.checkConnectSocketIo(user as any);
+      if (connectSocketId !== null) {
+        this.notificationsGateway.sendNotification({
+          message: `Có sản phẩm mới: ${product.name}`,
+          title: `Có sản phẩm mới: ${product.name}`,
+          userId: user as any
+        }, connectSocketId as any)
+      }
+
+    })
+  }
+
 
   async findAll(currentPage: number, limit: number, qs: string) {
 

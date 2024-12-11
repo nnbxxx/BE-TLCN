@@ -7,7 +7,6 @@ import { Role } from 'src/modules/roles/schemas/role.schemas';
 // import { Role } from 'src/roles/schemas/role.schemas';
 
 export type UserDocument = HydratedDocument<User>;
-
 @Schema({ timestamps: true }) // biến class thành 1 schema // lấy time at
 export class User {
     @Prop()

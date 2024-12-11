@@ -17,6 +17,7 @@ export class DashboardService {
     private blogModel: SoftDeleteModel<BlogDocument>,
     @InjectModel(User.name)
     private userModel: SoftDeleteModel<UserDocument>,
+
     @InjectModel(Receipt.name)
     private receiptModel: SoftDeleteModel<ReceiptDocument>,
     @InjectModel(Brand.name)
