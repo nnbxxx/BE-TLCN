@@ -34,6 +34,14 @@ export class NotificationsService {
     }
     return await this.notificationModel.findOneAndUpdate({ _id: notificationId, userId: user._id }, { isRead: true }, { new: true });
   }
+  // Mark all unread notifications as read
+  async markAllAsRead(user: IUser): Promise<number> {
+    const result = await this.notificationModel.updateMany(
+      { isRead: false, userId: user._id }, // Filter: Only unread notifications
+      { $set: { isRead: true } }, // Update: Set isRead to true
+    );
+    return result.modifiedCount; // Return the number of updated documents
+  }
   async findAll(currentPage: number, limit: number, qs: string) {
     const { filter, sort, population } = aqp(qs);
     delete filter.current;

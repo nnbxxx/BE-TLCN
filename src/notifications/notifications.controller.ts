@@ -52,6 +52,10 @@ export class NotificationsController {
   async markAsRead(@Param('notificationId') notificationId: string, @User() user: IUser) {
     return await this.notificationsService.markAsRead(notificationId, user);
   }
+  @Post('mark-all-as-read')
+  async markAllAsRead(@User() user: IUser) {
+    return await this.notificationsService.markAllAsRead(user);
+  }
 
 
 }
