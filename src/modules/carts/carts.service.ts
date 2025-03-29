@@ -74,7 +74,7 @@ export class CartsService {
       throw new BadRequestException(`not found cart with id=${cartItem.product._id}`);
     }
 
-    const isStock = await this.checkIsProductStock(cartItem.product._id as any, cartItem)
+    //const isStock = await this.checkIsProductStock(cartItem.product._id as any, cartItem)
     const foundCart = await this.findByUser(user)
     // if (!isStock) {
     //   throw new BadRequestException(`Sản phẩm ${cartItem.product.name} không đủ số lượng`)
@@ -124,8 +124,8 @@ export class CartsService {
 
   //                        ==================Utils=================
   async checkIsProductStock(productId: Types.ObjectId, cartItem: CartItem | UpdateToCartDto) {
-    const productStock = (await this.inventoryProductService.findByProductId(productId as any)).quantity;
-    return productStock >= cartItem.product.quantity
+    // const productStock = (await this.inventoryProductService.findByProductId(productId as any)).quantity;
+    // return productStock >= cartItem.product.quantity
   }
   async checkIsItemExit(productId: mongoose.Types.ObjectId, userProductCart: any) {
     const itemExist = userProductCart.filter(item => {

@@ -1,76 +1,91 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { HydratedDocument } from "mongoose";
 import { Product } from "src/modules/products/schemas/product.schemas";
-import { ReservationProduct } from "../dto/create-inventory-product.dto";
 import { User } from "src/modules/users/schemas/user.schema";
 import { Color } from "src/color/schemas/color.schemas";
 
 export type InventoryProductDocument = HydratedDocument<InventoryProduct>;
 
+// Chi tiết biến thể sản phẩm trong kho
+class ProductVariant {
+    @Prop({ type: Map, of: String, required: false })
+    attributes: Record<string, any>; // Lưu trữ các thuộc tính như color, size, material, hoặc bất kỳ thuộc tính nào khác
+
+    @Prop({ type: Number, default: 0 })
+    importPrice: number; // Giá nhập
+
+    @Prop({ type: Number, default: 0 }) // Có thể là % hoặc số cố định
+    exportPrice: number; // Giá xuất
+
+    @Prop({ type: Number, default: 0 })
+    stock: number; // Số lượng tồn kho
+
+    @Prop({ default: 0 })
+    discount: number;
+}
+
+// Lịch sử nhập hàng và xuất hàng
+class StockHistory {
+    @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: User.name })
+    userId: mongoose.Schema.Types.ObjectId; // Người thực hiện
+
+    @Prop({ required: true })
+    quantity: number; // Số lượng
+
+    @Prop({ required: true })
+    price: number; // Giá trị (giá nhập hoặc giá xuất)
+
+    @Prop({ required: true, enum: ['import', 'export'] })
+    action: 'import' | 'export'; // Loại hành động (nhập hoặc xuất)
+
+    @Prop({ default: Date.now })
+    date: Date; // Thời gian thực hiện
+}
+
 @Schema({ timestamps: true })
 export class InventoryProduct {
     @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: Product.name })
     productId: mongoose.Schema.Types.ObjectId;
+
+    @Prop({ type: [ProductVariant], default: [] })
+    productVariants: ProductVariant[]; // Danh sách biến thể sản phẩm
+
     @Prop({ type: Number, default: 0 })
-    quantity: number;
+    totalQuantity: number; // Tổng số lượng sản phẩm (tính từ tất cả variants)
 
-    // chi tiết các sản phẩm user mua
     @Prop({
-        type: [{
-            userId: { type: mongoose.Schema.Types.ObjectId, ref: User.name, require: true, },
-            color: { type: mongoose.Schema.Types.ObjectId, ref: Color.name, require: true, },
-            quantity: { type: Number, require: true, },
-            price: { type: Number, require: true, },
-        }], default: []
+        type: {
+            _id: { type: mongoose.Schema.Types.ObjectId, required: true },
+            email: { type: String, required: true }
+        }
     })
-    reservations: [ReservationProduct]
+    createdBy: { _id: mongoose.Schema.Types.ObjectId; email: string };
 
-    @Prop({ type: Object })
-    createdBy: {
-        _id: mongoose.Schema.Types.ObjectId;
-        email: string;
-    };
+    @Prop({
+        type: {
+            _id: { type: mongoose.Schema.Types.ObjectId, required: true },
+            email: { type: String, required: true }
+        }
+    })
+    updatedBy: { _id: mongoose.Schema.Types.ObjectId; email: string };
 
-    @Prop({ type: Object })
-    updatedBy: {
-        _id: mongoose.Schema.Types.ObjectId;
-        email: string;
-    };
+    @Prop({
+        type: {
+            _id: { type: mongoose.Schema.Types.ObjectId, required: true },
+            email: { type: String, required: true }
+        }
+    })
+    deletedBy: { _id: mongoose.Schema.Types.ObjectId; email: string };
 
-
-    @Prop({ type: Object })
-    deletedBy: {
-        _id: mongoose.Schema.Types.ObjectId;
-        email: string;
-    };
-
-    @Prop({ default: Date.now })
-    createdAt: Date;
-
-    @Prop()
-    updatedAt: Date;
-
-    @Prop()
+    @Prop({ default: false })
     isDeleted: boolean;
 
     @Prop()
     deletedAt: Date;
-}
 
+    // Lịch sử nhập hàng và xuất hàng
+    @Prop({ type: [StockHistory], default: [] })
+    stockHistory: StockHistory[];
+}
 
 export const InventoryProductSchema = SchemaFactory.createForClass(InventoryProduct);
-
-const test = {
-    productId: '123',
-    quantity: {
-        "total": 1000,
-        "red-xl": 1,
-        "red-l": 2,
-        "red-x": 3,
-        "blue-xl": 4,
-        "blue-xxl": 1,
-        "black-x": 1
-    },
-    reservations: [],
-
-}

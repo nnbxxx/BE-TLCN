@@ -24,7 +24,7 @@ export class InventoryProductService {
       }
     })
   }
-
+  
   async findAll(currentPage: number, limit: number, qs: string) {
     const { filter, sort, population } = aqp(qs);
     delete filter.current;
@@ -80,7 +80,7 @@ export class InventoryProductService {
     receiptItems.map(async (item: any) => {
       const { product, price, quantity, color } = item
       const productInventory = await this.findByProductId(product);
-      productInventory.quantity -= quantity;
+      //productInventory.quantity -= quantity;
       if (!productInventory) {
         throw new NotFoundException('Product not found');
       }
@@ -90,7 +90,7 @@ export class InventoryProductService {
         price: price,
         color: color,
       }
-      productInventory.reservations.push(reservationData);
+      //productInventory.reservations.push(reservationData);
       await productInventory.save();
 
     })

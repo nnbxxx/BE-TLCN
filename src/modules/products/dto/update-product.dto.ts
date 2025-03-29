@@ -5,8 +5,6 @@ import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { IsArray, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from "class-validator";
 import mongoose from "mongoose";
 export class UpdateProductDto
-// extends OmitType(CreateProductDto, [
-// ] as const)
 {
     @IsMongoId({ message: '_id có dạng mongodb id' })
     @IsNotEmpty({ message: '_id không được để trống' })
@@ -24,17 +22,9 @@ export class UpdateProductDto
     @IsNotEmpty({ message: 'Brand không được để trống', })
     brand: string;
 
-    @ApiProperty({ example: 12345, description: 'giá sản phẩm' })
-    @Min(1, { message: 'Price phải là số dương' })
-    @IsNumber({}, { message: 'Price phải là số nguyên', })
-    @IsNotEmpty({ message: 'Giá không được để trống', })
-    price: number;
-
-
     @ApiProperty({ example: 'featured', description: 'tên thương hiệu' })
     @IsNotEmpty({ message: 'Tags không được để trống', })
     tags: string;
-
 
     @ApiProperty({ example: 'mô tả sản phẩm', description: 'mô tả sản phẩm' })
     @IsNotEmpty({ message: 'Description không được để trống', })
@@ -47,10 +37,4 @@ export class UpdateProductDto
     @IsString({ each: true, message: "Image phải là string" })
     images: string[];
 
-
-    @ApiProperty({ example: 1000, description: 'số lượng trong kho' })
-    @Min(1, { message: 'quantity phải là số dương' })
-    @IsNumber({}, { message: 'quantity phải là số nguyên', })
-    @IsNotEmpty({ message: 'quantity không được để trống', })
-    quantity: number;
 }
