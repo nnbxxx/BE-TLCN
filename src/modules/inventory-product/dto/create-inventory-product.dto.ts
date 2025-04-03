@@ -22,7 +22,7 @@ class ProductVariantDto {
 
     @IsString()
     @IsNotEmpty({ message: 'Export Price không được để trống' })
-    exportPrice: string; // Giá xuất (có thể là tỷ lệ phần trăm hoặc số cố định)
+    exportPrice: number; // Giá xuất (có thể là tỷ lệ phần trăm hoặc số cố định)
 
     @Min(0, { message: 'Stock phải là số dương' })
     @IsNumber({}, { message: 'Stock phải là số nguyên' })
