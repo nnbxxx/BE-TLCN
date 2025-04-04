@@ -19,6 +19,10 @@ class ImportVariantDto {
 
     @IsNumber()
     importPrice: number;
+
+    @IsNumber()
+    @IsOptional()
+    exportPrice: number;
 }
 
 export class ImportStockDto {
