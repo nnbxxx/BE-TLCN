@@ -85,11 +85,12 @@ export class ProductsService {
         variantData.importPrice = 0;
         variantData.exportPrice = 0;
         variantData.stock = 0;
+        variantData.sellPrice = 0;
         return variantData;
       });
     }
     else {
-      dataVariants = [{ importPrice: 0, exportPrice: 0, stock: 0 }]
+      dataVariants = [{ importPrice: 0, exportPrice: 0, stock: 0, sellPrice: 0 }]
     }
 
     // Biến đổi dữ liệu từ productDto sang CreateInventoryProductDto

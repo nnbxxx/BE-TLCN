@@ -131,6 +131,8 @@ export class InventoryProductService {
       quantity: number;
       importPrice: number;
       exportPrice?: number;
+      discount?: number;
+      sellPrice: number;
     }[],
     user: IUser
   ) {
@@ -144,7 +146,7 @@ export class InventoryProductService {
     let totalAdded = 0;
     let totalImportValue = 0;
 
-    variants.forEach(({ color, size, material, quantity, importPrice, exportPrice }) => {
+    variants.forEach(({ color, size, material, quantity, importPrice, exportPrice, discount }) => {
       let variantIndex: number | null = null;
       let oldStock = 0;
 
@@ -161,10 +163,13 @@ export class InventoryProductService {
             (!material || attr.material === material);
         });
       }
-
+      let oldExportPrice: number;
       if (variantIndex !== -1) {
         // Nếu tìm thấy biến thể → Lưu lại stock cũ trước khi xóa
-        oldStock = inventory.productVariants[variantIndex].stock;
+        const { stock, discount, exportPrice, importPrice } = inventory.productVariants[variantIndex]
+        oldStock = stock;
+        oldExportPrice = (importPrice * stock);
+
         inventory.productVariants.splice(variantIndex, 1);
       }
 
@@ -173,13 +178,15 @@ export class InventoryProductService {
       if (color) attributes.color = color;
       if (size) attributes.size = size;
       if (material) attributes.material = material;
-
+      const newPrice = (oldExportPrice + quantity * importPrice) / (quantity + oldStock) * (100 - discount) * (100 + exportPrice) / (100 * 100);
+      const newImportPrice = (oldExportPrice + quantity * importPrice) / (quantity + oldStock)
       const newVariant = {
         attributes,
-        importPrice,
-        exportPrice: exportPrice ?? 0, // Giá xuất mặc định là 0 nếu không có
+        importPrice: newImportPrice,
+        exportPrice, // Giá xuất mặc định là 0 nếu không có
         stock: quantity + oldStock, // Cộng dồn stock cũ vào số lượng nhập mới
-        discount: 0
+        discount: discount ?? 0,
+        sellPrice: newPrice
       };
 
       // Thêm lại biến thể mới vào danh sách

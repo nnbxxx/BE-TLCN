@@ -1,4 +1,4 @@
-import { IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, Min, ValidateNested, IsArray, IsEnum } from "class-validator";
+import { IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, Min, ValidateNested, IsArray, IsEnum, Max } from "class-validator";
 import { Type } from "class-transformer";
 
 // DTO cho biến thể sản phẩm trong kho
@@ -16,10 +16,13 @@ class ProductVariantDto {
     material?: string;
 
     @Min(0, { message: 'Import Price phải là số dương' })
+    @Min(0, { message: 'Import Price phải là số dương' })
     @IsNumber({}, { message: 'Import Price phải là số nguyên' })
     @IsNotEmpty({ message: 'Import Price không được để trống' })
     importPrice: number;
 
+    @Min(0, { message: 'Export Price phải là số dương' })
+    @Max(100, { message: 'Export Price phải là tối đa 100' })
     @IsString()
     @IsNotEmpty({ message: 'Export Price không được để trống' })
     exportPrice: number; // Giá xuất (có thể là tỷ lệ phần trăm hoặc số cố định)
@@ -28,8 +31,12 @@ class ProductVariantDto {
     @IsNumber({}, { message: 'Stock phải là số nguyên' })
     @IsNotEmpty({ message: 'Stock không được để trống' })
     stock: number; // Số lượng tồn kho
-}
 
+    @Min(0, { message: 'Stock phải là số dương' })
+    @IsNumber({}, { message: 'Stock phải là số nguyên' })
+    @IsNotEmpty({ message: 'Stock không được để trống' })
+    sellPrice: number; //giá bán
+}
 // DTO cho lịch sử nhập hàng và xuất hàng
 class StockHistoryDto {
     @IsMongoId({ message: 'userId có dạng mongodb id' })

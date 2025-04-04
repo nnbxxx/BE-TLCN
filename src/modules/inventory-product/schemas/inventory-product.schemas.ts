@@ -14,8 +14,11 @@ class ProductVariant {
     @Prop({ type: Number, default: 0 })
     importPrice: number; // Giá nhập
 
-    @Prop({ type: Number, default: 0 }) // Có thể là % hoặc số cố định
+    @Prop({ type: Number, default: 0, min: 0, max: 100 }) // Có thể là % hoặc số cố định
     exportPrice: number; // Giá xuất
+
+    @Prop({ type: Number, default: 0 }) //  Số cố định
+    sellPrice: number; // Giá xuất
 
     @Prop({ type: Number, default: 0 })
     stock: number; // Số lượng tồn kho

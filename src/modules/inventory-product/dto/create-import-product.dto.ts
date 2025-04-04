@@ -23,6 +23,14 @@ class ImportVariantDto {
     @IsNumber()
     @IsOptional()
     exportPrice: number;
+
+    @IsNumber()
+    @IsOptional()
+    discount: number;
+
+    @IsNumber()
+    @IsOptional()
+    sellPrice: number;
 }
 
 export class ImportStockDto {
