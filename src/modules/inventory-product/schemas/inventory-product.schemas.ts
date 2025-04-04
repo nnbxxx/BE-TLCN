@@ -52,6 +52,8 @@ export class InventoryProduct {
 
     @Prop({ type: Number, default: 0 })
     totalQuantity: number; // Tổng số lượng sản phẩm (tính từ tất cả variants)
+    @Prop({ type: Number, default: 0 })
+    totalQuantitySell: number; // Tổng số lượng sản phẩm đã bán
 
     @Prop({
         type: {

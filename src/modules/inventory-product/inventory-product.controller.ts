@@ -5,6 +5,7 @@ import { UpdateInventoryProductDto } from './dto/update-inventory-product.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { Public, ResponseMessage, User } from 'src/decorator/customize';
 import { IUser } from '../users/users.interface';
+import { ImportStockDto } from './dto/create-import-product.dto';
 
 @ApiTags('inventory-product')
 @Controller('inventory-product')
@@ -29,7 +30,15 @@ export class InventoryProductController {
   findOne(@Param('id') id: string) {
     return this.inventoryProductService.findOne(id as any);
   }
-
+  @Post('import-stock')
+  @ResponseMessage("Create a import InventoryProduct")
+  async importStock(@Body() importStockDto: ImportStockDto, @User() user: IUser) {
+    return this.inventoryProductService.importStock(
+      importStockDto.productId,
+      importStockDto.variants,
+      user
+    );
+  }
   // @Patch(':id')
   // update(@Param('id') id: string, @Body() updateInventoryProductDto: UpdateInventoryProductDto) {
   //   return this.inventoryProductService.update(+id, updateInventoryProductDto);

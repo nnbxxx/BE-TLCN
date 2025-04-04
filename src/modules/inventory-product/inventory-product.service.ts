@@ -16,6 +16,7 @@ export class InventoryProductService {
     private inventoryProductModel: SoftDeleteModel<InventoryProductDocument>
   ) { }
   create(createInventoryProductDto: CreateInventoryProductDto, user: IUser) {
+
     return this.inventoryProductModel.create({
       ...createInventoryProductDto,
       createdBy: {
@@ -24,7 +25,7 @@ export class InventoryProductService {
       }
     })
   }
-  
+
   async findAll(currentPage: number, limit: number, qs: string) {
     const { filter, sort, population } = aqp(qs);
     delete filter.current;
@@ -95,7 +96,7 @@ export class InventoryProductService {
 
     })
   }
-  async getTopProductsWithReservations(): Promise<any[]> {
+  async getTopProductsWithReservations() {
     const results = await this.inventoryProductModel
       .aggregate([
         {
@@ -119,6 +120,96 @@ export class InventoryProductService {
       totalQuantityBought: item.totalQuantityBought,
     }));
   }
+
+
+  async importStock(
+    productId: string,
+    variants: {
+      color?: string;
+      size?: string;
+      material?: string;
+      quantity: number;
+      importPrice: number;
+      exportPrice?: number;
+    }[],
+    user: IUser
+  ) {
+    // Tìm kho hàng của sản phẩm
+    const inventory = await this.inventoryProductModel.findOne({ productId });
+
+    if (!inventory) {
+      throw new NotFoundException("Sản phẩm không tồn tại trong kho.");
+    }
+
+    let totalAdded = 0;
+    let totalImportValue = 0;
+
+    variants.forEach(({ color, size, material, quantity, importPrice, exportPrice }) => {
+      let variantIndex: number | null = null;
+      let oldStock = 0;
+
+      // Kiểm tra nếu không có thuộc tính (color, size, material) thì tìm biến thể không có attributes
+      const isNoAttributes = !color && !size && !material;
+
+      if (isNoAttributes) {
+        variantIndex = inventory.productVariants.findIndex(v => !v.attributes || Object.keys(v.attributes).length === 0);
+      } else {
+        variantIndex = inventory.productVariants.findIndex(v => {
+          const attr = v.attributes || {};
+          return (!color || attr.color === color) &&
+            (!size || attr.size === size) &&
+            (!material || attr.material === material);
+        });
+      }
+
+      if (variantIndex !== -1) {
+        // Nếu tìm thấy biến thể → Lưu lại stock cũ trước khi xóa
+        oldStock = inventory.productVariants[variantIndex].stock;
+        inventory.productVariants.splice(variantIndex, 1);
+      }
+
+      // Tạo biến thể mới với dữ liệu đã cập nhật
+      const attributes: Record<string, any> = {};
+      if (color) attributes.color = color;
+      if (size) attributes.size = size;
+      if (material) attributes.material = material;
+
+      const newVariant = {
+        attributes,
+        importPrice,
+        exportPrice: exportPrice ?? 0, // Giá xuất mặc định là 0 nếu không có
+        stock: quantity + oldStock, // Cộng dồn stock cũ vào số lượng nhập mới
+        discount: 0
+      };
+
+      // Thêm lại biến thể mới vào danh sách
+      inventory.productVariants.push(newVariant);
+
+      totalAdded += quantity;
+      totalImportValue += importPrice * quantity;
+    });
+
+    // Cập nhật tổng số lượng của kho
+    inventory.totalQuantity += totalAdded;
+
+    // Thêm lịch sử nhập kho
+    inventory.stockHistory.push({
+      userId: user._id as any,
+      quantity: totalAdded,
+      price: totalImportValue,
+      action: "import",
+      date: new Date()
+    });
+
+    // Lưu thông tin kho sau khi cập nhật
+    await inventory.save();
+
+    return { message: "Nhập hàng thành công", totalAdded };
+  }
+
+
+
+
 
   // update(id: number, updateInventoryProductDto: UpdateInventoryProductDto) {
   //   return `This action updates a #${id} inventoryProduct`;

@@ -67,25 +67,30 @@ export class ProductsService {
     });
 
     // Biến đổi dữ liệu các biến thể (variants) theo các thuộc tính động trong features
-    const dataVariants = variants.map((variant: any) => {
-      const variantData: any = {}; // Đối tượng lưu trữ thông tin biến thể
+    let dataVariants: any[];
+    if (variants && variants.length) {
+      dataVariants = variants.map((variant: any) => {
+        const variantData: any = {}; // Đối tượng lưu trữ thông tin biến thể
 
-      // Kiểm tra các thuộc tính trong features và lấy giá trị tương ứng từ variant
-      if (features.includes('color') && variant.attributes.color) {
-        variantData.color = variant.attributes.color.name;
-      }
-      if (features.includes('size') && variant.attributes.size) {
-        variantData.size = variant.attributes.size.name;
-      }
-      if (features.includes('material') && variant.attributes.material) {
-        variantData.material = variant.attributes.material.name;
-      }
-      variantData.importPrice = 0;
-      variantData.exportPrice = 0;
-      variantData.stock = 0;
-      return variantData;
-    });
-
+        // Kiểm tra các thuộc tính trong features và lấy giá trị tương ứng từ variant
+        if (features.includes('color') && variant.attributes.color) {
+          variantData.color = variant.attributes.color.name;
+        }
+        if (features.includes('size') && variant.attributes.size) {
+          variantData.size = variant.attributes.size.name;
+        }
+        if (features.includes('material') && variant.attributes.material) {
+          variantData.material = variant.attributes.material.name;
+        }
+        variantData.importPrice = 0;
+        variantData.exportPrice = 0;
+        variantData.stock = 0;
+        return variantData;
+      });
+    }
+    else {
+      dataVariants = [{ importPrice: 0, exportPrice: 0, stock: 0 }]
+    }
 
     // Biến đổi dữ liệu từ productDto sang CreateInventoryProductDto
     const inventoryProductDto: CreateInventoryProductDto = {
