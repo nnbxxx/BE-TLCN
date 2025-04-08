@@ -23,7 +23,7 @@ class ProductVariantDto {
 
     @Min(0, { message: 'Export Price phải là số dương' })
     @Max(100, { message: 'Export Price phải là tối đa 100' })
-    @IsString()
+    @IsNumber({}, { message: 'Import Price phải là số nguyên' })
     @IsNotEmpty({ message: 'Export Price không được để trống' })
     exportPrice: number; // Giá xuất (có thể là tỷ lệ phần trăm hoặc số cố định)
 

@@ -70,17 +70,20 @@ export class ProductsService {
     let dataVariants: any[];
     if (variants && variants.length) {
       dataVariants = variants.map((variant: any) => {
-        const variantData: any = {}; // Đối tượng lưu trữ thông tin biến thể
+        const variantData: any = {
+          attributes: {
+          } as any
+        }; // Đối tượng lưu trữ thông tin biến thể
 
         // Kiểm tra các thuộc tính trong features và lấy giá trị tương ứng từ variant
         if (features.includes('color') && variant.attributes.color) {
-          variantData.color = variant.attributes.color.name;
+          variantData.attributes.color = variant.attributes.color.name;
         }
         if (features.includes('size') && variant.attributes.size) {
-          variantData.size = variant.attributes.size.name;
+          variantData.attributes.size = variant.attributes.size.name;
         }
         if (features.includes('material') && variant.attributes.material) {
-          variantData.material = variant.attributes.material.name;
+          variantData.attributes.material = variant.attributes.material.name;
         }
         variantData.importPrice = 0;
         variantData.exportPrice = 0;

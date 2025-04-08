@@ -11,11 +11,11 @@ import { ImportStockDto } from './dto/create-import-product.dto';
 @Controller('inventory-product')
 export class InventoryProductController {
   constructor(private readonly inventoryProductService: InventoryProductService) { }
-  @ResponseMessage("Create a new InventoryProduct")
-  @Post()
-  create(@Body() createInventoryProductDto: CreateInventoryProductDto, @User() user: IUser) {
-    return this.inventoryProductService.create(createInventoryProductDto, user);
-  }
+  // @ResponseMessage("Create a new InventoryProduct")
+  // @Post()
+  // create(@Body() createInventoryProductDto: CreateInventoryProductDto, @User() user: IUser) {
+  //   return this.inventoryProductService.create(createInventoryProductDto, user);
+  // }
   @Public()
   @Get()
   @ResponseMessage("Fetch InventoryProduct with paginate")

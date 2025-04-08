@@ -132,7 +132,7 @@ export class InventoryProductService {
       importPrice: number;
       exportPrice?: number;
       discount?: number;
-      sellPrice: number;
+      sellPrice?: number;
     }[],
     user: IUser
   ) {
@@ -174,14 +174,11 @@ export class InventoryProductService {
       }
 
       // Tạo biến thể mới với dữ liệu đã cập nhật
-      const attributes: Record<string, any> = {};
-      if (color) attributes.color = color;
-      if (size) attributes.size = size;
-      if (material) attributes.material = material;
+
       const newPrice = (oldExportPrice + quantity * importPrice) / (quantity + oldStock) * (100 - discount) * (100 + exportPrice) / (100 * 100);
       const newImportPrice = (oldExportPrice + quantity * importPrice) / (quantity + oldStock)
-      const newVariant = {
-        attributes,
+      let newVariant: any = {
+        attributes: {} as any,
         importPrice: newImportPrice,
         exportPrice, // Giá xuất mặc định là 0 nếu không có
         stock: quantity + oldStock, // Cộng dồn stock cũ vào số lượng nhập mới
@@ -189,6 +186,9 @@ export class InventoryProductService {
         sellPrice: newPrice
       };
 
+      if (color) newVariant.attributes.color = color;
+      if (size) newVariant.attributes.size = size;
+      if (material) newVariant.attributes.material = material;
       // Thêm lại biến thể mới vào danh sách
       inventory.productVariants.push(newVariant);
 

@@ -7,7 +7,7 @@ import { Color } from "src/color/schemas/color.schemas";
 export type InventoryProductDocument = HydratedDocument<InventoryProduct>;
 
 // Chi tiết biến thể sản phẩm trong kho
-class ProductVariant {
+export class ProductVariant {
     @Prop({ type: Map, of: String, required: false })
     attributes: Record<string, any>; // Lưu trữ các thuộc tính như color, size, material, hoặc bất kỳ thuộc tính nào khác
 
