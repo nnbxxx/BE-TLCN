@@ -21,11 +21,9 @@ class ImportVariantDto {
     importPrice: number;
 
     @IsNumber()
-    @IsOptional()
     exportPrice: number;
 
     @IsNumber()
-    @IsOptional()
     discount: number;
 
     @IsNumber()

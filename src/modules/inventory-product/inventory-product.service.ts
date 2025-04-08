@@ -158,6 +158,7 @@ export class InventoryProductService {
       } else {
         variantIndex = inventory.productVariants.findIndex(v => {
           const attr = v.attributes || {};
+
           return (!color || attr.color === color) &&
             (!size || attr.size === size) &&
             (!material || attr.material === material);
@@ -166,7 +167,7 @@ export class InventoryProductService {
       let oldExportPrice: number;
       if (variantIndex !== -1) {
         // Nếu tìm thấy biến thể → Lưu lại stock cũ trước khi xóa
-        const { stock, discount, exportPrice, importPrice } = inventory.productVariants[variantIndex]
+        const { stock, discount, importPrice } = inventory.productVariants[variantIndex]
         oldStock = stock;
         oldExportPrice = (importPrice * stock);
 
@@ -174,8 +175,9 @@ export class InventoryProductService {
       }
 
       // Tạo biến thể mới với dữ liệu đã cập nhật
-
+      // (0 + 10*10)/(10+0)*(100-0)*(100+10)/(100*100)
       const newPrice = (oldExportPrice + quantity * importPrice) / (quantity + oldStock) * (100 - discount) * (100 + exportPrice) / (100 * 100);
+
       const newImportPrice = (oldExportPrice + quantity * importPrice) / (quantity + oldStock)
       let newVariant: any = {
         attributes: {} as any,

@@ -25,7 +25,7 @@ class ProductVariantDto {
     @Max(100, { message: 'Export Price phải là tối đa 100' })
     @IsNumber({}, { message: 'Import Price phải là số nguyên' })
     @IsNotEmpty({ message: 'Export Price không được để trống' })
-    exportPrice: number; // Giá xuất (có thể là tỷ lệ phần trăm hoặc số cố định)
+    exportPrice: number; // Giá xuất (có thể là tỷ lệ phần trăm)
 
     @Min(0, { message: 'Stock phải là số dương' })
     @IsNumber({}, { message: 'Stock phải là số nguyên' })
@@ -36,6 +36,8 @@ class ProductVariantDto {
     @IsNumber({}, { message: 'Stock phải là số nguyên' })
     @IsNotEmpty({ message: 'Stock không được để trống' })
     sellPrice: number; //giá bán
+
+    
 }
 // DTO cho lịch sử nhập hàng và xuất hàng
 class StockHistoryDto {
