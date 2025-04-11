@@ -207,7 +207,8 @@ export class InventoryProductService {
       quantity: totalAdded,
       price: totalImportValue,
       action: "import",
-      date: new Date()
+      date: new Date(),
+      variants: variants
     });
 
     // Lưu thông tin kho sau khi cập nhật

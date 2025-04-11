@@ -43,6 +43,8 @@ class StockHistory {
 
     @Prop({ default: Date.now })
     date: Date; // Thời gian thực hiện
+    @Prop()
+    variants: any
 }
 
 @Schema({ timestamps: true })
