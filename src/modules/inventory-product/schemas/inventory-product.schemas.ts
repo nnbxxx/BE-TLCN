@@ -43,7 +43,7 @@ class StockHistory {
 
     @Prop({ default: Date.now })
     date: Date; // Thời gian thực hiện
-    @Prop()
+    @Prop({ type: Object })
     variants: any
 }
 
