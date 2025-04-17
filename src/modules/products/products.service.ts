@@ -199,29 +199,25 @@ export class ProductsService {
       throw new BadRequestException(`not found product with id=${id}`);
     }
     this.userService.updateRecentViewProduct(user, id as any);
-    const data = await this.productModel
-      .findById(id)
-      .populate({
-        path: 'colors', // Trường colors tham chiếu đến bảng Color
-        select: 'color', // Chỉ lấy mã màu từ bảng Color
-      })
-      .exec();
+    const product = await this.productModel.findById(id).exec();
+    if (!product) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
+    }
+    // Lấy thông tin từ các service khác
     const productInventory =
       await this.inventoryProductService.findByProductId(id);
-    const quantityComments = await this.reviewService.getQuantityComment(
-      id as any,
-    );
-    const productPurchased =
-      (await this.inventoryProductService.getProductPurchased(
-        id as any,
-      )) as any;
-    const { _id, reservations } = productPurchased;
+    const quantityComments = await this.reviewService.getQuantityComment(id);
+    // Chuẩn bị dữ liệu trả về
     const newData = {
-      ...data.toObject(),
+      product: { ...product.toObject() },
+      // colors: product.colors, // Thay thế ID của màu bằng thông tin chi tiết (mã màu hoặc tên)
       quantityComments: +quantityComments,
-      quantityProductPurchased: reservations.length,
-      // quantity: productInventory.quantity,
+      inventory: {
+        productInventory
+      }
+      //quantity: productInventory?.quantity || 0,
     };
+
     return newData;
   }
   async findImages(id: string) {
