@@ -180,20 +180,14 @@ export class ProductsService {
     const productInventory =
       await this.inventoryProductService.findByProductId(id);
     const quantityComments = await this.reviewService.getQuantityComment(id);
-    const productPurchased =
-      (await this.inventoryProductService.getProductPurchased(id)) as any;
-
-    const { reservations = [] } = productPurchased || {};
-    const quantityProductPurchased = Array.isArray(reservations)
-      ? reservations.length
-      : 0;
-
     // Chuẩn bị dữ liệu trả về
     const newData = {
-      ...product.toObject(),
+      product: { ...product.toObject() },
       // colors: product.colors, // Thay thế ID của màu bằng thông tin chi tiết (mã màu hoặc tên)
       quantityComments: +quantityComments,
-      quantityProductPurchased,
+      inventory: {
+        productInventory
+      }
       //quantity: productInventory?.quantity || 0,
     };
 

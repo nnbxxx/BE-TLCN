@@ -340,10 +340,14 @@ export class ReceiptsService {
     if (coupon) {
       // kích hoặc coupon
       const receipt = await this.receiptModel.findOne({ _id: receiptId });
+      if (coupon.quantity === 0) {
+        throw new BadRequestException(` Coupon đã hết `)
+      }
       if (receipt) {
         const { value } = coupon.description
         if (coupon.type === TYPE_COUPONS.PRICE) {
           receipt.total += active ? -value : +value
+
         }
         else if (coupon.type === TYPE_COUPONS.PERCENT) {
           receipt.total += active ? -receipt.total * value / 100 : +receipt.total * value / (100 - value)
@@ -359,6 +363,8 @@ export class ReceiptsService {
           await receipt.save();
 
         }
+        coupon.quantity -= 1
+        await coupon.save();
         await receipt.save();
         return receipt
       }
