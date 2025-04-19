@@ -33,10 +33,6 @@ export class CartsService {
       path: "items.product",
       model: Product.name,
       select: "_id name price images "  // Lựa chọn chỉ lấy _id và tên sản phẩm
-    }, {
-      path: "items.color",
-      model: Color.name,
-      select: "_id color "
     }
     ]
     const re = await this.cartModel
@@ -74,11 +70,8 @@ export class CartsService {
       throw new BadRequestException(`not found cart with id=${cartItem.product._id}`);
     }
 
-    //const isStock = await this.checkIsProductStock(cartItem.product._id as any, cartItem)
+    const isStock = await this.inventoryProductService.checkProductAvailability(cartItem.product);
     const foundCart = await this.findByUser(user)
-    // if (!isStock) {
-    //   throw new BadRequestException(`Sản phẩm ${cartItem.product.name} không đủ số lượng`)
-    // }
     //true -> empty
     const isItemExist = await this.checkIsItemExit(cartItem.product._id as any, foundCart.items)
     if (!isItemExist) {
@@ -91,9 +84,10 @@ export class CartsService {
           $set: {
             "items.$": {
               product: cartItem.product._id,
-              color: cartItem.product.color,
+              color: cartItem.product?.color,
               quantity: cartItem.product.quantity,
-              price: cartItem.product.price,
+              price: cartItem.product?.price,
+              size: cartItem.product?.size,
             }
           },
         },
@@ -107,9 +101,10 @@ export class CartsService {
           $push: {
             items: {
               product: cartItem.product._id,
-              color: cartItem.product.color,
+              color: cartItem.product?.color,
               quantity: cartItem.product.quantity,
-              price: cartItem.product.price,
+              price: cartItem.product?.price,
+              size: cartItem.product?.size,
             }
           },
         },
@@ -124,8 +119,13 @@ export class CartsService {
 
   //                        ==================Utils=================
   async checkIsProductStock(productId: Types.ObjectId, cartItem: CartItem | UpdateToCartDto) {
-    // const productStock = (await this.inventoryProductService.findByProductId(productId as any)).quantity;
+    const productStock = (await this.inventoryProductService.findByProductId(productId as any));
+    // kiểm tra 
+    // quantity: number,
+    // color: string,
+    // size: string
     // return productStock >= cartItem.product.quantity
+    return true;
   }
   async checkIsItemExit(productId: mongoose.Types.ObjectId, userProductCart: any) {
     const itemExist = userProductCart.filter(item => {
@@ -151,19 +151,5 @@ export class CartsService {
       findByIdAndUpdate(cartId, { $set: { total: total } }, { new: true });
   }
 
-  // findAll() {
-  //   return `This action returns all carts`;
-  // }
 
-  // findOne(id: number) {
-  //   return `This action returns a #${id} cart`;
-  // }
-
-  // update(id: number,) {
-  //   return `This action updates a #${id} cart`;
-  // }
-
-  // remove(id: number) {
-  //   return `This action removes a #${id} cart`;
-  // }
 }

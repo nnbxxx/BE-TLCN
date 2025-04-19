@@ -217,15 +217,51 @@ export class InventoryProductService {
     return { message: "Nhập hàng thành công", totalAdded };
   }
 
+  async checkProductAvailability(product: {
+    _id: string,
+    price: number,
+    quantity: number,
+    color: string,
+    size: string
+  }) {
+    const { _id, quantity, color, size } = product;
+
+    // Tìm InventoryProduct theo productId
+    const inventory = await this.inventoryProductModel.findOne({ productId: _id });
+
+    if (!inventory) {
+      throw new BadRequestException(`not found product with id=${product._id}`);
+    }
+
+    // Tìm biến thể khớp color và size
+    const matchedVariant = inventory.productVariants.find(variant => {
+      const attributes = variant.attributes;
+      return (
+        attributes.color === color &&
+        attributes.size === size
+      );
+    });
+
+    if (!matchedVariant) {
+      throw new BadRequestException(`not found varients with color=${product.color} and size= ${product.size}`);
+    }
 
 
+    if (matchedVariant.stock < quantity) {
+      throw new BadRequestException(`not enough product`);
+    }
 
-
-  // update(id: number, updateInventoryProductDto: UpdateInventoryProductDto) {
-  //   return `This action updates a #${id} inventoryProduct`;
-  // }
-
-  // remove(id: number) {
-  //   return `This action removes a #${id} inventoryProduct`;
-  // }
+    return true;
+  }
 }
+
+
+
+// update(id: number, updateInventoryProductDto: UpdateInventoryProductDto) {
+//   return `This action updates a #${id} inventoryProduct`;
+// }
+
+// remove(id: number) {
+//   return `This action removes a #${id} inventoryProduct`;
+// }
+

@@ -1,6 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateCartDto } from './create-cart.dto';
-import { IsMongoId, IsNotEmpty, IsNumber, IsString, Min, ValidateNested } from 'class-validator';
+import { IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, Min, ValidateNested } from 'class-validator';
 import mongoose from 'mongoose';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
@@ -8,8 +8,10 @@ import { ApiProperty } from '@nestjs/swagger';
 class ProductAdd {
     @IsNotEmpty({ message: 'product_id không được để trống' })
     _id: string;
-    @IsNotEmpty({ message: 'product_id không được để trống' })
+    @IsOptional()
     color: string;
+    @IsOptional()
+    size: string;
 
     @Min(1, { message: 'Price phải là số dương' })
     @IsNumber({}, { message: 'Price phải là số nguyên', })
@@ -30,6 +32,7 @@ export class CartItem {
         price: number,
         quantity: number,
         color: string,
+        size: string
     }
 }
 export class UpdateToCartDto extends PartialType(CartItem) {
