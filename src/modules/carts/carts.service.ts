@@ -73,7 +73,7 @@ export class CartsService {
     const isStock = await this.inventoryProductService.checkProductAvailability(cartItem.product);
     const foundCart = await this.findByUser(user)
     //true -> empty
-    const isItemExist = await this.checkIsItemExit(cartItem.product._id as any, foundCart.items)
+    const isItemExist = await this.checkIsItemExit(cartItem, foundCart.items)
     if (!isItemExist) {
       await this.cartModel.findOneAndUpdate(
         {
@@ -118,22 +118,28 @@ export class CartsService {
 
 
   //                        ==================Utils=================
-  async checkIsProductStock(productId: Types.ObjectId, cartItem: CartItem | UpdateToCartDto) {
-    const productStock = (await this.inventoryProductService.findByProductId(productId as any));
-    // kiểm tra 
-    // quantity: number,
-    // color: string,
-    // size: string
-    // return productStock >= cartItem.product.quantity
-    return true;
-  }
-  async checkIsItemExit(productId: mongoose.Types.ObjectId, userProductCart: any) {
+
+  async checkIsItemExit(cartItem: CartItem, userProductCart: any) {
+    // console.log("🚀 ~ CartsService ~ checkIsItemExit ~ userProductCart:", userProductCart)
     const itemExist = userProductCart.filter(item => {
+
+
       if (item.product) {
-        return item.product.equals(productId)
+        // if (item.)
+        if (item.product.equals(cartItem.product._id) && item?.color === cartItem?.product?.color && item?.size === cartItem?.product?.size)
+          return true;
+        if (
+          item.product.equals(cartItem.product._id) &&
+          (item.color !== cartItem.product.color || item.size !== cartItem.product.size)
+        ) {
+          return false;
+        }
+
+        return item.product.equals(cartItem.product._id);
       }
       return false
     });
+    // console.log("🚀 ~ CartsService ~ checkIsItemExit ~ itemExist:", itemExist)
     return (itemExist.length === 0)
   }
   async calcTotal(cartId: string) {
