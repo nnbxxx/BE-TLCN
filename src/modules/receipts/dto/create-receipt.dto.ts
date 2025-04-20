@@ -11,10 +11,12 @@ export class ReceiptDetailDTo {
     @IsNotEmpty({ message: 'productId không được để trống' })
     @IsString({ message: "productId phải là string" })
     product: string
-    @IsMongoId({ message: 'productId phải là mongid' })
-    @IsNotEmpty({ message: 'productId không được để trống' })
+    @IsOptional()
     @IsString({ message: "productId phải là string" })
     color: string
+    @IsOptional()
+    @IsString({ message: "productId phải là string" })
+    size: string
     @Min(1, { message: 'Price phải là số dương' })
     @IsNumber({}, { message: 'Price phải là số nguyên', })
     @IsNotEmpty({ message: 'Price không được để trống', })
