@@ -23,7 +23,8 @@ export class Receipt {
       product: { type: mongoose.Schema.Types.ObjectId, ref: Product.name, require: true, },
       quantity: { type: Number, require: true, },
       price: { type: Number, require: true, },
-      color: { type: mongoose.Schema.Types.ObjectId, ref: Color.name, require: true, },
+      color: { type: String },
+      size: { type: String },
     }]
   })
   items: ReceiptItem[];

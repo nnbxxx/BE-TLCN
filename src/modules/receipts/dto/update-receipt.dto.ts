@@ -57,9 +57,10 @@ export class ReceiptAdd {
     @IsMongoId({ message: '_id phải là mongo id' })
     @IsNotEmpty({ message: '_id không được để trống' })
     _id: string;
-    @IsMongoId({ message: '_id phải là mongo id' })
-    @IsNotEmpty({ message: '_id không được để trống' })
+    @IsOptional()
     color: string;
+    @IsOptional()
+    size: string;
 
     @IsNotEmpty({ message: 'name không được để trống' })
     @IsString({ message: "name phải là string" }) // To make a field optional you can add @IsOptional
@@ -84,7 +85,8 @@ export class ReceiptItem {
         name: string,
         price: number,
         quantity: number
-        color: mongoose.Schema.Types.ObjectId,
+        color: string,
+        size: string,
     }
 }
 export class AddressReceipt {
