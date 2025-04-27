@@ -171,7 +171,7 @@ export class ProductsService {
     }
 
     // Tìm sản phẩm và populate màu
-    const product = await this.productModel.findById(id).exec();
+    const product = await (await this.productModel.findById(id)).populate("category");
     if (!product) {
       throw new NotFoundException(`Product with ID ${id} not found`);
     }
@@ -183,7 +183,6 @@ export class ProductsService {
     // Chuẩn bị dữ liệu trả về
     const newData = {
       product: { ...product.toObject() },
-      // colors: product.colors, // Thay thế ID của màu bằng thông tin chi tiết (mã màu hoặc tên)
       quantityComments: +quantityComments,
       inventory: {
         productInventory
