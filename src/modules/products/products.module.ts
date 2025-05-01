@@ -9,9 +9,10 @@ import { ReviewsModule } from '../reviews/reviews.module';
 import { CategoriesModule } from '../categories/categories.module';
 import { NotificationsModule } from 'src/notifications/notifications.module';
 import { User, UserSchema } from '../users/schemas/user.schema';
+import { InventoryProduct, InventoryProductSchema } from '../inventory-product/schemas/inventory-product.schemas';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: Product.name, schema: ProductSchema }, { name: User.name, schema: UserSchema }]),
+  imports: [MongooseModule.forFeature([{ name: Product.name, schema: ProductSchema }, { name: User.name, schema: UserSchema }, { name: InventoryProduct.name, schema: InventoryProductSchema }]),
     UsersModule,
     InventoryProductModule,
   forwardRef(() => ReviewsModule),

@@ -21,10 +21,13 @@ import { CategoriesService } from '../categories/categories.service';
 import { User, UserDocument } from '../users/schemas/user.schema';
 import { NotificationsService } from 'src/notifications/notifications.service';
 import { NotificationsGateway } from 'src/notifications/notifications.gateway';
+import { InventoryProduct, InventoryProductDocument } from '../inventory-product/schemas/inventory-product.schemas';
 
 @Injectable()
 export class ProductsService {
   constructor(
+    @InjectModel(InventoryProduct.name)
+    private inventoryProductModel: SoftDeleteModel<InventoryProductDocument>,
     @InjectModel(Product.name)
     private productModel: SoftDeleteModel<ProductDocument>,
     private userService: UsersService,
@@ -140,28 +143,53 @@ export class ProductsService {
     const { filter, sort, population } = aqp(qs);
     delete filter.current;
     delete filter.pageSize;
-    let offset = (+currentPage - 1) * +limit;
-    let defaultLimit = +limit ? +limit : 1000;
 
-    const totalItems = (await this.productModel.find(filter)).length;
+    const offset = (+currentPage - 1) * +limit;
+    const defaultLimit = +limit || 1000;
+
+    // Đếm tổng số bản ghi
+    const totalItems = await this.productModel.countDocuments(filter);
     const totalPages = Math.ceil(totalItems / defaultLimit);
 
-    let result = await this.productModel
+    // Lấy danh sách sản phẩm
+    const products = await this.productModel
       .find(filter)
       .skip(offset)
       .limit(defaultLimit)
       .sort(sort as any)
-      .select([''])
       .populate(population)
       .exec();
+
+    // Lấy danh sách _id sản phẩm để truy vấn tồn kho
+    const productIds = products.map((product) => product._id);
+
+    // Lấy thông tin tồn kho tương ứng
+    const inventoryList = await this.inventoryProductModel
+      .find({ productId: { $in: productIds } })
+      .exec();
+
+    // Map productId => inventory để tra nhanh
+    const inventoryMap = new Map(
+      inventoryList.map((inv) => [inv.productId.toString(), inv])
+    );
+
+    // Gắn inventory vào từng product
+    const result = products.map((product) => {
+      const inventory = inventoryMap.get(product._id.toString());
+      return {
+        ...product.toObject(),
+        inventory: inventory || null, // có thể null nếu chưa có tồn kho
+      };
+    });
+
     return {
       meta: {
-        current: currentPage, //trang hiện tại
-        pageSize: limit, //số lượng bản ghi đã lấy
-        pages: totalPages, //tổng số trang với điều kiện query
-        total: totalItems, // tổng số phần tử (số bản ghi)
+        current: currentPage,
+        pageSize: limit,
+        pages: totalPages,
+        total: totalItems,
       },
-      result, //kết quả query
+      result,
     };
   }
 
