@@ -14,6 +14,10 @@ export enum PAYMENT_METHOD {
     COD = 'COD',
     VNPAY = 'VNPAY'
 }
+export enum INVENTORY_ACTION {
+    IMPORT = 'IMPORT',
+    EXPORT = 'EXPORT'
+}
 export enum TYPE_GENDER {
     FEMALE = 'FEMALE',
     MALE = 'MALE',

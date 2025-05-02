@@ -172,10 +172,6 @@ export class ReceiptsService {
         path: 'items.product',
         select: 'name images', // Chỉ chọn các trường name và images từ product
       })
-      .populate({
-        path: 'items.color',
-        select: 'name', // Chỉ chọn trường name từ color
-      })
       .exec();
 
 
@@ -199,10 +195,6 @@ export class ReceiptsService {
       .populate({
         path: 'items.product',
         select: 'name images brand', // Chỉ chọn các trường name và images từ product
-      })
-      .populate({
-        path: 'items.color',
-        select: 'color', // Chỉ chọn trường name từ color
       })
       .populate({
         path: 'address',

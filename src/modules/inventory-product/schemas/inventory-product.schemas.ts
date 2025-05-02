@@ -3,6 +3,7 @@ import mongoose, { HydratedDocument } from "mongoose";
 import { Product } from "src/modules/products/schemas/product.schemas";
 import { User } from "src/modules/users/schemas/user.schema";
 import { Color } from "src/color/schemas/color.schemas";
+import { INVENTORY_ACTION } from "src/constants/schema.enum";
 
 export type InventoryProductDocument = HydratedDocument<InventoryProduct>;
 
@@ -38,8 +39,8 @@ class StockHistory {
     @Prop({ required: true })
     price: number; // Giá trị (giá nhập hoặc giá xuất)
 
-    @Prop({ required: true, enum: ['import', 'export'] })
-    action: 'import' | 'export'; // Loại hành động (nhập hoặc xuất)
+    @Prop({ required: true, enum: INVENTORY_ACTION })
+    action: INVENTORY_ACTION; // Loại hành động (nhập hoặc xuất)
 
     @Prop({ default: Date.now })
     date: Date; // Thời gian thực hiện

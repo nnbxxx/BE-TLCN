@@ -8,6 +8,7 @@ import { IUser } from '../users/users.interface';
 import aqp from 'api-query-params';
 import mongoose from 'mongoose';
 import { ReceiptAdd, ReceiptItem } from '../receipts/dto/update-receipt.dto';
+import { INVENTORY_ACTION } from 'src/constants/schema.enum';
 
 @Injectable()
 export class InventoryProductService {
@@ -79,20 +80,63 @@ export class InventoryProductService {
   }
   async updateReceiptUser(receiptItems: ReceiptItem[], user: IUser) {
     receiptItems.map(async (item: any) => {
-      const { product, price, quantity, color } = item
-      const productInventory = await this.findByProductId(product);
+      const { price, color, _id, name, size } = item.product
+      const { quantity } = item;
+      const inventory = await this.findByProductId(_id);
       //productInventory.quantity -= quantity;
-      if (!productInventory) {
+      if (!inventory) {
         throw new NotFoundException('Product not found');
       }
-      const reservationData = {
-        userId: user._id,
-        quantity: quantity,
-        price: price,
-        color: color,
+
+      let variantIndex: number | null = null;
+
+      // Kiểm tra nếu không có thuộc tính (color, size, material) thì tìm biến thể không có attributes
+      variantIndex = inventory.productVariants.findIndex(v => {
+        const attr = v.attributes || {};
+
+
+        return (!color || attr.color === color) &&
+          (!size || attr.size === size)
+      });
+
+      let newVariant: any;
+      if (variantIndex !== -1) {
+        // Nếu tìm thấy biến thể → Lưu lại stock cũ trước khi xóa
+        const { stock, discount, importPrice, exportPrice, attributes, sellPrice } = inventory.productVariants[variantIndex]
+        if (stock - quantity < 0) {
+          throw new BadRequestException("Not Enough Product in Inventory")
+        }
+        inventory.productVariants.splice(variantIndex, 1);
+        newVariant = {
+          attributes,
+          importPrice: importPrice,
+          exportPrice, // Giá xuất mặc định là 0 nếu không có
+          stock: stock - quantity, // Cộng dồn stock cũ vào số lượng nhập mới
+          discount: discount,
+          sellPrice: sellPrice
+        };
+        if (color) newVariant.attributes.color = color;
+        if (size) newVariant.attributes.size = size;
+        // Thêm lại biến thể mới vào danh sách
+        inventory.productVariants.push(newVariant);
+
+        // Cập nhật tổng số lượng của kho
+        inventory.totalQuantity -= quantity;
+
+        // Thêm lịch sử nhập kho
+        inventory.stockHistory.push({
+          userId: user._id as any,
+          quantity: quantity,
+          price: sellPrice * quantity,
+          action: INVENTORY_ACTION.EXPORT,
+          date: new Date(),
+          variants: attributes
+        });
+
+        // Lưu thông tin kho sau khi cập nhật
       }
-      //productInventory.reservations.push(reservationData);
-      await productInventory.save();
+
+      await inventory.save();
 
     })
   }
@@ -122,7 +166,7 @@ export class InventoryProductService {
   }
 
 
-  async importStock(
+  async manageStock(
     productId: string,
     variants: {
       color?: string;
@@ -134,7 +178,8 @@ export class InventoryProductService {
       discount?: number;
       sellPrice?: number;
     }[],
-    user: IUser
+    user: IUser,
+    type: INVENTORY_ACTION = INVENTORY_ACTION.IMPORT
   ) {
     // Tìm kho hàng của sản phẩm
     const inventory = await this.inventoryProductModel.findOne({ productId });
@@ -142,79 +187,81 @@ export class InventoryProductService {
     if (!inventory) {
       throw new NotFoundException("Sản phẩm không tồn tại trong kho.");
     }
+    if (type === INVENTORY_ACTION.IMPORT) {
+      let totalAdded = 0;
+      let totalImportValue = 0;
 
-    let totalAdded = 0;
-    let totalImportValue = 0;
+      variants.forEach(({ color, size, material, quantity, importPrice, exportPrice, discount }) => {
+        let variantIndex: number | null = null;
+        let oldStock = 0;
 
-    variants.forEach(({ color, size, material, quantity, importPrice, exportPrice, discount }) => {
-      let variantIndex: number | null = null;
-      let oldStock = 0;
+        // Kiểm tra nếu không có thuộc tính (color, size, material) thì tìm biến thể không có attributes
+        const isNoAttributes = !color && !size && !material;
 
-      // Kiểm tra nếu không có thuộc tính (color, size, material) thì tìm biến thể không có attributes
-      const isNoAttributes = !color && !size && !material;
+        if (isNoAttributes) {
+          variantIndex = inventory.productVariants.findIndex(v => !v.attributes || Object.keys(v.attributes).length === 0);
+        } else {
+          variantIndex = inventory.productVariants.findIndex(v => {
+            const attr = v.attributes || {};
 
-      if (isNoAttributes) {
-        variantIndex = inventory.productVariants.findIndex(v => !v.attributes || Object.keys(v.attributes).length === 0);
-      } else {
-        variantIndex = inventory.productVariants.findIndex(v => {
-          const attr = v.attributes || {};
+            return (!color || attr.color === color) &&
+              (!size || attr.size === size) &&
+              (!material || attr.material === material);
+          });
+        }
+        let oldExportPrice: number;
+        if (variantIndex !== -1) {
+          // Nếu tìm thấy biến thể → Lưu lại stock cũ trước khi xóa
+          const { stock, discount, importPrice } = inventory.productVariants[variantIndex]
+          oldStock = stock;
+          oldExportPrice = (importPrice * stock);
 
-          return (!color || attr.color === color) &&
-            (!size || attr.size === size) &&
-            (!material || attr.material === material);
-        });
-      }
-      let oldExportPrice: number;
-      if (variantIndex !== -1) {
-        // Nếu tìm thấy biến thể → Lưu lại stock cũ trước khi xóa
-        const { stock, discount, importPrice } = inventory.productVariants[variantIndex]
-        oldStock = stock;
-        oldExportPrice = (importPrice * stock);
+          inventory.productVariants.splice(variantIndex, 1);
+        }
 
-        inventory.productVariants.splice(variantIndex, 1);
-      }
+        // Tạo biến thể mới với dữ liệu đã cập nhật
+        // (0 + 10*10)/(10+0)*(100-0)*(100+10)/(100*100)
+        const newPrice = (oldExportPrice + quantity * importPrice) / (quantity + oldStock) * (100 - discount) * (100 + exportPrice) / (100 * 100);
 
-      // Tạo biến thể mới với dữ liệu đã cập nhật
-      // (0 + 10*10)/(10+0)*(100-0)*(100+10)/(100*100)
-      const newPrice = (oldExportPrice + quantity * importPrice) / (quantity + oldStock) * (100 - discount) * (100 + exportPrice) / (100 * 100);
+        const newImportPrice = (oldExportPrice + quantity * importPrice) / (quantity + oldStock)
+        let newVariant: any = {
+          attributes: {} as any,
+          importPrice: newImportPrice,
+          exportPrice, // Giá xuất mặc định là 0 nếu không có
+          stock: quantity + oldStock, // Cộng dồn stock cũ vào số lượng nhập mới
+          discount: discount ?? 0,
+          sellPrice: newPrice
+        };
 
-      const newImportPrice = (oldExportPrice + quantity * importPrice) / (quantity + oldStock)
-      let newVariant: any = {
-        attributes: {} as any,
-        importPrice: newImportPrice,
-        exportPrice, // Giá xuất mặc định là 0 nếu không có
-        stock: quantity + oldStock, // Cộng dồn stock cũ vào số lượng nhập mới
-        discount: discount ?? 0,
-        sellPrice: newPrice
-      };
+        if (color) newVariant.attributes.color = color;
+        if (size) newVariant.attributes.size = size;
+        if (material) newVariant.attributes.material = material;
+        // Thêm lại biến thể mới vào danh sách
+        inventory.productVariants.push(newVariant);
 
-      if (color) newVariant.attributes.color = color;
-      if (size) newVariant.attributes.size = size;
-      if (material) newVariant.attributes.material = material;
-      // Thêm lại biến thể mới vào danh sách
-      inventory.productVariants.push(newVariant);
+        totalAdded += quantity;
+        totalImportValue += importPrice * quantity;
+      });
 
-      totalAdded += quantity;
-      totalImportValue += importPrice * quantity;
-    });
+      // Cập nhật tổng số lượng của kho
+      inventory.totalQuantity += totalAdded;
 
-    // Cập nhật tổng số lượng của kho
-    inventory.totalQuantity += totalAdded;
+      // Thêm lịch sử nhập kho
+      inventory.stockHistory.push({
+        userId: user._id as any,
+        quantity: totalAdded,
+        price: totalImportValue,
+        action: type,
+        date: new Date(),
+        variants: variants
+      });
 
-    // Thêm lịch sử nhập kho
-    inventory.stockHistory.push({
-      userId: user._id as any,
-      quantity: totalAdded,
-      price: totalImportValue,
-      action: "import",
-      date: new Date(),
-      variants: variants
-    });
+      // Lưu thông tin kho sau khi cập nhật
+      await inventory.save();
 
-    // Lưu thông tin kho sau khi cập nhật
-    await inventory.save();
+      return { message: "Nhập hàng thành công", totalAdded };
+    }
 
-    return { message: "Nhập hàng thành công", totalAdded };
   }
 
   async checkProductAvailability(product: {

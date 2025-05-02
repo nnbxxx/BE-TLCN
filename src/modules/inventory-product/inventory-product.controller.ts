@@ -32,8 +32,8 @@ export class InventoryProductController {
   }
   @Post('import-stock')
   @ResponseMessage("Create a import InventoryProduct")
-  async importStock(@Body() importStockDto: ImportStockDto, @User() user: IUser) {
-    return this.inventoryProductService.importStock(
+  async manageStock(@Body() importStockDto: ImportStockDto, @User() user: IUser) {
+    return this.inventoryProductService.manageStock(
       importStockDto.productId,
       importStockDto.variants,
       user
