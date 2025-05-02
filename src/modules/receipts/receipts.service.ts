@@ -147,10 +147,6 @@ export class ReceiptsService {
           select: 'name images price', // Chỉ chọn các trường name và images từ product
         })
         .populate({
-          path: 'items.color',
-          select: 'color', // Chỉ chọn trường name từ color
-        })
-        .populate({
           path: 'address',
           select: 'receiver phone province districts wards specific', // Chỉ chọn trường name từ color
         })
