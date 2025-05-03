@@ -7,6 +7,14 @@ import { Role } from 'src/modules/roles/schemas/role.schemas';
 // import { Role } from 'src/roles/schemas/role.schemas';
 
 export type UserDocument = HydratedDocument<User>;
+@Schema()
+export class RecentViewProduct {
+    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: Product.name, required: true })
+    productId: mongoose.Schema.Types.ObjectId;
+
+    @Prop({ type: Date, required: true })
+    timeView: Date;
+}
 @Schema({ timestamps: true }) // biến class thành 1 schema // lấy time at
 export class User {
     @Prop()
@@ -34,8 +42,12 @@ export class User {
 
     @Prop({ required: true, type: [mongoose.Schema.Types.ObjectId], ref: Product.name, default: [] },)
     purchasedProducts: [mongoose.Schema.Types.ObjectId];
-    @Prop({ required: true, type: [mongoose.Schema.Types.ObjectId], ref: Product.name, default: [] })
-    recentViewProducts: [mongoose.Schema.Types.ObjectId];
+    @Prop({
+        type: [RecentViewProduct],
+        default: [],
+        required: true,
+    })
+    recentViewProducts: RecentViewProduct[];
 
     @Prop({
         type: [{

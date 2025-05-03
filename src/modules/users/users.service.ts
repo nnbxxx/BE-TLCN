@@ -370,7 +370,7 @@ export class UsersService {
   }
   async updateRecentViewProduct(user: IUser, productId: string) {
     await this.userModel.findByIdAndUpdate(user._id, {
-      $addToSet: { recentViewProducts: productId },
+      $addToSet: { recentViewProducts: { productId, timeView: Date.now() } },
     }, {
       new: true,
     });

@@ -263,14 +263,36 @@ export class ProductsService {
   }
   async getProductsRecentViewByUser(user: IUser) {
     const userDB = (await this.userService.findOne(user._id)) as any;
+
+    // Lấy danh sách productId từ recentViewProducts
+    const recentViews = userDB.recentViewProducts;
+    const recentProductIds = recentViews.map((item) => item.productId);
+
+    // Truy vấn danh sách sản phẩm
     const products = await this.productModel
-      .find({ _id: { $in: userDB.recentViewProducts } })
+      .find({ _id: { $in: recentProductIds } })
       .select(['_id', 'name', 'price', 'images', 'brand', 'rating', 'category'])
-      .populate("category")
+      .populate('category')
       .exec();
-    const result = await this.addInforInventoryProduct(products)
-    return result
+
+    // Gắn thông tin tồn kho
+    const productsWithInventory = await this.addInforInventoryProduct(products);
+
+    // Tạo Map productId => timeView
+    const timeViewMap = new Map(
+      recentViews.map((item) => [item.productId.toString(), item.timeView])
+    );
+
+    // Bổ sung timeView vào kết quả
+    const result = productsWithInventory.map((product) => ({
+      ...product,
+      timeView: timeViewMap.get(product._id.toString()) || null,
+    }));
+
+    return result;
   }
+
+
   async getProductsPurchasedByUser(user: IUser) {
     const userDB = (await this.userService.findOne(user._id)) as any;
     const products = await this.productModel
