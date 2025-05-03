@@ -46,12 +46,12 @@ export class ProductsController {
   @Get('/product/recent')
   @ResponseMessage("Fetch Products Recent View for members")
   findProductsRecentViewForUser(@User() user: IUser) {
-    return this.productsService.getProductsRecentViewByUser(user);;
+    return this.productsService.getProductsRecentViewByUser(user);
   }
   @Get('/product/purchased')
   @ResponseMessage("Fetch Products Purchased  for members")
   findProductsPurchasedForUser(@User() user: IUser) {
-    return this.productsService.getProductsPurchasedByUser(user);;
+    return this.productsService.getProductsPurchasedByUser(user);
   }
 
   @ResponseMessage("Update a Product")

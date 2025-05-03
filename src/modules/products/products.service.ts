@@ -159,29 +159,8 @@ export class ProductsService {
       .sort(sort as any)
       .populate(population)
       .exec();
-
-    // Lấy danh sách _id sản phẩm để truy vấn tồn kho
-    const productIds = products.map((product) => product._id);
-
-    // Lấy thông tin tồn kho tương ứng
-    const inventoryList = await this.inventoryProductModel
-      .find({ productId: { $in: productIds } })
-      .exec();
-
-    // Map productId => inventory để tra nhanh
-    const inventoryMap = new Map(
-      inventoryList.map((inv) => [inv.productId.toString(), inv])
-    );
-
     // Gắn inventory vào từng product
-    const result = products.map((product) => {
-      const inventory = inventoryMap.get(product._id.toString());
-      return {
-        ...product.toObject(),
-        inventory: inventory || null, // có thể null nếu chưa có tồn kho
-      };
-    });
-
+    const resultssss = await this.addInforInventoryProduct(products)
     return {
       meta: {
         current: currentPage,
@@ -189,7 +168,7 @@ export class ProductsService {
         pages: totalPages,
         total: totalItems,
       },
-      result,
+      result: resultssss,
     };
   }
 
@@ -284,16 +263,49 @@ export class ProductsService {
   }
   async getProductsRecentViewByUser(user: IUser) {
     const userDB = (await this.userService.findOne(user._id)) as any;
-    return this.productModel
+    const products = await this.productModel
       .find({ _id: { $in: userDB.recentViewProducts } })
-      .select(['_id', 'name', 'price', 'images'])
+      .select(['_id', 'name', 'price', 'images', 'brand', 'rating', 'category'])
+      .populate("category")
       .exec();
+    const result = await this.addInforInventoryProduct(products)
+    return result
   }
   async getProductsPurchasedByUser(user: IUser) {
     const userDB = (await this.userService.findOne(user._id)) as any;
-    return this.productModel
-      .find({ _id: { $in: userDB.purchasedProducts } })
-      .select(['_id', 'name', 'price', 'images'])
+    const products = await this.productModel
+      .find({ _id: { $in: userDB.recentViewProducts } })
+      .select(['_id', 'name', 'price', 'images', 'brand', 'rating', 'category'])
+      .populate("category")
       .exec();
+    const result = await this.addInforInventoryProduct(products)
+    return result
+  }
+
+
+  async addInforInventoryProduct(products: any) {
+    // Lấy danh sách _id sản phẩm để truy vấn tồn kho
+    const productIds = products.map((product) => product._id);
+
+    // Lấy thông tin tồn kho tương ứng
+    const inventoryList = await this.inventoryProductModel
+      .find({ productId: { $in: productIds } })
+      // .select([])
+      .exec();
+
+    // Map productId => inventory để tra nhanh
+    const inventoryMap = new Map(
+      inventoryList.map((inv) => [inv.productId.toString(), inv])
+    );
+
+    // Gắn inventory vào từng product
+    const result = products.map((product) => {
+      const inventory = inventoryMap.get(product._id.toString());
+      return {
+        ...product.toObject(),
+        inventory: inventory || null, // có thể null nếu chưa có tồn kho
+      };
+    });
+    return result
   }
 }
