@@ -8,6 +8,8 @@ import { IUser } from '../users/users.interface';
 import mongoose, { Types } from 'mongoose';
 import { Product } from '../products/schemas/product.schemas';
 import { InventoryProductService } from '../inventory-product/inventory-product.service';
+import { Category } from '../categories/schemas/category.Schemas';
+import { ProductsService } from '../products/products.service';
 
 @Injectable()
 export class LikeProductsService {
@@ -15,6 +17,7 @@ export class LikeProductsService {
     @InjectModel(LikeProduct.name)
     private likeProductModel: SoftDeleteModel<LikeProductDocument>,
     private inventoryProductService: InventoryProductService,
+    private productService: ProductsService,
 
   ) { }
   create(user: IUser) {
@@ -28,17 +31,39 @@ export class LikeProductsService {
     });
   }
   async findByUser(user: IUser) {
-    const re = await this.likeProductModel
+    // Lấy likeProduct của user, có populate category trong từng item
+    let re = await this.likeProductModel
       .findOne({ user: user._id })
       .select("-__v -updatedAt -createdAt -isDeleted -deletedAt")
       .populate({
         path: "items",
         model: Product.name,
-        select: "_id name price images "  // Lựa chọn chỉ lấy _id và tên sản phẩm
+        select: "_id name price images brand rating category",
+        populate: {
+          path: "category",
+          model: Category.name,
+          select: "_id name"
+        }
       });
 
-    return re;
+    // // Nếu không có dữ liệu thì trả về null
+    // if (!re || !re.items || re.items.length === 0) {
+    //   return re;
+    // }
+
+    // Bổ sung thông tin tồn kho cho từng sản phẩm
+    const itemsWithInventory = await this.productService.addInforInventoryProduct(re.items);
+
+    // Gán lại danh sách items đã có inventory
+    // re.items = itemsWithInventory;
+    let newdata = {
+      ...re.toObject(),
+      items: itemsWithInventory
+    };
+
+    return newdata;
   }
+
 
   async removeProduct(idProduct: string, user: IUser) {
     if (!mongoose.Types.ObjectId.isValid(idProduct)) {
