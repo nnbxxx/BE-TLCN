@@ -1,36 +1,45 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { MessageService } from './message.service';
-import { CreateMessageDto } from './dto/create-message.dto';
-import { UpdateMessageDto } from './dto/update-message.dto';
+import {
+    Body,
+    Controller,
+    Get,
+    Post,
+    Query,
+    UnprocessableEntityException,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+
+import { ResponseMessage, User } from 'src/decorator/customize';
+import { CreateMessageDto } from 'src/modules/message/dto/create-message.dto';
+import { MessageService } from 'src/modules/message/message.service';
+import { IUser } from 'src/modules/users/users.interface';
 
 @ApiTags('message')
 @Controller('message')
 export class MessageController {
-  constructor(private readonly messageService: MessageService) { }
+    constructor(private readonly messageService: MessageService) {}
 
-  @Post()
-  create(@Body() createMessageDto: CreateMessageDto) {
-    return this.messageService.create(createMessageDto);
-  }
+    @Post()
+    @ResponseMessage('Create message success')
+    create(@User() user: IUser, @Body() createMessageDto: CreateMessageDto) {
+        return this.messageService.create(user, createMessageDto);
+    }
 
-  @Get()
-  findAll() {
-    return this.messageService.findAll();
-  }
+    @Get()
+    @ResponseMessage('List all messages success')
+    findAll(
+        @User() user: IUser,
+        @Query('chatRoom') chatRoom: string,
+        @Query('currentPage') currentPage: number,
+        @Query('limit') limit: number,
+    ) {
+        if (!chatRoom) {
+            throw new UnprocessableEntityException('chatRoom is required');
+        }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.messageService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMessageDto: UpdateMessageDto) {
-    return this.messageService.update(+id, updateMessageDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.messageService.remove(+id);
-  }
+        return this.messageService.findAll(user, {
+            chatRoom,
+            currentPage,
+            limit,
+        });
+    }
 }

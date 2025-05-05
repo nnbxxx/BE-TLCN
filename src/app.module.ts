@@ -37,75 +37,71 @@ import { BrandModule } from './brand/brand.module';
 import { BlogCategoryModule } from './blog-category/blog-category.module';
 import { BlogModule } from './modules/blog/blog.module';
 import { DashboardModule } from './dashboard/dashboard.module';
-
+import { GatewayModule } from './gateway/gateway.module';
 
 @Module({
-  imports: [
-    ScheduleModule.forRoot(),
-    // Config Module
-    ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: '.env'
-    }),
-    // Mongoose Module
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => (
+    imports: [
+        ScheduleModule.forRoot(),
+        // Config Module
+        ConfigModule.forRoot({
+            isGlobal: true,
+            envFilePath: '.env',
+        }),
+        // Mongoose Module
+        MongooseModule.forRootAsync({
+            imports: [ConfigModule],
+            inject: [ConfigService],
+            useFactory: async (configService: ConfigService) => ({
+                uri: configService.get<string>('MONGODB_URI'),
+                connectionFactory: (connection) => {
+                    connection.plugin(softDeletePlugin);
+                    return connection;
+                },
+            }),
+        }),
+        // Throttler Module
+        ThrottlerModule.forRoot(),
+        UsersModule,
+        AuthModule,
+        MailModule,
+        ProductsModule,
+        CategoriesModule,
+        CartsModule,
+        AddressModule,
+        ReceiptsModule,
+        ReviewsModule,
+        LikeProductsModule,
+        CouponsModule,
+        NotificationsModule,
+        CloudinaryModule,
+        FilesModule,
+        InventoryProductModule,
+        AddressUserModule,
+        PermissionsModule,
+        // RolesModule,
+        DatabasesModule,
+        ChatRoomsModule,
+        MessageModule,
+        ColorModule,
+        BrandModule,
+        BlogCategoryModule,
+        BlogModule,
+        DashboardModule,
+        GatewayModule,
+    ],
+    controllers: [AppController],
+    providers: [
+        AppService,
+        NotificationsGateway,
+        // bind to ThrottlerGuard globally
         {
-          uri: configService.get<string>('MONGODB_URI'),
-          connectionFactory: (connection) => {
-            connection.plugin(softDeletePlugin);
-            return connection;
-          },
-        }
-      ),
-    }),
-    // Throttler Module
-    ThrottlerModule.forRoot(),
-    UsersModule,
-    AuthModule,
-    MailModule,
-    ProductsModule,
-    CategoriesModule,
-    CartsModule,
-    AddressModule,
-    ReceiptsModule,
-    ReviewsModule,
-    LikeProductsModule,
-    CouponsModule,
-    NotificationsModule,
-    CloudinaryModule,
-    FilesModule,
-    InventoryProductModule,
-    AddressUserModule,
-    PermissionsModule,
-    // RolesModule,
-    DatabasesModule,
-    ChatRoomsModule,
-    MessageModule,
-    ColorModule,
-    BrandModule,
-    BlogCategoryModule,
-    BlogModule,
-    DashboardModule,
-
-  ],
-  controllers: [AppController],
-  providers: [
-    AppService, NotificationsGateway,
-    // bind to ThrottlerGuard globally
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: JwtAuthGuard,
-    // }
-  ],
-
-
-
+            provide: APP_GUARD,
+            useClass: ThrottlerGuard,
+        },
+        // {
+        //   provide: APP_GUARD,
+        //   useClass: JwtAuthGuard,
+        // }
+    ],
 })
-export class AppModule { }
+export class AppModule {}
