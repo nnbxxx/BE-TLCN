@@ -37,6 +37,7 @@ import { BrandModule } from './brand/brand.module';
 import { BlogCategoryModule } from './blog-category/blog-category.module';
 import { BlogModule } from './modules/blog/blog.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { ChatAiModule } from './chat-ai/chat-ai.module';
 
 
 @Module({
@@ -89,6 +90,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
     BlogCategoryModule,
     BlogModule,
     DashboardModule,
+    ChatAiModule,
 
   ],
   controllers: [AppController],
