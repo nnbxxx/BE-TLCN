@@ -20,14 +20,14 @@ export class Receipt {
   @Prop({
     require: true,
     type: [{
-      product: { type: mongoose.Schema.Types.ObjectId, ref: Product.name, require: true, },
+      product: { type: mongoose.Schema.Types.ObjectId, ref: Product.name, required: true },
       quantity: { type: Number, require: true, },
       price: { type: Number, require: true, },
       color: { type: String },
       size: { type: String },
     }]
   })
-  items: ReceiptItem[];
+  items: [];
   @Prop({
     default: [],
     type: [String]
@@ -91,7 +91,7 @@ export const ReceiptSchema = SchemaFactory.createForClass(Receipt);
 {
   "items": [
     {
-      "product": "66f3d74a9a0b38cea549a180",
+      "product": null,
       "name": "dior 1",
       "price": 123450,
       "quantity": 5

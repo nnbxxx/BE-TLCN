@@ -69,24 +69,4 @@ export class Product {
 
 export const ProductSchema = SchemaFactory.createForClass(Product);
 
-// cục FE build sản phẩm
-const product = {
-    "name": "Áo Thun Nam",
-    "category": "64b76d2a2a3f1c6abc123456",
-    "brand": "BrandX",
-    "description": "Áo thun nam cao cấp",
-    "images": ["image1.jpg", "image2.jpg"],
-    "rating": 4.5,
-    "tags": "featured",
-    "feature": ["color", "size", "chất liệu"],
-    // Danh sách biến thể sản phẩm (màu + size + giá + giảm giá + tồn kho)
-    "variants": [
-        {
-            "color": { "name": "red", "decs": "link_img_red" },
-            "size": { "name": "M", "decs": "" },
-            "chất liệu": { "name": "Chất liệu x", "decs": "" },
-        },
-        //...
 
-    ]
-};

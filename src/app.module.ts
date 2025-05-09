@@ -88,7 +88,7 @@ import { GatewayModule } from './gateway/gateway.module';
         BlogCategoryModule,
         BlogModule,
         DashboardModule,
-    ChatAiModule,
+        ChatAiModule,
         GatewayModule,
     ],
     controllers: [AppController],
@@ -106,4 +106,4 @@ import { GatewayModule } from './gateway/gateway.module';
         // }
     ],
 })
-export class AppModule {}
+export class AppModule { }

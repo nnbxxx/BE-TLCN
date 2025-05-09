@@ -142,10 +142,10 @@ export class ReceiptsService {
         .limit(defaultLimit)
         .sort(sort as any)
         .select([])
-        .populate({
-          path: 'items.product',
-          select: 'name images price', // Chỉ chọn các trường name và images từ product
-        })
+        // .populate({
+        //   path: 'items.product',
+        //   select: 'name images price', // Chỉ chọn các trường name và images từ product
+        // })
         .populate({
           path: 'address',
           select: 'receiver phone province districts wards specific', // Chỉ chọn trường name từ color
@@ -168,10 +168,10 @@ export class ReceiptsService {
       .limit(defaultLimit)
       .sort(sort as any)
       .select([])
-      .populate({
-        path: 'items.product',
-        select: 'name images', // Chỉ chọn các trường name và images từ product
-      })
+      // .populate({
+      //   path: 'items.product',
+      //   select: 'name images', // Chỉ chọn các trường name và images từ product
+      // })
       .exec();
 
 
@@ -192,10 +192,10 @@ export class ReceiptsService {
       throw new NotFoundException(`not found receipt with id=${receiptId}`);
     }
     const receipt = await this.receiptModel.findById(receiptId)
-      .populate({
-        path: 'items.product',
-        select: 'name images brand', // Chỉ chọn các trường name và images từ product
-      })
+      // .populate({
+      //   path: 'items.product',
+      //   select: 'name images brand', // Chỉ chọn các trường name và images từ product
+      // })
       .populate({
         path: 'address',
         select: 'receiver phone province districts wards specific',
@@ -303,7 +303,8 @@ export class ReceiptsService {
   async confirmPayment(receiptId: string, user: IUser) {
 
     const receipt = await this.findOne(receiptId);
-    const productIds = receipt.items.map(item => item.product._id.toString());
+    console.log("🚀 ~ ReceiptsService ~ confirmPayment ~ receipt:", receipt)
+    const productIds = receipt.items.map((item: any) => { return item.product._id.toString() });
 
     if (receipt.statusUser !== RECEIPT_STATUS.DELIVERED) {
       // update sản phẩm đã mua của user
