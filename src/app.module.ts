@@ -38,76 +38,72 @@ import { BlogCategoryModule } from './blog-category/blog-category.module';
 import { BlogModule } from './modules/blog/blog.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { ChatAiModule } from './chat-ai/chat-ai.module';
-
+import { GatewayModule } from './gateway/gateway.module';
 
 @Module({
-  imports: [
-    ScheduleModule.forRoot(),
-    // Config Module
-    ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: '.env'
-    }),
-    // Mongoose Module
-    MongooseModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => (
-        {
-          uri: configService.get<string>('MONGODB_URI'),
-          connectionFactory: (connection) => {
-            connection.plugin(softDeletePlugin);
-            return connection;
-          },
-        }
-      ),
-    }),
-    // Throttler Module
-    ThrottlerModule.forRoot(),
-    UsersModule,
-    AuthModule,
-    MailModule,
-    ProductsModule,
-    CategoriesModule,
-    CartsModule,
-    AddressModule,
-    ReceiptsModule,
-    ReviewsModule,
-    LikeProductsModule,
-    CouponsModule,
-    NotificationsModule,
-    CloudinaryModule,
-    FilesModule,
-    InventoryProductModule,
-    AddressUserModule,
-    PermissionsModule,
-    // RolesModule,
-    DatabasesModule,
-    ChatRoomsModule,
-    MessageModule,
-    ColorModule,
-    BrandModule,
-    BlogCategoryModule,
-    BlogModule,
-    DashboardModule,
+    imports: [
+        ScheduleModule.forRoot(),
+        // Config Module
+        ConfigModule.forRoot({
+            isGlobal: true,
+            envFilePath: '.env',
+        }),
+        // Mongoose Module
+        MongooseModule.forRootAsync({
+            imports: [ConfigModule],
+            inject: [ConfigService],
+            useFactory: async (configService: ConfigService) => ({
+                uri: configService.get<string>('MONGODB_URI'),
+                connectionFactory: (connection) => {
+                    connection.plugin(softDeletePlugin);
+                    return connection;
+                },
+            }),
+        }),
+        // Throttler Module
+        ThrottlerModule.forRoot(),
+        UsersModule,
+        AuthModule,
+        MailModule,
+        ProductsModule,
+        CategoriesModule,
+        CartsModule,
+        AddressModule,
+        ReceiptsModule,
+        ReviewsModule,
+        LikeProductsModule,
+        CouponsModule,
+        NotificationsModule,
+        CloudinaryModule,
+        FilesModule,
+        InventoryProductModule,
+        AddressUserModule,
+        PermissionsModule,
+        // RolesModule,
+        DatabasesModule,
+        ChatRoomsModule,
+        MessageModule,
+        ColorModule,
+        BrandModule,
+        BlogCategoryModule,
+        BlogModule,
+        DashboardModule,
     ChatAiModule,
-
-  ],
-  controllers: [AppController],
-  providers: [
-    AppService, NotificationsGateway,
-    // bind to ThrottlerGuard globally
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: JwtAuthGuard,
-    // }
-  ],
-
-
-
+        GatewayModule,
+    ],
+    controllers: [AppController],
+    providers: [
+        AppService,
+        NotificationsGateway,
+        // bind to ThrottlerGuard globally
+        {
+            provide: APP_GUARD,
+            useClass: ThrottlerGuard,
+        },
+        // {
+        //   provide: APP_GUARD,
+        //   useClass: JwtAuthGuard,
+        // }
+    ],
 })
-export class AppModule { }
+export class AppModule {}
