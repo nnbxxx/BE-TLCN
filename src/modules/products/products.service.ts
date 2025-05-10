@@ -295,11 +295,34 @@ export class ProductsService {
 
   async getProductsPurchasedByUser(user: IUser) {
     const userDB = (await this.userService.findOne(user._id)) as any;
-    const products = await this.productModel
-      .find({ _id: { $in: userDB.recentViewProducts } })
-      .select(['_id', 'name', 'price', 'images', 'brand', 'rating', 'category'])
-      .populate("category")
-      .exec();
+    const products = await this.productModel.aggregate([
+      {
+        $match: {
+          _id: { $in: userDB.purchasedProducts.map(id => new Types.ObjectId(id)) }
+        }
+      },
+      {
+        $lookup: {
+          from: 'categories', // tên collection thật (không phải tên model)
+          localField: 'category',
+          foreignField: '_id',
+          as: 'category'
+        }
+      },
+      { $unwind: '$category' },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          images: 1,
+          brand: 1,
+          rating: 1,
+          category: 1
+        }
+      }
+    ]);
+
+
     const result = await this.addInforInventoryProduct(products)
     return result
   }
@@ -322,9 +345,11 @@ export class ProductsService {
 
     // Gắn inventory vào từng product
     const result = products.map((product) => {
+      console.log("🚀 ~ ProductsService ~ result ~ product:", product)
+
       const inventory = inventoryMap.get(product._id.toString());
       return {
-        ...product.toObject(),
+        ...product,
         inventory: inventory || null, // có thể null nếu chưa có tồn kho
       };
     });
