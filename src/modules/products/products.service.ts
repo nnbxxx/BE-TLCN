@@ -271,7 +271,7 @@ export class ProductsService {
     // Truy vấn danh sách sản phẩm
     const products = await this.productModel
       .find({ _id: { $in: recentProductIds } })
-      .select(['_id', 'name', 'price', 'images', 'brand', 'rating', 'category'])
+      .select(['_id', 'name', 'images', 'brand', 'rating', 'category'])
       .populate('category')
       .exec();
 
@@ -295,10 +295,12 @@ export class ProductsService {
 
   async getProductsPurchasedByUser(user: IUser) {
     const userDB = (await this.userService.findOne(user._id)) as any;
+    const recentProductIds = userDB.purchasedProducts.map((item) => new Types.ObjectId(item));
+
     const products = await this.productModel
-      .find({ _id: { $in: userDB.recentViewProducts } })
-      .select(['_id', 'name', 'price', 'images', 'brand', 'rating', 'category'])
-      .populate("category")
+      .find({ _id: { $in: recentProductIds } })
+      .select(['_id', 'name', 'images', 'brand', 'rating', 'category'])
+      .populate('category')
       .exec();
     const result = await this.addInforInventoryProduct(products)
     return result
