@@ -303,7 +303,7 @@ export class ReceiptsService {
   async confirmPayment(receiptId: string, user: IUser) {
 
     const receipt = await this.findOne(receiptId);
-    console.log("🚀 ~ ReceiptsService ~ confirmPayment ~ receipt:", receipt)
+
     const productIds = receipt.items.map((item: any) => { return item.product._id.toString() });
 
     if (receipt.statusUser !== RECEIPT_STATUS.DELIVERED) {
