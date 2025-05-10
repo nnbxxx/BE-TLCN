@@ -59,6 +59,11 @@ export class CreateProductDto {
     @IsString({ message: "Tags phải là chuỗi" })
     tags: string;
 
+    @ApiProperty({ example: "code1234", description: "code sản phẩm" })
+    @IsNotEmpty({ message: "code không được để trống" })
+    @IsString({ message: "code phải là chuỗi" })
+    code: string;
+
     @ApiProperty({ example: ["color", "size"], description: "Danh sách thuộc tính" })
     @IsArray({ message: "Features phải là một mảng" })
     @IsString({ each: true, message: "Mỗi feature phải là chuỗi" })

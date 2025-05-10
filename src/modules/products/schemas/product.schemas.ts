@@ -37,8 +37,9 @@ export class Product {
     tags: string;
 
     @Prop({ type: [String], default: [] })
-    features: string[]; // Danh sách thuộc tính động
-
+    features: string; // Danh sách thuộc tính động
+    @Prop({ type: String, default: "", unique: true })
+    code: string;
     @Prop({ type: [VariantSchema], default: [] })
     variants: Variant[];
 

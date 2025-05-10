@@ -51,8 +51,12 @@ export class ProductsService {
       tags,
       features,
       variants,
+      code
     } = createProductDto;
-
+    const existingProduct = await this.productModel.findOne({ code });
+    if (existingProduct) {
+      throw new BadRequestException('Mã sản phẩm (code) đã tồn tại.');
+    }
     // Tạo sản phẩm mới
     const product = await this.productModel.create({
       brand,
@@ -62,7 +66,7 @@ export class ProductsService {
       name,
       tags,
       features,
-      variants,
+      variants, code,
       createdBy: {
         _id: user._id,
         email: user.email,
@@ -295,13 +299,34 @@ export class ProductsService {
 
   async getProductsPurchasedByUser(user: IUser) {
     const userDB = (await this.userService.findOne(user._id)) as any;
-    const recentProductIds = userDB.purchasedProducts.map((item) => new Types.ObjectId(item));
+    const products = await this.productModel.aggregate([
+      {
+        $match: {
+          _id: { $in: userDB.purchasedProducts.map(id => new Types.ObjectId(id)) }
+        }
+      },
+      {
+        $lookup: {
+          from: 'categories', // tên collection thật (không phải tên model)
+          localField: 'category',
+          foreignField: '_id',
+          as: 'category'
+        }
+      },
+      { $unwind: '$category' },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          images: 1,
+          brand: 1,
+          rating: 1,
+          category: 1
+        }
+      }
+    ]);
 
-    const products = await this.productModel
-      .find({ _id: { $in: recentProductIds } })
-      .select(['_id', 'name', 'images', 'brand', 'rating', 'category'])
-      .populate('category')
-      .exec();
+
     const result = await this.addInforInventoryProduct(products)
     return result
   }
@@ -324,9 +349,11 @@ export class ProductsService {
 
     // Gắn inventory vào từng product
     const result = products.map((product) => {
+      console.log("🚀 ~ ProductsService ~ result ~ product:", product)
+
       const inventory = inventoryMap.get(product._id.toString());
       return {
-        ...product.toObject(),
+        ...product,
         inventory: inventory || null, // có thể null nếu chưa có tồn kho
       };
     });
