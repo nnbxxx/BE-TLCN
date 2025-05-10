@@ -51,8 +51,12 @@ export class ProductsService {
       tags,
       features,
       variants,
+      code
     } = createProductDto;
-
+    const existingProduct = await this.productModel.findOne({ code });
+    if (existingProduct) {
+      throw new BadRequestException('Mã sản phẩm (code) đã tồn tại.');
+    }
     // Tạo sản phẩm mới
     const product = await this.productModel.create({
       brand,
@@ -62,7 +66,7 @@ export class ProductsService {
       name,
       tags,
       features,
-      variants,
+      variants, code,
       createdBy: {
         _id: user._id,
         email: user.email,

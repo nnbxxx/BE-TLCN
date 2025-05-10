@@ -31,24 +31,6 @@ export class ChatAiService {
     }
   }
 
-  // ⚠️ Ollama hiện không hỗ trợ image input (chỉ text)
-  async askWithImage(base64Image: string): Promise<string> {
-    try {
-      const prompt = 'Hãy mô tả nội dung của bức ảnh sau bằng tiếng Việt:';
-
-      const response = await axios.post('http://localhost:11434/api/generate', {
-        model: this.MODEL, // phải là mô hình hỗ trợ ảnh
-        prompt: prompt,
-        images: [base64Image],
-        stream: false,
-      });
-
-      return response.data.response || 'Không có phản hồi.';
-    } catch (error) {
-      console.error('Ollama image API error:', error.message);
-      throw new Error('Lỗi xử lý ảnh: ' + error.message);
-    }
-  }
 
 
   create(createChatAiDto: CreateChatAiDto) {

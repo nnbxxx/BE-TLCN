@@ -3,9 +3,7 @@ import { ChatAiService } from './chat-ai.service';
 import { CreateChatAiDto } from './dto/create-chat-ai.dto';
 import { UpdateChatAiDto } from './dto/update-chat-ai.dto';
 import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { FileInterceptor } from '@nestjs/platform-express';
-import * as fs from 'fs';
-import multer from 'multer';
+
 @ApiTags('chat-ai')
 @Controller('chat-ai')
 export class ChatAiController {
@@ -49,29 +47,5 @@ export class ChatAiController {
     const reply = await this.chatAiService.askAI(message);
     return { reply };
   }
-  @Post('image')
-  @ApiOperation({ summary: 'Upload ảnh để hỏi AI' })
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        image: {
-          type: 'string',
-          format: 'binary',
-        },
-      },
-    },
-  })
-  @UseInterceptors(FileInterceptor('image', {
-    storage: multer.memoryStorage(),
-  }))
-  async uploadImage(@UploadedFile() file: Express.Multer.File) {
-    console.log("🚀 ~ ChatAiController ~ uploadImage ~ file:", file)
-    const buffer = file.buffer;
-    const base64Image = buffer.toString('base64');
 
-    const result = await this.chatAiService.askWithImage(base64Image);
-    return { reply: result };
-  }
 }
