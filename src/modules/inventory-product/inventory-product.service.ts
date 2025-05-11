@@ -300,15 +300,49 @@ export class InventoryProductService {
 
     return true;
   }
+  async update(updateInventoryProduct: UpdateInventoryProductDto, user: IUser) {
+    const { productId, productVariants } = updateInventoryProduct;
+
+    const existingInventory = await this.inventoryProductModel.findOne({ productId });
+
+    if (!existingInventory) {
+      throw new BadRequestException(`Not found inventory product with id =${productId}`);
+    }
+
+    const existingVariants = existingInventory.productVariants || [];
+
+    // So sánh dựa trên các key-value thực tế có mặt trong biến thể mới
+    const isSameVariant = (a: any, b: any) => {
+      // So sánh các thuộc tính 'color', 'size', 'material'
+      return a.attributes.color === b.attributes.color &&
+        a.attributes.size === b.attributes.size &&
+        a.attributes.material === b.attributes.material;
+    };
+
+    // Lọc các biến thể mới
+    const newVariants = productVariants.filter(newVar => {
+      // Nếu không có biến thể cũ nào giống biến thể mới này, thì thêm vào danh sách mới
+      return !existingVariants.some(existingVar => isSameVariant(newVar, existingVar));
+    });
+
+    if (newVariants.length === 0) {
+      return existingInventory; // Nếu không có biến thể mới, trả lại dữ liệu cũ
+    }
+
+    const updatedVariants = [...existingVariants, ...newVariants];
+
+    return this.inventoryProductModel.findOneAndUpdate(
+      { productId },
+      {
+        productVariants: updatedVariants,
+        updatedBy: {
+          _id: user._id,
+          email: user.email,
+        },
+        updatedAt: new Date(),
+      },
+      { new: true }
+    );
+  }
 }
-
-
-
-// update(id: number, updateInventoryProductDto: UpdateInventoryProductDto) {
-//   return `This action updates a #${id} inventoryProduct`;
-// }
-
-// remove(id: number) {
-//   return `This action removes a #${id} inventoryProduct`;
-// }
 

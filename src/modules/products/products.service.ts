@@ -238,17 +238,113 @@ export class ProductsService {
     return data.images;
   }
   async update(updateProductDto: UpdateProductDto, user: IUser) {
-    return await this.productModel.updateOne(
-      { _id: updateProductDto._id },
+    const {
+      _id,
+      brand,
+      category,
+      description,
+      images,
+      name,
+      tags,
+      features,
+      variants,
+      code,
+    } = updateProductDto;
+
+    // Kiểm tra tồn tại sản phẩm
+    const existingProduct: any = await this.productModel.findById(_id);
+    if (!existingProduct) {
+      throw new NotFoundException('Sản phẩm không tồn tại.');
+    }
+
+    // Kiểm tra nếu code đã tồn tại ở sản phẩm khác
+    if (code && code !== existingProduct.code) {
+      const codeExisted = await this.productModel.findOne({ code });
+      if (codeExisted) {
+        throw new BadRequestException('Mã sản phẩm (code) đã tồn tại.');
+      }
+    }
+
+    // Cập nhật thông tin sản phẩm
+    const updatedProduct = await this.productModel.findByIdAndUpdate(
+      _id,
       {
-        ...updateProductDto,
+        brand,
+        category,
+        description,
+        images,
+        name,
+        tags,
+        features,
+        code,
         updatedBy: {
           _id: user._id,
           email: user.email,
         },
       },
+      { new: true }
     );
+
+    // Giữ lại các biến thể cũ và thêm các biến thể mới
+    let existingVariants = existingProduct.variants || [];
+    let newVariants = variants || [];
+
+    // Lọc các biến thể mới để thêm vào (nếu có)
+    newVariants = newVariants.filter((newVariant: any) => {
+      // Nếu biến thể chưa tồn tại trong cũ thì mới thêm vào
+      return !existingVariants.some(
+        (existingVariant: any) =>
+          JSON.stringify(existingVariant.attributes) ===
+          JSON.stringify(newVariant.attributes)
+      );
+    });
+
+    // Gộp biến thể cũ và mới lại
+    const updatedVariants = [...existingVariants, ...newVariants];
+
+    // Cập nhật lại biến thể cho sản phẩm
+    updatedProduct.variants = updatedVariants;
+
+    // Chuẩn bị dữ liệu biến thể cho kho
+    let dataVariants: any[] = [];
+    if (updatedVariants.length) {
+      dataVariants = updatedVariants.map((variant: any) => {
+        const variantData: any = {
+          attributes: {} as any,
+        };
+
+        if (features.includes('color') && variant.attributes.color) {
+          variantData.attributes.color = variant.attributes.color.name;
+        }
+        if (features.includes('size') && variant.attributes.size) {
+          variantData.attributes.size = variant.attributes.size.name;
+        }
+        if (features.includes('material') && variant.attributes.material) {
+          variantData.attributes.material = variant.attributes.material.name;
+        }
+
+        // Nếu đã có thông tin giá/kho => giữ lại, nếu không gán mặc định
+        variantData.importPrice = variant.importPrice ?? 0;
+        variantData.exportPrice = variant.exportPrice ?? 0;
+        variantData.stock = variant.stock ?? 0;
+        variantData.sellPrice = variant.sellPrice ?? 0;
+
+        return variantData;
+      });
+    }
+
+    // Chuẩn bị DTO cập nhật kho
+    const inventoryUpdateDto: CreateInventoryProductDto = {
+      productId: _id,
+      productVariants: dataVariants,
+    };
+
+    // Cập nhật kho
+    await this.inventoryProductService.update(inventoryUpdateDto, user);
+    await updatedProduct.save();
+    return updatedProduct;
   }
+
 
   async remove(id: string, user: IUser) {
     if (!mongoose.Types.ObjectId.isValid(id)) {

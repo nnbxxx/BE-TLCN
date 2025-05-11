@@ -11,8 +11,7 @@ import {
     ValidateNested
 } from "class-validator";
 import { Type } from "class-transformer";
-
-class AttributeDto {
+export class AttributeDto {
     @ApiProperty({ example: "red", description: "Tên thuộc tính (VD: màu sắc, kích thước...)" })
     @IsNotEmpty({ message: "Tên thuộc tính không được để trống" })
     @IsString({ message: "Tên thuộc tính phải là chuỗi" })
@@ -24,7 +23,7 @@ class AttributeDto {
     desc?: string;
 }
 
-class VariantDto {
+export class VariantDto {
     @ApiProperty({ example: { color: { name: "red", desc: "link_img_red" } }, description: "Thuộc tính biến thể" })
     @IsNotEmpty({ message: "Attributes không được để trống" })
     attributes: Record<string, AttributeDto>;
