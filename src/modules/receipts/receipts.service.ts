@@ -142,10 +142,10 @@ export class ReceiptsService {
         .limit(defaultLimit)
         .sort(sort as any)
         .select([])
-        // .populate({
-        //   path: 'items.product',
-        //   select: 'name images price', // Chỉ chọn các trường name và images từ product
-        // })
+        .populate({
+          path: 'items.product',
+          select: 'name images price', // Chỉ chọn các trường name và images từ product
+        })
         .populate({
           path: 'address',
           select: 'receiver phone province districts wards specific', // Chỉ chọn trường name từ color
@@ -168,10 +168,10 @@ export class ReceiptsService {
       .limit(defaultLimit)
       .sort(sort as any)
       .select([])
-      // .populate({
-      //   path: 'items.product',
-      //   select: 'name images', // Chỉ chọn các trường name và images từ product
-      // })
+      .populate({
+        path: 'items.product',
+        select: 'name images', // Chỉ chọn các trường name và images từ product
+      })
       .exec();
 
 
@@ -192,10 +192,10 @@ export class ReceiptsService {
       throw new NotFoundException(`not found receipt with id=${receiptId}`);
     }
     const receipt = await this.receiptModel.findById(receiptId)
-      // .populate({
-      //   path: 'items.product',
-      //   select: 'name images brand', // Chỉ chọn các trường name và images từ product
-      // })
+      .populate({
+        path: 'items.product',
+        select: 'name images brand', // Chỉ chọn các trường name và images từ product
+      })
       .populate({
         path: 'address',
         select: 'receiver phone province districts wards specific',
