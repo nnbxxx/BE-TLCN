@@ -2,15 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import axios from 'axios';
-import { CreateChatAiDto } from './dto/create-chat-ai.dto';
-import { UpdateChatAiDto } from './dto/update-chat-ai.dto';
 import { Product } from 'src/modules/products/schemas/product.schemas';
 
 @Injectable()
 export class ChatAiService {
   private readonly OLLAMA_URL: string;
   private readonly MODEL: string;
-  private readonly BASE_URL: string = 'http://localhost:3000/product'; // URL cơ sở cho sản phẩm
 
   constructor(@InjectModel(Product.name) private productModel: Model<Product>) {
     this.OLLAMA_URL = process.env.OLLAMA_URL;
@@ -129,13 +126,40 @@ export class ChatAiService {
     if (query.productCode && product.code === query.productCode) score += 3;
     return score;
   }
+  private async isRelevantToFashionShopByAI(message: string): Promise<boolean> {
+    const prompt = `
+Bạn là hệ thống phân loại câu hỏi cho trợ lý bán hàng quần áo truyền thống.
 
+Câu hỏi: "${message}"
+
+Câu hỏi trên có liên quan đến mua sắm, tìm hiểu sản phẩm, hoặc đặt hàng quần áo truyền thống không?
+
+Trả lời chỉ **có một từ duy nhất** là: "có" hoặc "không". Không giải thích thêm.
+  `.trim();
+
+    try {
+      const response = await axios.post(this.OLLAMA_URL, {
+        model: this.MODEL,
+        prompt: prompt,
+        stream: false,
+      });
+
+      const answer = response.data.response?.trim().toLowerCase();
+      return answer === 'có';
+    } catch (error) {
+      console.error('AI relevance check failed:', error.message);
+      // fallback: cho phép tiếp tục nếu lỗi
+      return true;
+    }
+  }
   // Gọi mô hình để xử lý câu hỏi
   async askAI(userMessage: string): Promise<string> {
     if (!userMessage || typeof userMessage !== 'string') {
       throw new Error('Câu hỏi không hợp lệ.');
     }
-
+    if (!(await this.isRelevantToFashionShopByAI(userMessage))) {
+      return 'Xin lỗi, tôi là trợ lý cho cửa hàng thời trang truyền thống. Vui lòng đặt câu hỏi liên quan đến sản phẩm quần áo để tôi hỗ trợ nhé!';
+    }
     // Làm sạch đầu vào
     const cleanMessage = userMessage.replace(/[<>{}]/g, '');
 
@@ -162,8 +186,7 @@ export class ChatAiService {
             )
             .map((v) => `Màu: ${v.attributes.color.name}, Size: ${v.attributes.size.name}`)
             .join('; ');
-          const productLink = `<a href="${this.BASE_URL}/${p._id}">Xem chi tiết</a>`;
-          return `Tên: ${p.name}, Mã: ${p.code}, Mô tả: ${p.description.replace(/<[^>]+>/g, '')}, Biến thể: ${variants}, Link: ${productLink}`;
+          return `Tên: ${p.name}, Mã: ${p.code}, Mô tả: ${p.description.replace(/<[^>]+>/g, '')}, Biến thể: ${variants}`;
         })
         .join('\n');
     } else {
@@ -174,10 +197,9 @@ export class ChatAiService {
     const prompt = `
 Bạn là một trợ lý bán hàng cho website bán quần áo thời trang truyền thống. Hãy trả lời ngắn gọn, lịch sự, rõ ràng bằng tiếng Việt.
 
-- Dựa trên danh sách sản phẩm dưới đây, gợi ý **một hoặc hai sản phẩm phù hợp nhất** với yêu cầu của khách, bao gồm đường dẫn HTML (<a href="...">Xem chi tiết</a>).
+- Dựa trên danh sách sản phẩm dưới đây, gợi ý **một hoặc hai sản phẩm phù hợp nhất** với yêu cầu của khách).
 - Nếu có nhiều sản phẩm phù hợp, ưu tiên sản phẩm có mô tả hoặc biến thể khớp chính xác nhất với yêu cầu.
 - Nếu không có sản phẩm phù hợp, xin lỗi và đề nghị khách liên hệ nhân viên.
-- Đảm bảo giữ nguyên định dạng HTML của đường dẫn trong phản hồi.
 - Nếu khách hỏi về giá, xin lỗi và đề nghị liên hệ nhân viên vì thông tin giá không có sẵn.
 
 **Câu hỏi từ khách**: "${cleanMessage}"
@@ -201,24 +223,4 @@ ${productDetails}
     }
   }
 
-  // Các phương thức CRUD
-  create(createChatAiDto: CreateChatAiDto) {
-    return 'This action adds a new chatAi';
-  }
-
-  findAll() {
-    return 'This action returns all chatAi';
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} chatAi`;
-  }
-
-  update(id: number, updateChatAiDto: UpdateChatAiDto) {
-    return `This action updates a #${id} chatAi`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} chatAi`;
-  }
 }
