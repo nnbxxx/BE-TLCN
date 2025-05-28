@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { DashboardService } from './dashboard.service';
 import { CreateDashboardDto, DataRevenueDto } from './dto/create-dashboard.dto';
 import { UpdateDashboardDto } from './dto/update-dashboard.dto';
@@ -11,11 +11,10 @@ import { TYPE_TIME_FILTER } from 'src/constants/schema.enum';
 export class DashboardController {
   constructor(private readonly dashboardService: DashboardService) { }
 
-
   @Get('/info')
   @Public()
-  findOne() {
-    return this.dashboardService.getDashboardCardInfo(TYPE_TIME_FILTER.WEEK);
+  findOne(@Query('type') type: TYPE_TIME_FILTER = TYPE_TIME_FILTER.WEEK) {
+    return this.dashboardService.getDashboardCardInfo(type);
   }
   // @Post('/revenue')
   // @Public()
