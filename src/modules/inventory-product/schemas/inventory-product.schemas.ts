@@ -2,7 +2,6 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { HydratedDocument } from "mongoose";
 import { Product } from "src/modules/products/schemas/product.schemas";
 import { User } from "src/modules/users/schemas/user.schema";
-import { Color } from "src/color/schemas/color.schemas";
 import { INVENTORY_ACTION } from "src/constants/schema.enum";
 
 export type InventoryProductDocument = HydratedDocument<InventoryProduct>;

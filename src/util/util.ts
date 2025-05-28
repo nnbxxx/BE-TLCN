@@ -25,7 +25,5 @@ export function getTimeRangeFromDate(
     }
 
     from.setHours(0, 0, 0, 0); // về đầu ngày
-    console.log("🚀 ~ from:", from)
-    console.log("🚀 ~ to:", to)
     return { from, to: toDate };
 }

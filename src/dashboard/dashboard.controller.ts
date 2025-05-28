@@ -11,16 +11,21 @@ import { TYPE_TIME_FILTER } from 'src/constants/schema.enum';
 export class DashboardController {
   constructor(private readonly dashboardService: DashboardService) { }
 
+  @Get('/info-time')
+  @Public()
+  findDataWithTime(@Query('type') type: TYPE_TIME_FILTER = TYPE_TIME_FILTER.WEEK) {
+    return this.dashboardService.getDashboardCardInfoTime(type);
+  }
   @Get('/info')
   @Public()
-  findOne(@Query('type') type: TYPE_TIME_FILTER = TYPE_TIME_FILTER.WEEK) {
-    return this.dashboardService.getDashboardCardInfo(type);
+  findData() {
+    return this.dashboardService.getDashboardCardInfo();
   }
-  // @Post('/revenue')
-  // @Public()
-  // getDataRevenue(@Body() dataRevenueDto: DataRevenueDto) {
-  //   return this.dashboardService.getMonthlyTotal(dataRevenueDto.year);
-  // }
+  @Post('/revenue')
+  @Public()
+  getDataRevenue(@Body() dataRevenueDto: DataRevenueDto) {
+    return this.dashboardService.getMonthlyTotal(dataRevenueDto.year);
+  }
 
   // @Patch(':id')
   // update(@Param('id') id: string, @Body() updateDashboardDto: UpdateDashboardDto) {

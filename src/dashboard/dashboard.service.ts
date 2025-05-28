@@ -11,6 +11,7 @@ import { InventoryProductService } from 'src/modules/inventory-product/inventory
 import { Brand, BrandDocument } from 'src/brand/schemas/brand.schemas';
 import { getTimeRangeFromDate } from 'src/util/util';
 import { InventoryProduct, InventoryProductDocument } from 'src/modules/inventory-product/schemas/inventory-product.schemas';
+import { LikeProduct, LikeProductDocument } from 'src/modules/like-products/schemas/like-product.schemas';
 
 
 @Injectable()
@@ -27,19 +28,34 @@ export class DashboardService {
     private brandModel: SoftDeleteModel<BrandDocument>,
     @InjectModel(InventoryProduct.name)
     private inventoryProductModel: SoftDeleteModel<InventoryProductDocument>,
+    @InjectModel(LikeProduct.name)
+    private likeProductModel: SoftDeleteModel<LikeProductDocument>,
 
     private inventoryProductService: InventoryProductService,
   ) { }
 
-  async getDashboardCardInfo(time: TYPE_TIME_FILTER) {
+  async getDashboardCardInfoTime(time: TYPE_TIME_FILTER) {
     const inforBlog = await this.countBlogsCreatedInTimeRange(time);
     const inforUser = await this.countUsersCreatedInTimeRange(time);
     const inforProductExport = await this.countProductDeliveredInTimeRange(time);
     const inforProductImport = await this.countProductImportInTimeRange(time);
-    const inforInventoryProduct = await this.getTotalInventorySummary();
     const inforRevenue = await this.countRevenueInTimeRange(time);
+
     return {
-      inforUser, inforBlog, inforProductExport, inforProductImport, inforInventoryProduct, inforRevenue
+      inforUser, inforBlog, inforProductExport, inforProductImport, inforRevenue,
+    }
+  }
+  async getDashboardCardInfo() {
+
+    const inforInventoryProduct = await this.getTotalInventorySummary();
+    const inforUsersAndBuyers = await this.countUsersAndBuyers();
+    const dataTopBuyers = await this.getTopUsersByDistinctProducts();
+    const inforInventorySumary = await this.getInventorySummary();
+    const dataTopSellingProduct = await this.getTopSellingProducts();
+    const dataTopLikeProduct = await this.getTopLikedProducts();
+    const dataTopViewProduct = await this.getTopViewedProducts();
+    return {
+      inforInventoryProduct, inforUsersAndBuyers, dataTopBuyers, inforInventorySumary, dataTopSellingProduct, dataTopLikeProduct, dataTopViewProduct
     }
   }
   async countUsersCreatedInTimeRange(type: TYPE_TIME_FILTER) {
@@ -200,57 +216,254 @@ export class DashboardService {
     return result[0]?.totalAmount || 0;
   }
   async getMonthlyTotal(year: number) {
-    // Tên các tháng bằng tiếng Anh
     const monthNames = [
       "January", "February", "March", "April", "May", "June",
       "July", "August", "September", "October", "November", "December"
     ];
 
-    // Tạo startDate và endDate cho mỗi tháng của năm
-    const startOfYear = new Date(year, 0, 1); // Ngày đầu tiên của năm
-    const endOfYear = new Date(year + 1, 0, 1); // Ngày đầu tiên của năm tiếp theo
+    const startOfYear = new Date(year, 0, 1);
+    const endOfYear = new Date(year + 1, 0, 1);
 
-    // Aggregation pipeline để tính toán tổng hóa đơn theo tháng
-    const pipeline = [
+    // Tính tổng tiền bán theo tháng
+    const receiptPipeline = [
       {
         $match: {
-          statusUser: "DELIVERED", // Lọc hóa đơn có trạng thái DELIVERED
-          createdAt: {
-            $gte: startOfYear, // Hóa đơn được tạo từ đầu năm
-            $lt: endOfYear // Hóa đơn được tạo đến hết năm
-          }
+          statusUser: "DELIVERED",
+          createdAt: { $gte: startOfYear, $lt: endOfYear }
         }
       },
       {
         $project: {
-          month: { $month: "$createdAt" }, // Trích xuất tháng từ trường createdAt
-          total: 1 // Giữ trường total trong hóa đơn
+          month: { $month: "$createdAt" },
+          total: 1
         }
       },
       {
         $group: {
-          _id: "$month", // Nhóm theo tháng
-          totalAmount: { $sum: "$total" } // Tính tổng giá trị theo tháng
+          _id: "$month",
+          totalAmount: { $sum: "$total" }
         }
       },
       {
-        $sort: { _id: 1 } // Sắp xếp theo tháng từ tháng 1 đến tháng 12
+        $sort: { _id: 1 }
       }
     ];
 
-    // Thực hiện aggregation với pipeline
-    const result = await this.receiptModel.aggregate(pipeline as any);
+    const receiptResult = await this.receiptModel.aggregate(receiptPipeline as any);
 
-    // Đảm bảo mỗi tháng đều có dữ liệu, nếu không có thì khởi tạo với 0
-    const monthlyTotals = monthNames.map((month, index) => {
-      const monthData = result.find(r => r._id === index + 1);
-      return {
-        month,
-        value: monthData ? monthData.totalAmount : 0
-      };
-    });
+    // Tính tổng tiền nhập kho theo tháng
+    const monthlyTotals = [];
 
+    for (let month = 0; month < 12; month++) {
+      const monthStart = new Date(year, month, 1);
+      const monthEnd = new Date(year, month + 1, 1);
+
+      // Tổng bán hàng
+      const receiptData = receiptResult.find(r => r._id === month + 1);
+      const totalSales = receiptData ? receiptData.totalAmount : 0;
+
+      // Tổng nhập kho
+      const inventoryProducts = await this.inventoryProductModel.find({
+        stockHistory: {
+          $elemMatch: {
+            action: INVENTORY_ACTION.IMPORT,
+            date: { $gte: monthStart, $lt: monthEnd }
+          }
+        }
+      }).lean();
+
+      let totalImportAmount = 0;
+      for (const product of inventoryProducts) {
+        for (const history of product.stockHistory) {
+          if (
+            history.action === INVENTORY_ACTION.IMPORT &&
+            history.date >= monthStart &&
+            history.date < monthEnd
+          ) {
+            totalImportAmount += history.price;
+          }
+        }
+      }
+
+      monthlyTotals.push({
+        month: monthNames[month],
+        sales: totalSales,
+        import: totalImportAmount
+      });
+    }
     return monthlyTotals;
   }
+  async countUsersAndBuyers(): Promise<{ totalUsers: number; buyers: number }> {
+    const totalUsers = await this.userModel.countDocuments({});
+    const buyers = await this.userModel.countDocuments({
+      purchasedProducts: { $exists: true, $not: { $size: 0 } },
+    });
 
+    return { totalUsers, buyers };
+  }
+  async getTopUsersByDistinctProducts(limit = 20): Promise<
+    { userId: string; name: string; avatar: string; totalItems: number }[]
+  > {
+    return this.userModel.aggregate([
+      {
+        $project: {
+          userId: { $toString: "$_id" },
+          name: 1,
+          avatar: 1,
+          totalItems: {
+            $size: {
+              $ifNull: [
+                {
+                  $setUnion: [
+                    {
+                      $map: {
+                        input: "$purchasedProducts",
+                        as: "item",
+                        in: "$$item.productId"
+                      }
+                    }
+                  ]
+                },
+                []
+              ]
+            }
+          }
+        }
+      },
+      {
+        $sort: { totalItems: -1 }
+      },
+      {
+        $limit: limit
+      }
+    ]);
+  }
+  async getInventorySummary() {
+    const result = await this.inventoryProductModel.aggregate([
+      {
+        $facet: {
+          totalProducts: [
+            { $match: { isDeleted: false } },
+            { $count: "count" }
+          ],
+          soldAtLeastOne: [
+            { $match: { isDeleted: false, totalQuantitySell: { $gt: 0 } } },
+            { $count: "count" }
+          ]
+        }
+      },
+      {
+        $project: {
+          totalProducts: { $arrayElemAt: ["$totalProducts.count", 0] },
+          soldAtLeastOne: { $arrayElemAt: ["$soldAtLeastOne.count", 0] }
+        }
+      }
+    ]);
+
+    return result[0] || { totalProducts: 0, soldAtLeastOne: 0 };
+  }
+  async getTopSellingProducts(limit = 20) {
+    const result = await this.inventoryProductModel.aggregate([
+      {
+        $match: {
+          isDeleted: false,
+          totalQuantitySell: { $gt: 0 }
+        }
+      },
+      {
+        $lookup: {
+          from: "products",
+          localField: "productId",
+          foreignField: "_id",
+          as: "productInfo"
+        }
+      },
+      { $unwind: "$productInfo" },
+      {
+        $project: {
+          _id: 0,
+          name: "$productInfo.name",
+          totalSold: "$totalQuantitySell",
+          image: { $arrayElemAt: ["$productInfo.images", 0] } // Đảm bảo field image có trong schema Product
+        }
+      },
+      { $sort: { totalSold: -1 } },
+      { $limit: limit }
+    ]);
+
+    return result;
+  }
+  async getTopLikedProducts(limit = 20) {
+    const topLiked = await this.likeProductModel.aggregate([
+      { $unwind: '$items' },
+      { $group: { _id: '$items', count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: limit },
+      {
+        $lookup: {
+          from: 'products',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'product',
+        },
+      },
+      { $unwind: '$product' },
+      {
+        $project: {
+          name: '$product.name',
+          image: '$product.image', // nếu là mảng thì dùng `$product.image[0]`
+          totalLike: '$count',
+        },
+      },
+    ]);
+
+    return topLiked;
+  }
+  async getTopViewedProducts(): Promise<any[]> {
+    const currentYear = new Date().getFullYear();
+    const startOfYear = new Date(currentYear, 0, 1); // Jan 1
+    const endOfYear = new Date(currentYear + 1, 0, 1); // Jan 1 next year
+
+    // Aggregation pipeline
+    const result = await this.userModel.aggregate([
+      { $unwind: '$recentViewProducts' },
+      // {
+      //   $match: {
+      //     'recentViewProducts.timeView': {
+      //       $gte: startOfYear,
+      //       $lt: endOfYear,
+      //     },
+      //   },
+      // },
+      {
+        $group: {
+          _id: '$recentViewProducts.productId',
+          viewCount: { $sum: 1 },
+        },
+      },
+      { $sort: { viewCount: -1 } },
+      { $limit: 20 },
+      {
+        $lookup: {
+          from: 'products',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'productInfo',
+        },
+      },
+      { $unwind: '$productInfo' },
+      {
+        $project: {
+          _id: 0,
+          productId: '$_id',
+          name: '$productInfo.name',
+          totalLike: '$productInfo.totalLike',
+          image: '$productInfo.image',
+          viewCount: 1,
+        },
+      },
+    ]);
+
+    return result;
+  }
 }

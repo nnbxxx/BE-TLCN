@@ -79,7 +79,6 @@ export class InventoryProductService {
     return this.inventoryProductModel.findOne({ productId }).select(['reservations']);
   }
   async updateReceiptUser(receiptItems: ReceiptItem[], user: IUser) {
-    console.log("🚀 ~ InventoryProductService ~ updateReceiptUser ~ receiptItems:", receiptItems)
     receiptItems.map(async (item: any) => {
       const { price, color, _id, name, size } = item.product
       const { quantity } = item;
@@ -99,7 +98,6 @@ export class InventoryProductService {
         return (!color || attr.color === color) &&
           (!size || attr.size === size)
       });
-      console.log("🚀 ~ InventoryProductService ~ receiptItems.map ~ variantIndex:", variantIndex)
 
       let newVariant: any;
       if (variantIndex !== -1) {
@@ -117,6 +115,7 @@ export class InventoryProductService {
           discount: discount,
           sellPrice: sellPrice
         };
+        console.log("🚀 ~ InventoryProductService ~ receiptItems.map ~ newVariant:", newVariant)
         if (color) newVariant.attributes.color = color;
         if (size) newVariant.attributes.size = size;
         // Thêm lại biến thể mới vào danh sách
@@ -124,7 +123,7 @@ export class InventoryProductService {
 
         // Cập nhật tổng số lượng của kho
         inventory.totalQuantity -= quantity;
-
+        inventory.totalQuantitySell += quantity;
         // Thêm lịch sử nhập kho
         inventory.stockHistory.push({
           userId: user._id as any,
