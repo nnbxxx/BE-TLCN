@@ -28,3 +28,9 @@ export enum MESSAGE_TYPES {
     TEXT = 'text',
     FILE = 'file',
 }
+export enum TYPE_TIME_FILTER {
+    DAY = 'DAY',
+    WEEK = 'WEEK',
+    MONTH = 'MONTH',
+    YEAR = 'YEAR',
+}

@@ -4,32 +4,24 @@ import { CreateDashboardDto, DataRevenueDto } from './dto/create-dashboard.dto';
 import { UpdateDashboardDto } from './dto/update-dashboard.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/decorator/customize';
+import { TYPE_TIME_FILTER } from 'src/constants/schema.enum';
 
 @ApiTags('dashboard')
 @Controller('dashboard')
 export class DashboardController {
   constructor(private readonly dashboardService: DashboardService) { }
 
-  // @Post()
-  // create(@Body() createDashboardDto: CreateDashboardDto) {
-  //   return this.dashboardService.create(createDashboardDto);
-  // }
-
-  // @Get()
-  // findAll() {
-  //   return this.dashboardService.findAll();
-  // }
 
   @Get('/info')
   @Public()
   findOne() {
-    return this.dashboardService.getDashboardCardInfo();
+    return this.dashboardService.getDashboardCardInfo(TYPE_TIME_FILTER.WEEK);
   }
-  @Post('/revenue')
-  @Public()
-  getDataRevenue(@Body() dataRevenueDto: DataRevenueDto) {
-    return this.dashboardService.getMonthlyTotal(dataRevenueDto.year);
-  }
+  // @Post('/revenue')
+  // @Public()
+  // getDataRevenue(@Body() dataRevenueDto: DataRevenueDto) {
+  //   return this.dashboardService.getMonthlyTotal(dataRevenueDto.year);
+  // }
 
   // @Patch(':id')
   // update(@Param('id') id: string, @Body() updateDashboardDto: UpdateDashboardDto) {

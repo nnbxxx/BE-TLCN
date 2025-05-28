@@ -7,6 +7,7 @@ import { User, UserSchema } from 'src/modules/users/schemas/user.schema';
 import { Receipt, ReceiptSchema } from 'src/modules/receipts/schemas/receipt.schemas';
 import { InventoryProductModule } from 'src/modules/inventory-product/inventory-product.module';
 import { Brand, BrandSchema } from 'src/brand/schemas/brand.schemas';
+import { InventoryProduct, InventoryProductSchema } from 'src/modules/inventory-product/schemas/inventory-product.schemas';
 
 @Module({
   imports: [MongooseModule.forFeature([
@@ -14,7 +15,8 @@ import { Brand, BrandSchema } from 'src/brand/schemas/brand.schemas';
     { name: User.name, schema: UserSchema },
     { name: Receipt.name, schema: ReceiptSchema },
     { name: Brand.name, schema: BrandSchema },
-
+    { name: InventoryProduct.name, schema: InventoryProductSchema },
+    { name: Receipt.name, schema: ReceiptSchema },
   ]),
     InventoryProductModule
   ],
