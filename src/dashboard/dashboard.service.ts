@@ -411,7 +411,7 @@ export class DashboardService {
       {
         $project: {
           name: '$product.name',
-          image: '$product.image', // nếu là mảng thì dùng `$product.image[0]`
+          image: { $arrayElemAt: ["$productInfo.images", 0] }, // nếu là mảng thì dùng `$product.image[0]`
           totalLike: '$count',
         },
       },
@@ -420,21 +420,11 @@ export class DashboardService {
     return topLiked;
   }
   async getTopViewedProducts(): Promise<any[]> {
-    const currentYear = new Date().getFullYear();
-    const startOfYear = new Date(currentYear, 0, 1); // Jan 1
-    const endOfYear = new Date(currentYear + 1, 0, 1); // Jan 1 next year
 
     // Aggregation pipeline
     const result = await this.userModel.aggregate([
       { $unwind: '$recentViewProducts' },
-      // {
-      //   $match: {
-      //     'recentViewProducts.timeView': {
-      //       $gte: startOfYear,
-      //       $lt: endOfYear,
-      //     },
-      //   },
-      // },
+
       {
         $group: {
           _id: '$recentViewProducts.productId',
@@ -458,7 +448,7 @@ export class DashboardService {
           productId: '$_id',
           name: '$productInfo.name',
           totalLike: '$productInfo.totalLike',
-          image: '$productInfo.image',
+          image: { $arrayElemAt: ["$productInfo.images", 0] },
           viewCount: 1,
         },
       },
