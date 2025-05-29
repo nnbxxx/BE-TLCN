@@ -411,7 +411,7 @@ export class DashboardService {
       {
         $project: {
           name: '$product.name',
-          image: { $arrayElemAt: ["$productInfo.images", 0] }, // nếu là mảng thì dùng `$product.image[0]`
+          image: { $arrayElemAt: ["$product.images", 0] }, // nếu là mảng thì dùng `$product.image[0]`
           totalLike: '$count',
         },
       },
