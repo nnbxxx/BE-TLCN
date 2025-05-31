@@ -12,6 +12,7 @@ import {
     Message,
     MessageSchema,
 } from 'src/modules/message/schemas/message.schemas';
+import { GatewayModule } from 'src/gateway/gateway.module';
 
 @Module({
     imports: [
@@ -19,6 +20,7 @@ import {
             { name: ChatRoom.name, schema: ChatRoomSchema },
             { name: Message.name, schema: MessageSchema },
         ]),
+        GatewayModule,
     ],
     controllers: [AdminChatRoomsController, ClientChatRoomsController],
     providers: [ChatRoomsService],

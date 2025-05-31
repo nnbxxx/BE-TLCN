@@ -13,6 +13,7 @@ import {
 } from 'src/modules/message/schemas/message.schemas';
 import { MESSAGE_TYPES } from 'src/constants/schema.enum';
 import { paginate } from 'src/helpers';
+import { AppGateway } from 'src/gateway/app.gateway';
 
 @Injectable()
 export class ChatRoomsService {
@@ -21,6 +22,7 @@ export class ChatRoomsService {
         private chatRoomModel: SoftDeleteModel<ChatRoomDocument>,
         @InjectModel(Message.name)
         private messageModel: SoftDeleteModel<MessageDocument>,
+        private readonly appGateway: AppGateway,
     ) {}
 
     private generateRoomKey(userId: string) {
@@ -40,7 +42,10 @@ export class ChatRoomsService {
                     path: 'lastMessage',
                     populate: [{ path: 'sender', select: ['email', 'name'] }],
                 },
-                { path: 'members', select: ['email', 'name'] },
+                {
+                    path: 'members',
+                    select: ['email', 'name', 'avatar', 'role'],
+                },
             ],
         });
     }
@@ -79,6 +84,14 @@ export class ChatRoomsService {
                 roomName: this.generateRoomName(user.name),
                 members: [user._id],
             });
+            const chatRoomPopulated = await chatRoom.populate('members', [
+                'email',
+                'name',
+                'avatar',
+                'role',
+            ]);
+            console.log(chatRoomPopulated);
+            this.appGateway.server.emit(`new-chat-room`, chatRoomPopulated);
 
             const newMessage = await this.messageModel.create({
                 chatRoom: chatRoom._id,
