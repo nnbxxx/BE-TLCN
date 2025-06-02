@@ -97,17 +97,19 @@ export class ReceiptsService {
       return acc + cur.price * cur.quantity
     }, 0);
     // tính coupoun
-    const codeCheck = await this.couponModel.findOne({ code: found[0] })
+    const codeCheck: any = await this.couponModel.findOne({ code: found.coupons[0] })
+    console.log("🚀 ~ ReceiptsService ~ calcTotal ~ codeCheck:", codeCheck)
+
     if (codeCheck.quantity === 0) {
       throw new BadRequestException(` Coupon đã hết `)
     }
     const { value } = codeCheck.description
     if (codeCheck.type === TYPE_COUPONS.PRICE) {
-      total += value
+      total -= value
 
     }
     else if (codeCheck.type === TYPE_COUPONS.PERCENT) {
-      total += total * value / (100 - value)
+      total -= Math.min(total * value / 100, codeCheck.description?.maxDiscount)
     }
 
     return await this.receiptModel.
@@ -258,10 +260,7 @@ export class ReceiptsService {
 
   async updateForUser(updateReceiptDto: UpdateReceiptDto) {
     const receipt = await this.findOne(updateReceiptDto._id)
-    // chưa phân role
-    // if (receipt.statusUser === RECEIPT_STATUS.CONFIRMED) {
-    //   throw new BadRequestException(`Đơn hàng đã xác nhận, vui lòng liên hệ nhà cung cấp để cập nhật đơn hàng`)
-    // }
+
     await this.receiptModel.updateOne({ _id: updateReceiptDto._id }, {
       ...updateReceiptDto
     })
@@ -270,8 +269,8 @@ export class ReceiptsService {
   async updateStatus(updateStatusDto: UpdateStatusDto) {
     const receipt = await this.findOne(updateStatusDto._id)
     let data = {
-      ...updateStatusDto,
-      statusUser: updateStatusDto.statusSupplier
+      statusUser: updateStatusDto.statusSupplier,
+      statusSupplier: updateStatusDto.statusSupplier
     }
 
     if (receipt) {
@@ -336,7 +335,7 @@ export class ReceiptsService {
 
   }
   async activeCoupons(checkValidCoupon: CheckValidCoupon, receiptId: string, user: IUser, active: boolean = true) {
-    const coupon = await this.couponService.checkValidCoupon(checkValidCoupon, user, active)
+    const coupon: any = await this.couponService.checkValidCoupon(checkValidCoupon, user, active)
     if (coupon) {
       // kích hoặc coupon
       const receipt = await this.receiptModel.findOne({ _id: receiptId });
@@ -350,7 +349,7 @@ export class ReceiptsService {
 
         }
         else if (coupon.type === TYPE_COUPONS.PERCENT) {
-          receipt.total += active ? -receipt.total * value / 100 : +receipt.total * value / (100 - value)
+          receipt.total += active ? -Math.min(receipt.total * value / 100, coupon.description?.maxDiscount) : +receipt.total * value / (100 - value)
         }
 
         // check lại logic
