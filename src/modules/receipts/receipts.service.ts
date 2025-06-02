@@ -313,8 +313,10 @@ export class ReceiptsService {
       // update vào kho lịch sử mua hàng
       await this.inventoryProductService.updateReceiptUser(receipt.items, user)
       receipt.statusSupplier = RECEIPT_STATUS.DELIVERED;
-      receipt.statusSupplier = RECEIPT_STATUS.DELIVERED;
+      receipt.statusUser = RECEIPT_STATUS.DELIVERED;
       await receipt.save();
+      console.log("🚀 ~ ReceiptsService ~ confirmPayment ~ receipt:", receipt)
+
       return receipt;
 
     }
