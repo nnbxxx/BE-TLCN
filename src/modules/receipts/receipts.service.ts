@@ -58,17 +58,20 @@ export class ReceiptsService {
     });
     this.cartService.removeAllCartItem(user);
     if (createReceiptDto?.coupons?.length > 0) {
-      createReceiptDto?.coupons.forEach((code) => {
-        this.activeCoupons({
+      createReceiptDto?.coupons.forEach(async (code) => {
+        await this.activeCoupons({
           code,
         }, receipt._id as any, user)
       })
 
     }
-    const tmp = await this.calcTotal(receipt._id as any, false)
+    const tmp = await this.calcTotal(receipt._id as any, true)
+    console.log("🚀 ~ ReceiptsService ~ create ~ tmp:", tmp)
+    console.log("🚀 ~ ReceiptsService ~ create ~ receipt:", receipt)
+
     if (receipt.paymentMethod === PAYMENT_METHOD.VNPAY)
       return await this.generatePaymentUrl({ orderId: tmp._id as any, total: tmp.total });
-    return receipt;
+    return tmp;
   }
   async validate(createReceiptDto: CreateReceiptDto) {
     const productsExist = await Promise.all(
@@ -86,7 +89,7 @@ export class ReceiptsService {
     }
   }
 
-  async calcTotal(receiptId: string, isActiveCode = true) {
+  async calcTotal(receiptId: string, isActive = true) {
     const found = await this.receiptModel.findById(receiptId);
     if (!found) throw new NotFoundException("receipt không tìm thấy");
     if (found.items.length === 0) {
@@ -96,8 +99,9 @@ export class ReceiptsService {
     let total = found.items.reduce((acc, cur: any) => {
       return acc + cur.price * cur.quantity
     }, 0);
+
     // tính coupoun
-    if (isActiveCode === true) {
+    if (isActive === true) {
       const codeCheck: any = await this.couponModel.findOne({ code: found.coupons[0] })
 
       if (codeCheck.quantity === 0) {
@@ -112,8 +116,9 @@ export class ReceiptsService {
         total -= Math.min(total * value / 100, codeCheck.description?.maxDiscount)
       }
       found.total = total;
-      await found.save();
+
     }
+    await found.save();
     return found;
   }
   async autoconfirm() {
@@ -265,10 +270,11 @@ export class ReceiptsService {
     await this.receiptModel.updateOne({ _id: updateReceiptDto._id }, {
       ...updateReceiptDto
     })
-    return await this.calcTotal(receipt._id as any);
+    return await this.calcTotal(receipt._id as any, false);
   }
   async updateStatus(updateStatusDto: UpdateStatusDto) {
     const receipt = await this.findOne(updateStatusDto._id)
+    console.log("🚀 ~ ReceiptsService ~ updateStatus ~ receipt:", receipt)
 
     if (receipt) {
       if (updateStatusDto.statusSupplier === RECEIPT_STATUS.DELIVERED) {
@@ -280,6 +286,8 @@ export class ReceiptsService {
       receipt.statusUser = updateStatusDto.statusSupplier as RECEIPT_STATUS;
       receipt.statusSupplier = updateStatusDto.statusSupplier as RECEIPT_STATUS;
       await receipt.save();
+      console.log("🚀 ~ ReceiptsService ~ updateStatus ~ receipt:", receipt)
+
       return receipt;
     }
     else {
@@ -339,14 +347,14 @@ export class ReceiptsService {
         throw new BadRequestException(` Coupon đã hết `)
       }
       if (receipt) {
-        const { value } = coupon.description
-        if (coupon.type === TYPE_COUPONS.PRICE) {
-          receipt.total += active ? -value : +value
+        // const { value } = coupon.description
+        // if (coupon.type === TYPE_COUPONS.PRICE) {
+        //   receipt.total += active ? -value : +value
 
-        }
-        else if (coupon.type === TYPE_COUPONS.PERCENT) {
-          receipt.total += active ? -Math.min(receipt.total * value / 100, coupon.description?.maxDiscount) : +receipt.total * value / (100 - value)
-        }
+        // }
+        // else if (coupon.type === TYPE_COUPONS.PERCENT) {
+        //   receipt.total += active ? -Math.min(receipt.total * value / 100, coupon.description?.maxDiscount) : +receipt.total * value / (100 - value)
+        // }
 
         // check lại logic
         if (active && !receipt.coupons.includes(checkValidCoupon.code)) {
@@ -361,6 +369,7 @@ export class ReceiptsService {
         coupon.quantity -= 1
         await coupon.save();
         await receipt.save();
+        console.log("🚀 ~ ReceiptsService ~ activeCoupons ~ receipt:", receipt)
         return receipt
       }
       else {
