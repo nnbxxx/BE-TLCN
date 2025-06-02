@@ -63,10 +63,10 @@ export class ReceiptsService {
       })
 
     }
-    const tmp = await this.calcTotal(receipt._id as any)
+
     if (receipt.paymentMethod === PAYMENT_METHOD.VNPAY)
-      return await this.generatePaymentUrl({ orderId: tmp._id as any, total: tmp.total });
-    return tmp;
+      return await this.generatePaymentUrl({ orderId: receipt._id as any, total: receipt.total });
+    return receipt;
   }
   async validate(createReceiptDto: CreateReceiptDto) {
     const productsExist = await Promise.all(
@@ -250,7 +250,7 @@ export class ReceiptsService {
     await this.receiptModel.updateOne({ _id: updateReceiptDto._id }, {
       ...updateReceiptDto
     })
-    return await this.calcTotal(receipt._id as any);
+    return receipt;
   }
   async updateStatus(updateStatusDto: UpdateStatusDto) {
     const receipt = await this.findOne(updateStatusDto._id)
