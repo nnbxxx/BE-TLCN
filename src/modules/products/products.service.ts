@@ -423,7 +423,6 @@ export class ProductsService {
 
     // Gắn inventory vào từng product
     const result = products.map((product) => {
-      console.log("🚀 ~ ProductsService ~ result ~ product:", product)
 
       const inventory = inventoryMap.get(product._id.toString());
       return {

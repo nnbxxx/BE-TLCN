@@ -115,7 +115,6 @@ export class InventoryProductService {
           discount: discount,
           sellPrice: sellPrice
         };
-        console.log("🚀 ~ InventoryProductService ~ receiptItems.map ~ newVariant:", newVariant)
         if (color) newVariant.attributes.color = color;
         if (size) newVariant.attributes.size = size;
         // Thêm lại biến thể mới vào danh sách

@@ -303,6 +303,7 @@ export class ReceiptsService {
   async confirmPayment(receiptId: string, user: IUser) {
 
     const receipt = await this.findOne(receiptId);
+    console.log("🚀 ~ ReceiptsService ~ confirmPayment ~ receipt:", receipt)
 
     const productIds = receipt.items.map((item: any) => { return item.product._id.toString() });
 
@@ -311,17 +312,13 @@ export class ReceiptsService {
       await this.userService.updatePurchasedProducts(receipt.user as any, productIds, receipt.total / 10)
       // update vào kho lịch sử mua hàng
       await this.inventoryProductService.updateReceiptUser(receipt.items, user)
-
-      return await this.receiptModel.findOneAndUpdate(
-        { _id: receiptId },
-        { $set: { isCheckout: true, statusUser: RECEIPT_STATUS.DELIVERED, statusSupplier: RECEIPT_STATUS.DELIVERED, } },
-        { new: true }
-      );
+      receipt.statusSupplier = RECEIPT_STATUS.DELIVERED;
+      receipt.statusSupplier = RECEIPT_STATUS.DELIVERED;
+      await receipt.save();
+      return receipt;
 
     }
-    return await this.receiptModel.findOneAndUpdate(
-      { _id: receiptId },
-    );
+    return receipt
 
   }
   async activeCoupons(checkValidCoupon: CheckValidCoupon, receiptId: string, user: IUser, active: boolean = true) {
