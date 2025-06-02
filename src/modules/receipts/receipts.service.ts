@@ -258,10 +258,7 @@ export class ReceiptsService {
       ...updateStatusDto,
       statusUser: updateStatusDto.statusSupplier
     }
-    // chưa phân role
-    // if (receipt.statusUser === RECEIPT_STATUS.CONFIRMED) {
-    //   throw new BadRequestException(`Đơn hàng đã xác nhận, vui lòng liên hệ nhà cung cấp để cập nhật đơn hàng`)
-    // }
+
     if (receipt) {
       if (updateStatusDto.statusSupplier === RECEIPT_STATUS.DELIVERED) {
         const user = {
@@ -273,7 +270,7 @@ export class ReceiptsService {
         ...data
       })
 
-      return await this.calcTotal(receipt._id as any);
+      return receipt;
     }
     else {
       throw new NotFoundException(`Not found Receipt with Id = ${updateStatusDto._id}`)
@@ -315,7 +312,7 @@ export class ReceiptsService {
       receipt.statusSupplier = RECEIPT_STATUS.DELIVERED;
       receipt.statusUser = RECEIPT_STATUS.DELIVERED;
       await receipt.save();
-      console.log("🚀 ~ ReceiptsService ~ confirmPayment ~ receipt:", receipt)
+      console.log("🚀 ~ ReceiptsService ~ confirmPayment ~ receipt:", receipt.total)
 
       return receipt;
 
