@@ -10,9 +10,10 @@ import { InventoryProductModule } from '../inventory-product/inventory-product.m
 import { CouponsService } from '../coupons/coupons.service';
 import { CouponsModule } from '../coupons/coupons.module';
 import { AddressUserModule } from '../address-user/address-user.module';
+import { Coupon, CouponSchema } from '../coupons/schemas/coupon.schemas';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: Receipt.name, schema: ReceiptSchema }])
+  imports: [MongooseModule.forFeature([{ name: Receipt.name, schema: ReceiptSchema }, { name: Coupon.name, schema: CouponSchema }])
     , forwardRef(() => ProductsModule)
     , CartsModule
     , UsersModule

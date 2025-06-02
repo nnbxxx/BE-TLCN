@@ -20,6 +20,7 @@ import { ProductCode, VNPay, VnpLocale } from 'vnpay';
 import { PaymentUrlDto } from './dto/payment-url.dto';
 import path from 'path';
 import { AddressUserService } from '../address-user/address-user.service';
+import { Coupon, CouponDocument } from '../coupons/schemas/coupon.schemas';
 
 @Injectable()
 export class ReceiptsService {
@@ -34,7 +35,8 @@ export class ReceiptsService {
     private inventoryProductService: InventoryProductService,
     private couponService: CouponsService,
     private addressUserService: AddressUserService,
-
+    @InjectModel(Coupon.name)
+    private couponModel: SoftDeleteModel<CouponDocument>,
   ) {
     this.vnpay = new VNPay({
       vnpayHost: 'https://sandbox.vnpayment.vn',
@@ -63,10 +65,10 @@ export class ReceiptsService {
       })
 
     }
-
+    const tmp = await this.calcTotal(receipt._id as any)
     if (receipt.paymentMethod === PAYMENT_METHOD.VNPAY)
-      return await this.generatePaymentUrl({ orderId: receipt._id as any, total: receipt.total });
-    return receipt;
+      return await this.generatePaymentUrl({ orderId: tmp._id as any, total: tmp.total });
+    return tmp;
   }
   async validate(createReceiptDto: CreateReceiptDto) {
     const productsExist = await Promise.all(
@@ -91,9 +93,22 @@ export class ReceiptsService {
       return await this.receiptModel.
         findByIdAndUpdate(receiptId, { $set: { total: 0 } }, { new: true });
     }
-    const total = found.items.reduce((acc, cur: any) => {
+    let total = found.items.reduce((acc, cur: any) => {
       return acc + cur.price * cur.quantity
     }, 0);
+    // tính coupoun
+    const codeCheck = await this.couponModel.findOne({ code: found[0] })
+    if (codeCheck.quantity === 0) {
+      throw new BadRequestException(` Coupon đã hết `)
+    }
+    const { value } = codeCheck.description
+    if (codeCheck.type === TYPE_COUPONS.PRICE) {
+      total += value
+
+    }
+    else if (codeCheck.type === TYPE_COUPONS.PERCENT) {
+      total += total * value / (100 - value)
+    }
 
     return await this.receiptModel.
       findByIdAndUpdate(receiptId, { $set: { total: total } }, { new: true });
@@ -250,7 +265,7 @@ export class ReceiptsService {
     await this.receiptModel.updateOne({ _id: updateReceiptDto._id }, {
       ...updateReceiptDto
     })
-    return receipt;
+    return await this.calcTotal(receipt._id as any);
   }
   async updateStatus(updateStatusDto: UpdateStatusDto) {
     const receipt = await this.findOne(updateStatusDto._id)
