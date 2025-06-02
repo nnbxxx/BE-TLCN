@@ -65,10 +65,10 @@ export class ReceiptsService {
       })
 
     }
-    const tmp = await this.calcTotal(receipt._id as any)
+    const tmp = await this.calcTotal(receipt._id as any, false)
     if (receipt.paymentMethod === PAYMENT_METHOD.VNPAY)
       return await this.generatePaymentUrl({ orderId: tmp._id as any, total: tmp.total });
-    return tmp;
+    return receipt;
   }
   async validate(createReceiptDto: CreateReceiptDto) {
     const productsExist = await Promise.all(
@@ -86,7 +86,7 @@ export class ReceiptsService {
     }
   }
 
-  async calcTotal(receiptId: string) {
+  async calcTotal(receiptId: string, isActiveCode = true) {
     const found = await this.receiptModel.findById(receiptId);
     if (!found) throw new NotFoundException("receipt không tìm thấy");
     if (found.items.length === 0) {
@@ -97,23 +97,24 @@ export class ReceiptsService {
       return acc + cur.price * cur.quantity
     }, 0);
     // tính coupoun
-    const codeCheck: any = await this.couponModel.findOne({ code: found.coupons[0] })
-    console.log("🚀 ~ ReceiptsService ~ calcTotal ~ codeCheck:", codeCheck)
+    if (isActiveCode === true) {
+      const codeCheck: any = await this.couponModel.findOne({ code: found.coupons[0] })
 
-    if (codeCheck.quantity === 0) {
-      throw new BadRequestException(` Coupon đã hết `)
-    }
-    const { value } = codeCheck.description
-    if (codeCheck.type === TYPE_COUPONS.PRICE) {
-      total -= value
+      if (codeCheck.quantity === 0) {
+        throw new BadRequestException(` Coupon đã hết `)
+      }
+      const { value } = codeCheck.description
+      if (codeCheck.type === TYPE_COUPONS.PRICE) {
+        total -= value
 
+      }
+      else if (codeCheck.type === TYPE_COUPONS.PERCENT) {
+        total -= Math.min(total * value / 100, codeCheck.description?.maxDiscount)
+      }
+      found.total = total;
+      await found.save();
     }
-    else if (codeCheck.type === TYPE_COUPONS.PERCENT) {
-      total -= Math.min(total * value / 100, codeCheck.description?.maxDiscount)
-    }
-
-    return await this.receiptModel.
-      findByIdAndUpdate(receiptId, { $set: { total: total } }, { new: true });
+    return found;
   }
   async autoconfirm() {
     const unConfirmReceipts = await this.receiptModel.find({ statusUser: RECEIPT_STATUS.UNCONFIRMED }).select('_id');
@@ -268,10 +269,6 @@ export class ReceiptsService {
   }
   async updateStatus(updateStatusDto: UpdateStatusDto) {
     const receipt = await this.findOne(updateStatusDto._id)
-    let data = {
-      statusUser: updateStatusDto.statusSupplier,
-      statusSupplier: updateStatusDto.statusSupplier
-    }
 
     if (receipt) {
       if (updateStatusDto.statusSupplier === RECEIPT_STATUS.DELIVERED) {
@@ -280,10 +277,9 @@ export class ReceiptsService {
         }
         this.confirmPayment(receipt._id as any, user as any);
       }
-      await this.receiptModel.updateOne({ _id: updateStatusDto._id }, {
-        ...data
-      })
-
+      receipt.statusUser = updateStatusDto.statusSupplier as RECEIPT_STATUS;
+      receipt.statusSupplier = updateStatusDto.statusSupplier as RECEIPT_STATUS;
+      await receipt.save();
       return receipt;
     }
     else {
