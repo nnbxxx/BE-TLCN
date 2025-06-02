@@ -99,9 +99,10 @@ export class ReceiptsService {
     let total = found.items.reduce((acc, cur: any) => {
       return acc + cur.price * cur.quantity
     }, 0);
-
+    found.total = total;
+    await found.save();
     // tính coupoun
-    if (isActive === true) {
+    if (isActive === true && found.coupons.length > 0) {
       const codeCheck: any = await this.couponModel.findOne({ code: found.coupons[0] })
 
       if (codeCheck.quantity === 0) {
