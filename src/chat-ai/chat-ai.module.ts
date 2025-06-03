@@ -3,12 +3,15 @@ import { ChatAiService } from './chat-ai.service';
 import { ChatAiController } from './chat-ai.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Product, ProductSchema } from 'src/modules/products/schemas/product.schemas';
+import { GeminiChatProvider } from './chat-ai.provider';
+import { InteractiveAgentService } from './ultils/interactive-agent.service';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Product.name, schema: ProductSchema }]),
   ],
   controllers: [ChatAiController],
-  providers: [ChatAiService],
+  providers: [ChatAiService, GeminiChatProvider, InteractiveAgentService],
+  exports: [ChatAiService, GeminiChatProvider]
 })
 export class ChatAiModule { }

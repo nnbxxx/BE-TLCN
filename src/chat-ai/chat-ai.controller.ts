@@ -1,51 +1,46 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, Query, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { ChatAiService } from './chat-ai.service';
 import { CreateChatAiDto } from './dto/create-chat-ai.dto';
 import { UpdateChatAiDto } from './dto/update-chat-ai.dto';
 import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
-
+import { Public } from 'src/decorator/customize';
+import { InteractiveAgentService } from './ultils/interactive-agent.service';
 @ApiTags('chat-ai')
 @Controller('chat-ai')
 export class ChatAiController {
-  constructor(private readonly chatAiService: ChatAiService) { }
-
-  // @Post()
-  // create(@Body() createChatAiDto: CreateChatAiDto) {
-  //   return this.chatAiService.create(createChatAiDto);
-  // }
-
-  // @Get()
-  // findAll() {
-  //   return this.chatAiService.findAll();
-  // }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.chatAiService.findOne(+id);
-  // }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateChatAiDto: UpdateChatAiDto) {
-  //   return this.chatAiService.update(+id, updateChatAiDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.chatAiService.remove(+id);
-  // }
-  @Post()
-  @ApiOperation({ summary: 'Gửi câu hỏi đến AI và nhận phản hồi' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        message: { type: 'string', example: 'Sản phẩm có bảo hành không?' },
-      },
-    },
-  })
-  async ask(@Body('message') message: string) {
-    const reply = await this.chatAiService.askAI(message);
-    return { reply };
+  constructor(private readonly chatAiService: ChatAiService,
+    private readonly interactiveAgentService: InteractiveAgentService,
+  ) { }
+  @Public()
+  @Get('interact')
+  async interactWithAgent(@Query('question') question: string) {
+    if (!question?.trim()) {
+      throw new BadRequestException('Query parameter "question" cannot be empty.');
+    }
+    try {
+      const answer = await this.interactiveAgentService.interact(question);
+      return { question, answer, timestamp: new Date().toISOString() };
+    } catch (error) {
+      throw new InternalServerErrorException(`Lỗi xử lý yêu cầu: ${error.message}`);
+    }
   }
+  @Public()
+  @Get('ask')
+  async askTheAgent(@Query('question') question: string) {
+    if (question?.trim() === '') {
+      throw new BadRequestException('Query parameter "question" cannot be empty.');
+    }
 
+    try {
+      const answer = await this.chatAiService.ask(question);
+      return {
+        question: question,
+        answer: answer,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      console.error('Error interacting with AI Agent:', error);
+      throw new InternalServerErrorException(`Sorry, an error occurred while processing your request. Please try again later.`);
+    }
+  }
 }

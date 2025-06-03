@@ -39,6 +39,7 @@ import { BlogModule } from './modules/blog/blog.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { ChatAiModule } from './chat-ai/chat-ai.module';
 import { GatewayModule } from './gateway/gateway.module';
+import { InteractiveAgentService } from './chat-ai/ultils/interactive-agent.service';
 
 @Module({
     imports: [
@@ -101,9 +102,10 @@ import { GatewayModule } from './gateway/gateway.module';
             useClass: ThrottlerGuard,
         },
         // {
-        //   provide: APP_GUARD,
+    //   provide: APP_GUARD,
         //   useClass: JwtAuthGuard,
         // }
+
     ],
 })
 export class AppModule { }
