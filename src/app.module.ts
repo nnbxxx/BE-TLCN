@@ -40,6 +40,9 @@ import { DashboardModule } from './dashboard/dashboard.module';
 import { ChatAiModule } from './chat-ai/chat-ai.module';
 import { GatewayModule } from './gateway/gateway.module';
 import { InteractiveAgentService } from './chat-ai/ultils/interactive-agent.service';
+import { VectorStoreService } from './vector-store/vector-store.service';
+import { VectorStoreModule } from './vector-store/vector-store.module';
+
 
 @Module({
     imports: [
@@ -91,6 +94,7 @@ import { InteractiveAgentService } from './chat-ai/ultils/interactive-agent.serv
         DashboardModule,
         ChatAiModule,
         GatewayModule,
+        VectorStoreModule,
     ],
     controllers: [AppController],
     providers: [
@@ -101,8 +105,9 @@ import { InteractiveAgentService } from './chat-ai/ultils/interactive-agent.serv
             provide: APP_GUARD,
             useClass: ThrottlerGuard,
         },
+        VectorStoreService,
         // {
-    //   provide: APP_GUARD,
+        //   provide: APP_GUARD,
         //   useClass: JwtAuthGuard,
         // }
 

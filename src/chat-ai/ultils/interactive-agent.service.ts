@@ -18,6 +18,7 @@ export class InteractiveAgentService implements OnModuleInit {
 
     constructor(
         @Inject('GEMINI_CHAT_MODEL') private readonly llm: BaseChatModel,
+
     ) {
 
     }
