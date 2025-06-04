@@ -68,6 +68,7 @@ export class ReviewsService {
       productId,
       isDeleted: false,
     });
+    console.log("🚀 ~ ReviewsService ~ validateReview ~ existingReviewsCount:", existingReviewsCount)
 
     // 2. Đếm số lượng đơn hàng "completed" chứa sản phẩm này
     const completedOrdersCount = await this.receiptModel.countDocuments({
@@ -76,9 +77,10 @@ export class ReviewsService {
       statusUser: RECEIPT_STATUS.DELIVERED,
       isCheckout: true
     });
+    console.log("🚀 ~ ReviewsService ~ validateReview ~ completedOrdersCount:", completedOrdersCount)
 
     // 3. Cho phép review nếu số lần review nhỏ hơn số đơn "completed"
-    if (existingReviewsCount >= completedOrdersCount) {
+    if (existingReviewsCount >= completedOrdersCount && completedOrdersCount != 0 && existingReviewsCount != 0) {
       throw new BadRequestException(
         `Bạn đã review đủ số lần tương ứng với các đơn hàng đã hoàn thành. Vui long mua lại sản phẩm để reviews`,
       );
