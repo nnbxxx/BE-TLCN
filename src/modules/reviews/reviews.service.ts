@@ -61,14 +61,12 @@ export class ReviewsService {
   }
   async validateReview(userId: string, productId: string) {
 
-
     // 1. Đếm số lần user đã review sản phẩm này
     const existingReviewsCount = await this.reviewModel.countDocuments({
       userId,
       productId,
       isDeleted: false,
     });
-    console.log("🚀 ~ ReviewsService ~ validateReview ~ existingReviewsCount:", existingReviewsCount)
 
     // 2. Đếm số lượng đơn hàng "completed" chứa sản phẩm này
     const completedOrdersCount = await this.receiptModel.countDocuments({
@@ -77,7 +75,6 @@ export class ReviewsService {
       statusUser: RECEIPT_STATUS.DELIVERED,
       isCheckout: true
     });
-    console.log("🚀 ~ ReviewsService ~ validateReview ~ completedOrdersCount:", completedOrdersCount)
 
     // 3. Cho phép review nếu số lần review nhỏ hơn số đơn "completed"
     if (existingReviewsCount >= completedOrdersCount && completedOrdersCount != 0 && existingReviewsCount != 0) {
