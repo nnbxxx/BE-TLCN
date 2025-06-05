@@ -3,6 +3,7 @@ import {
     IsEnum,
     IsMongoId,
     IsNotEmpty,
+    IsNumber,
     IsOptional,
     IsString,
 } from 'class-validator';
@@ -23,4 +24,8 @@ export class CreateMessageDto {
 
     @IsEnum(MESSAGE_TYPES)
     messageType: string;
+
+    @IsNumber()
+    @IsOptional()
+    questionId: number;
 }

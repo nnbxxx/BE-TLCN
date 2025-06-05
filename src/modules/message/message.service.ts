@@ -24,7 +24,7 @@ export class MessageService {
 
     async create(
         user: IUser,
-        { chatRoom, messageType, content, fileUrl }: CreateMessageDto,
+        { chatRoom, messageType, content, fileUrl, questionId }: CreateMessageDto,
     ) {
         await this.validateMember(user._id, chatRoom);
         const newMessage = await this.messageModel.create({
@@ -41,6 +41,7 @@ export class MessageService {
 
         this.appGateway.server.emit(`chat-rooms/${chatRoom}`, {
             ...newMessage.toJSON(),
+            questionId,
             sender: {
                 _id: user._id,
                 name: user.name,

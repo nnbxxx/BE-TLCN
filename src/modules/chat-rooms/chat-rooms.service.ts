@@ -37,6 +37,7 @@ export class ChatRoomsService {
         return paginate<ChatRoom>(this.chatRoomModel, {
             currentPage,
             limit,
+
             population: [
                 {
                     path: 'lastMessage',
