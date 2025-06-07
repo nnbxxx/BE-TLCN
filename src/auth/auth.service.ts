@@ -20,12 +20,11 @@ export class AuthService {
         private configService: ConfigService,
         private cartService: CartsService,
         private likeProductService: LikeProductsService,
-    ) {}
+    ) { }
 
     //ussername/ pass là 2 tham số thư viện passport nó ném về
     async validateUser(username: string, pass: string): Promise<any> {
         const user = await this.usersService.findOneByUsername(username);
-        return user;
         if (user) {
             const isValid = this.usersService.isValidPassword(
                 pass,
