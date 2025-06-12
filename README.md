@@ -8,7 +8,7 @@ This repository contains the backend server for an online groceries shop built w
 | ------------------ | -------- |
 | Lê Minh Quang      | 21110279 |
 | Ngô Nguyên Bảo     | 21119170 |
-
+| Võ Trường Vỹ       | 20110606 |
 
 ## Description
 
