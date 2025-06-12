@@ -1,15 +1,10 @@
 import { Injectable, Inject, OnModuleInit } from '@nestjs/common';
 import { BaseChatModel } from '@langchain/core/language_models/chat_models';
-import {
-    ChatPromptTemplate,
-    HumanMessagePromptTemplate,
-    MessagesPlaceholder,
-    SystemMessagePromptTemplate,
-} from '@langchain/core/prompts';
 import { BufferMemory } from 'langchain/memory';
 import { AgentExecutor, createStructuredChatAgent } from 'langchain/agents';
 import { interactiveAgentPromptTemplate } from '../prompts/interactive-agent.prompt';
 import { GetTimeTool } from '../tools/get-time.tool';
+import { SearchProductTool } from '../tools/search-product.tool';
 
 @Injectable()
 export class InteractiveAgentService implements OnModuleInit {
@@ -17,11 +12,13 @@ export class InteractiveAgentService implements OnModuleInit {
     private memory: BufferMemory;
 
     constructor(
-        @Inject('GEMINI_CHAT_MODEL') private readonly llm: BaseChatModel,
+        @Inject('GEMINI_CHAT_MODEL')
+        private readonly llm: BaseChatModel,
 
-    ) {
+        private readonly getTimeTool: GetTimeTool,
+        private readonly searchProductTool: SearchProductTool,
+    ) { }
 
-    }
     async onModuleInit() {
         this.memory = new BufferMemory({
             returnMessages: true,
@@ -29,19 +26,20 @@ export class InteractiveAgentService implements OnModuleInit {
             inputKey: 'input',
             outputKey: 'output',
         });
+
         const prompt = interactiveAgentPromptTemplate;
 
-        const tools = [GetTimeTool]; // Thêm GetTimeTool vào danh sách
+        const tools = [this.getTimeTool, this.searchProductTool];
 
         const agent = await createStructuredChatAgent({
             llm: this.llm,
-            tools, // Truyền tools vào agent
+            tools,
             prompt,
         });
 
         this.agentExecutor = new AgentExecutor({
             agent,
-            tools, // AgentExecutor cũng cần biết về tools để thực thi chúng
+            tools,
             memory: this.memory,
             verbose: true,
             handleParsingErrors: true,
@@ -49,10 +47,11 @@ export class InteractiveAgentService implements OnModuleInit {
     }
 
     async interact(userInput: string): Promise<string> {
-        console.log('User input:', userInput);
+        // console.log('User input:', userInput);
         const response = await this.agentExecutor.invoke({
             input: userInput,
         });
+        console.log("🚀 ~ InteractiveAgentService ~ interact ~ response:", response)
         return response.output;
     }
 }

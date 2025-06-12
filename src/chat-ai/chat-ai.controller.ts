@@ -17,7 +17,6 @@ import { OpenAIEmbeddings, ChatOpenAI } from '@langchain/openai';
 import { VectorStoreService } from 'src/vector-store/vector-store.service';
 import { InteractiveAgentService } from './ultils/interactive-agent.service';
 import { Public } from 'src/decorator/customize';
-import { ChatAiService } from './chat-ai.service';
 import { ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('chat-ai')
@@ -31,36 +30,11 @@ export class ChatAiController {
 
   constructor(
     private readonly vectorStoreService: VectorStoreService,
-    private readonly chatAiService: ChatAiService,
     private readonly interactiveAgentService: InteractiveAgentService,
   ) {
     fs.mkdir(this.uploadDir, { recursive: true }).catch(console.error);
   }
 
-  @Public()
-  @Get('ask')
-  @ApiOperation({ summary: 'Gửi câu hỏi tới Chat AI và nhận câu trả lời' })
-  @ApiQuery({ name: 'question', required: true, description: 'Câu hỏi' })
-  @ApiResponse({ status: 200, description: 'Câu trả lời từ Chat AI' })
-  @ApiResponse({ status: 400, description: 'Query parameter không hợp lệ' })
-  async askTheAgent(@Query('question') question: string) {
-    if (question?.trim() === '') {
-      throw new BadRequestException('Query parameter "question" cannot be empty.');
-    }
-
-    try {
-      const answer = await this.chatAiService.ask(question);
-      return {
-        question: question,
-        answer: answer,
-        timestamp: new Date().toISOString(),
-      };
-    } catch (error) {
-      console.error('Error interacting with AI Agent:', error);
-      throw new InternalServerErrorException(`Sorry, an error occurred while processing your request. Please try again later.`);
-    }
-
-  }
 
   @Public()
   @Get('interact')

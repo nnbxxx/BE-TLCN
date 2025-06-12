@@ -11,13 +11,13 @@ import { Server, Socket } from 'socket.io';
 
 import { IUser } from 'src/modules/users/users.interface';
 
-@WebSocketGateway(3006, { cors: true })
+// @WebSocketGateway(3006, { cors: true })
+@WebSocketGateway({ cors: true })
 export class AppGateway
-    implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-{
+    implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer() server: Server;
     private logger: Logger = new Logger(AppGateway.name);
-    constructor(private jwtService: JwtService) {}
+    constructor(private jwtService: JwtService) { }
 
     afterInit(server: any): any {
         this.logger.log(server, 'Init socket server');
