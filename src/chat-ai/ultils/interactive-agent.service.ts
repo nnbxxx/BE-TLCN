@@ -6,6 +6,7 @@ import { interactiveAgentPromptTemplate } from '../prompts/interactive-agent.pro
 import { GetTimeTool } from '../tools/get-time.tool';
 import { SearchProductTool } from '../tools/search-product.tool';
 import { SearchVectorDocumentTool } from '../tools/search-vector-document.tool';
+import { ResetConversationTool } from '../tools/reset-conversation.tool ';
 
 @Injectable()
 export class InteractiveAgentService implements OnModuleInit {
@@ -19,6 +20,7 @@ export class InteractiveAgentService implements OnModuleInit {
         private readonly getTimeTool: GetTimeTool,
         private readonly searchProductTool: SearchProductTool,
         private readonly searchVectorDocumentTool: SearchVectorDocumentTool, // 🆕
+        private readonly resetConversationTool: ResetConversationTool,
     ) { }
 
     async onModuleInit() {
@@ -30,8 +32,8 @@ export class InteractiveAgentService implements OnModuleInit {
         });
 
         const prompt = interactiveAgentPromptTemplate;
-
-        const tools = [this.getTimeTool, this.searchProductTool, this.searchVectorDocumentTool];
+        this.resetConversationTool.setMemory(this.memory);
+        const tools = [this.getTimeTool, this.searchProductTool, this.searchVectorDocumentTool, this.resetConversationTool];
 
         const agent = await createStructuredChatAgent({
             llm: this.llm,

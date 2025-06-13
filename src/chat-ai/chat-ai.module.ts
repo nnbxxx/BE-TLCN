@@ -10,6 +10,7 @@ import { InventoryProduct, InventoryProductSchema } from 'src/modules/inventory-
 import { GetTimeTool } from './tools/get-time.tool';
 import { SearchProductTool } from './tools/search-product.tool';
 import { SearchVectorDocumentTool } from './tools/search-vector-document.tool';
+import { ResetConversationTool } from './tools/reset-conversation.tool ';
 
 @Module({
   imports: [
@@ -24,9 +25,10 @@ import { SearchVectorDocumentTool } from './tools/search-vector-document.tool';
   providers: [
     GeminiChatProvider,
     InteractiveAgentService,
-    GetTimeTool,                // ✅ Thêm vào đây
-    SearchProductTool,          // ✅ Thêm vào đây
-    SearchVectorDocumentTool
+    GetTimeTool,
+    SearchProductTool,
+    SearchVectorDocumentTool,
+    ResetConversationTool
   ],
   exports: [
     GeminiChatProvider,
