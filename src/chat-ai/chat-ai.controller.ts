@@ -55,6 +55,50 @@ export class ChatAiController {
   }
 
 
+  @Public()
+  @Post('documents')
+  @ApiOperation({ summary: 'Upload file PDF và lưu vector' })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+        title: {
+          type: 'string',
+        },
+      },
+      required: ['file', 'title'],
+    },
+  })
+  async uploadDocument(
+    @UploadedFile() file: Express.Multer.File,
+    @Body('title') title: string,
+  ) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+    if (!title) {
+      throw new BadRequestException('Title is required');
+    }
 
-
+    try {
+      const metadata = await this.vectorStoreService.processPDFAndStoreVector(
+        file.buffer,
+        file.originalname,
+        title,
+      );
+      return {
+        message: 'PDF uploaded and vector stored successfully',
+        metadata,
+      };
+    } catch (err) {
+      console.error('Upload failed:', err);
+      throw new InternalServerErrorException('Upload failed: ' + err.message);
+    }
+  }
 }

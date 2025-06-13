@@ -1,18 +1,26 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document as MongooseDocument } from 'mongoose';
 
-export type VectorDocument = Vector & Document;
-
-@Schema()
-export class Vector {
+@Schema({ timestamps: true })
+export class VectorDocument extends MongooseDocument {
     @Prop({ required: true })
-    text: string;
+    content: string;
 
-    @Prop({ required: true })
-    source: string;
-
-    @Prop({ type: [Number], required: true })
+    @Prop({ type: [Number], required: true }) // mảng số thực
     embedding: number[];
+
+    @Prop({
+        type: {
+            filename: String,
+            title: String,
+        },
+        required: true,
+    })
+    metadata: {
+        filename: string;
+        title: string;
+    };
+
 }
 
-export const VectorSchema = SchemaFactory.createForClass(Vector);
+export const VectorSchema = SchemaFactory.createForClass(VectorDocument);

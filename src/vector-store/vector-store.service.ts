@@ -4,45 +4,54 @@ import { OpenAIEmbeddings } from '@langchain/openai';
 import { cosineSimilarity } from 'src/util/cosine';
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { InjectModel } from '@nestjs/mongoose';
-import { Vector, VectorDocument } from './schemas/vector-store.schema';
 import { Model } from 'mongoose';
+import pdfParse from "pdf-parse";
+import { VectorDocument } from './schemas/vector-store.schema';
+import { Document } from './schemas/document.schema';
 @Injectable()
 export class VectorStoreService {
   private embeddings = new OpenAIEmbeddings();
   constructor(
-    @InjectModel(Vector.name)
+    @InjectModel(VectorDocument.name)
     private vectorModel: Model<VectorDocument>,
+    @InjectModel(Document.name)
+    private documentModel: Model<Document>,
   ) {
 
   }
 
-  async saveTextAsChunksAndVectors(text: string, source: string) {
+  async processPDFAndStoreVector(buffer, filename, title) {
     // 1. Chia văn bản thành các đoạn nhỏ
+
+    const data = await pdfParse(buffer);
+    const text = data.text.trim();
     const splitter = new RecursiveCharacterTextSplitter({
       chunkSize: 1000,
       chunkOverlap: 150,
     });
-
     const docs = await splitter.createDocuments([text]);
-    const insertedIds: string[] = [];
+    const documentMetadata = {
+      filename,
+      title,
+      chunkCount: docs.length,
+      vectorIds: [],
+    };
+
+
 
     for (const doc of docs) {
       const embedding = await this.embeddings.embedQuery(doc.pageContent);
-
-      const result = await this.vectorModel.create({
-        text: doc.pageContent,
-        source,
+      const vectorDoc = {
+        content: doc.pageContent,
         embedding,
-        createdAt: new Date(),
-      });
-
-      insertedIds.push(result._id.toString());
+        metadata: { filename, title },
+      };
+      const result = await this.vectorModel.create(vectorDoc);
+      documentMetadata.vectorIds.push(result.id.toString());
     }
-
+    const newDoc = await this.documentModel.create(documentMetadata)
     return {
-      message: 'Saved chunks and vectors successfully',
-      chunkCount: docs.length,
-      insertedIds,
+      newDoc
     };
   }
 
