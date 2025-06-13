@@ -9,6 +9,7 @@ import { VectorDocument, VectorSchema } from 'src/vector-store/schemas/vector-st
 import { InventoryProduct, InventoryProductSchema } from 'src/modules/inventory-product/schemas/inventory-product.schemas';
 import { GetTimeTool } from './tools/get-time.tool';
 import { SearchProductTool } from './tools/search-product.tool';
+import { SearchVectorDocumentTool } from './tools/search-vector-document.tool';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { SearchProductTool } from './tools/search-product.tool';
     InteractiveAgentService,
     GetTimeTool,                // ✅ Thêm vào đây
     SearchProductTool,          // ✅ Thêm vào đây
+    SearchVectorDocumentTool
   ],
   exports: [
     GeminiChatProvider,

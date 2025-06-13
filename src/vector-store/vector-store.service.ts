@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { MongoClient } from 'mongodb';
 import { OpenAIEmbeddings } from '@langchain/openai';
-import { cosineSimilarity } from 'src/util/cosine';
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import pdfParse from "pdf-parse";
 import { VectorDocument } from './schemas/vector-store.schema';
 import { Document } from './schemas/document.schema';
+import { cosineSimilarity } from 'src/util/util';
 @Injectable()
 export class VectorStoreService {
   private embeddings = new OpenAIEmbeddings();
+
   constructor(
     @InjectModel(VectorDocument.name)
     private vectorModel: Model<VectorDocument>,
@@ -54,32 +54,29 @@ export class VectorStoreService {
       newDoc
     };
   }
+  async searchSimilarDocuments(query: string, topK = 5) {
+    // 1. Tính embedding cho truy vấn
+    const queryEmbedding = await this.embeddings.embedQuery(query);
 
-  async searchRelevantContent(query: string, topK = 3) {
-    // const db = this.client.db(this.dbName);
-    // const collection = db.collection(this.collectionName);
+    // 2. Lấy tất cả vector đã lưu từ MongoDB
+    const allVectors = await this.vectorModel.find();
 
-    // // Tính embedding của câu query
-    // const queryVector = await this.embeddings.embedQuery(query);
+    // 3. Tính cosine similarity giữa embedding của truy vấn và từng vector
+    const similarities = allVectors.map(doc => {
+      const similarity = cosineSimilarity(queryEmbedding, doc.embedding);
+      return { doc, similarity };
+    });
 
-    // // Lấy tất cả document trong DB (có embedding vector)
-    // const allDocs = await collection.find().toArray();
+    // 4. Sắp xếp theo độ tương đồng giảm dần và lấy top K kết quả
+    const topResults = similarities
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, topK);
 
-    // // Tính cosine similarity, lọc, sắp xếp, lấy topK
-    // const scored = allDocs
-    //   .map(doc => ({
-    //     ...doc,
-    //     score: cosineSimilarity(queryVector, doc.embedding),
-    //   }))
-    //   .filter(d => d.score > 0.90)
-    //   .sort((a, b) => b.score - a.score)
-    //   .slice(0, topK);
-
-    // return scored;
-  }
-
-  async clearAll() {
-    // const db = this.client.db(this.dbName);
-    // await db.collection(this.collectionName).deleteMany({});
+    // 5. Trả về kết quả
+    return topResults.map(result => ({
+      content: result.doc.content,
+      similarity: result.similarity,
+      metadata: result.doc.metadata,
+    }));
   }
 }

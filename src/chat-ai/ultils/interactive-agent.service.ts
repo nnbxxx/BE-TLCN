@@ -5,6 +5,7 @@ import { AgentExecutor, createStructuredChatAgent } from 'langchain/agents';
 import { interactiveAgentPromptTemplate } from '../prompts/interactive-agent.prompt';
 import { GetTimeTool } from '../tools/get-time.tool';
 import { SearchProductTool } from '../tools/search-product.tool';
+import { SearchVectorDocumentTool } from '../tools/search-vector-document.tool';
 
 @Injectable()
 export class InteractiveAgentService implements OnModuleInit {
@@ -17,6 +18,7 @@ export class InteractiveAgentService implements OnModuleInit {
 
         private readonly getTimeTool: GetTimeTool,
         private readonly searchProductTool: SearchProductTool,
+        private readonly searchVectorDocumentTool: SearchVectorDocumentTool, // 🆕
     ) { }
 
     async onModuleInit() {
@@ -29,7 +31,7 @@ export class InteractiveAgentService implements OnModuleInit {
 
         const prompt = interactiveAgentPromptTemplate;
 
-        const tools = [this.getTimeTool, this.searchProductTool];
+        const tools = [this.getTimeTool, this.searchProductTool, this.searchVectorDocumentTool];
 
         const agent = await createStructuredChatAgent({
             llm: this.llm,
@@ -51,7 +53,6 @@ export class InteractiveAgentService implements OnModuleInit {
         const response = await this.agentExecutor.invoke({
             input: userInput,
         });
-        console.log("🚀 ~ InteractiveAgentService ~ interact ~ response:", response)
         return response.output;
     }
 }

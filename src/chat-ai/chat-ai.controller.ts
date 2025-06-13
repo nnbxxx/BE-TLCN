@@ -18,15 +18,12 @@ import { VectorStoreService } from 'src/vector-store/vector-store.service';
 import { InteractiveAgentService } from './ultils/interactive-agent.service';
 import { Public } from 'src/decorator/customize';
 import { ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { HuggingFaceTransformersEmbeddings } from "@langchain/community/embeddings/huggingface_transformers";
 
 @ApiTags('chat-ai')
 @Controller('chat-ai')
 export class ChatAiController {
   private readonly uploadDir = path.join(__dirname, '..', '..', 'uploads');
-
-  private embeddings = new OpenAIEmbeddings({
-    openAIApiKey: process.env.OPENAI_API_KEY,
-  });
 
   constructor(
     private readonly vectorStoreService: VectorStoreService,
@@ -100,5 +97,14 @@ export class ChatAiController {
       console.error('Upload failed:', err);
       throw new InternalServerErrorException('Upload failed: ' + err.message);
     }
+  }
+  @Public()
+  @Get('search')
+  @ApiOperation({ summary: 'Tìm kiếm tài liệu gần giống với câu truy vấn' })
+  @ApiQuery({ name: 'query', type: String })
+  async searchDocuments(
+    @Query('query') query: string,
+  ) {
+    return this.vectorStoreService.searchSimilarDocuments(query);
   }
 }
